@@ -21,9 +21,9 @@ the terms of the Artistic License version 2.0.
 
 =head1 Credits
 
-Path matching and path building inspired by Viacheslav Tykhanovskyi's Router module
+Path matching and path building inspired by Viacheslav Tykhanovskyi's Router module https://github.com/vti/router
 
-Concept of nested routes inspired by Sebastian Riedel's Mojolicious::Routes module
+Concept of nested routes inspired by Sebastian Riedel's Mojolicious::Routes module https://github.com/kraih/mojo/tree/master/lib/Mojolicious/Routes
 
 Concept of restful resources inspired by Ruby on Rails
 
