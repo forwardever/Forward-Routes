@@ -163,6 +163,8 @@ L<Forward::Routes>: routes for framework builders, experimental, so API might ch
 =head2 Path Building and Resources
 
     $r = Forward::Routes->new;
+    $r->add_resources('users','photos','tags');
+
     is $r->build_path('photos_update', id => 987)->{path} => 'photos/987';
 
 
