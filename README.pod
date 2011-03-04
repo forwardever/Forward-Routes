@@ -1,0 +1,30 @@
+=pod
+
+=head1 NAME
+
+Forward::Routes
+
+=head1 Description
+
+L<Forward::Routes>: routes for framework builders, experimental, so API might change
+
+=head1 AUTHOR
+
+ForwardEver
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2011, ForwardEver
+
+This program is free software, you can redistribute it and/or modify it under
+the terms of the Artistic License version 2.0.
+
+=head1 Credits
+
+Path matching and path building inspired by Viacheslav Tykhanovskyi's Router module
+
+Concept of nested routes inspired by Sebastian Riedel's Mojolicious::Routes module
+
+Concept of restful resources inspired by Ruby on Rails
+
+=cut
