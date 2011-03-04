@@ -69,14 +69,14 @@ $r->add_route('foo');
 $r->add_route(':foo/:bar');
 
 my $m = $r->match(get => 'foo');
-is_deeply $m->params => {};
+is_deeply $m->[0]->params => {};
 
 $m = $r->match(get => 'hello/there');
-is_deeply $m->params => {foo => 'hello', bar => 'there'};
+is_deeply $m->[0]->params => {foo => 'hello', bar => 'there'};
 
 # match again (params empty again)
 $m = $r->match(get => 'foo');
-is_deeply $m->params => {};
+is_deeply $m->[0]->params => {};
 
 
 #############################################################################
@@ -87,14 +87,14 @@ $r->add_route('foo');
 $r->add_route(':foo/:bar');
 
 $m = $r->match(get => 'foo.html');
-is_deeply $m->params => {format => 'html'};
+is_deeply $m->[0]->params => {format => 'html'};
 
 $m = $r->match(get => 'hello/there.html');
-is_deeply $m->params => {foo => 'hello', bar => 'there', format => 'html'};
+is_deeply $m->[0]->params => {foo => 'hello', bar => 'there', format => 'html'};
 
 # match again (params empty again)
 $m = $r->match(get => 'foo.html');
-is_deeply $m->params => {format => 'html'};
+is_deeply $m->[0]->params => {format => 'html'};
 
 
 #############################################################################
@@ -115,10 +115,10 @@ $pattern = $r->add_route(':foo');
 $pattern->add_route(':bar');
 
 $m = $r->match(get => 'foo/bar');
-is_deeply $m->params => {};
+is_deeply $m->[0]->params => {};
 
 $m = $r->match(get => 'hello/there');
-is_deeply $m->params => {foo => 'hello', bar => 'there'};
+is_deeply $m->[0]->params => {foo => 'hello', bar => 'there'};
 
 $m = $r->match(get => 'foo/bar/baz');
 is $m, undef;
@@ -128,7 +128,7 @@ is $m, undef;
 
 # match again (params empty again)
 $m = $r->match(get => 'foo/bar');
-is_deeply $m->params => {};
+is_deeply $m->[0]->params => {};
 
 
 #############################################################################
@@ -138,7 +138,7 @@ $r = Forward::Routes->new;
 $r->add_route('articles')->defaults(controller => 'foo', action => 'bar');
 
 $m = $r->match(get => 'articles');
-is_deeply $m->params => {controller => 'foo', action => 'bar'};
+is_deeply $m->[0]->params => {controller => 'foo', action => 'bar'};
 
 
 #############################################################################
@@ -148,14 +148,14 @@ $r->add_route('articles')->to('foo#bar');
 $r->add_route(':controller/:action')->to('foo#bar');
 
 $m = $r->match(get => 'articles');
-is_deeply $m->params => {controller => 'foo', action => 'bar'};
+is_deeply $m->[0]->params => {controller => 'foo', action => 'bar'};
 
 # overwrite defaults
 $m = $r->match(get => 'foo/baz');
-is_deeply $m->params => {controller => 'foo', action => 'baz'};
+is_deeply $m->[0]->params => {controller => 'foo', action => 'baz'};
 
 $m = $r->match(get => 'hello/baz');
-is_deeply $m->params => {controller => 'hello', action => 'baz'};
+is_deeply $m->[0]->params => {controller => 'hello', action => 'baz'};
 
 
 #############################################################################
@@ -167,7 +167,7 @@ my $nested = $r->add_route(':author')->defaults(author => 'foo');
 $nested->add_route(':articles')->defaults(articles => 'bar');
 
 $m = $r->match(get => 'hello/world');
-is_deeply $m->params => {author => 'hello', articles => 'world'};
+is_deeply $m->[0]->params => {author => 'hello', articles => 'world'};
 
 
 # default has precedence over capture in parent routes
@@ -176,7 +176,7 @@ $nested = $r->add_route(':author');
 $nested->add_route(':articles')->defaults(author => 'foo', articles => 'bar');
 
 $m = $r->match(get => 'hello/world');
-is_deeply $m->params => {author => 'foo', articles => 'world'};
+is_deeply $m->[0]->params => {author => 'foo', articles => 'world'};
 
 
 # defaults deeper in the chain have precedence over earlier defaults
@@ -185,7 +185,7 @@ $nested = $r->add_route('author')->defaults(comments => 'baz');
 $nested->add_route('articles')->defaults(comments => 'foo');
 
 $m = $r->match(get => 'author/articles');
-is_deeply $m->params => {comments => 'foo'};
+is_deeply $m->[0]->params => {comments => 'foo'};
 
 
 #############################################################################
@@ -199,7 +199,7 @@ $m = $r->match(get => 'articles/abc');
 ok not defined $m;
 
 $m = $r->match(get => 'articles/123');
-is_deeply $m->params => {id => 123};
+is_deeply $m->[0]->params => {id => 123};
 
 
 #############################################################################
@@ -210,13 +210,13 @@ $r = Forward::Routes->new;
 $r->add_route(':year(/:month/:day)?')->name('foo');
 
 $m = $r->match(get => '2009');
-is_deeply $m->params => {year => 2009};
+is_deeply $m->[0]->params => {year => 2009};
 
 $m = $r->match(get => '2009/12');
 ok !defined $m;
 
 $m = $r->match(get => '2009/12/10');
-is_deeply $m->params => {year => 2009, month => 12, day => 10};
+is_deeply $m->[0]->params => {year => 2009, month => 12, day => 10};
 
 # build path
 is $r->build_path('foo', year => 2009)->{path}, '2009';
@@ -234,10 +234,10 @@ $r = Forward::Routes->new;
 $r->add_route(':year(/:month)?/:day')->name('foo');
 
 $m = $r->match(get => '2009/12');
-is_deeply $m->params => {year => 2009, day => 12};
+is_deeply $m->[0]->params => {year => 2009, day => 12};
 
 $m = $r->match(get => '2009/12/2');
-is_deeply $m->params => {year => 2009, month => 12, day => 2};
+is_deeply $m->[0]->params => {year => 2009, month => 12, day => 2};
 
 # build path
 is $r->build_path('foo', year => 2009, day => 12)->{path}, '2009/12';
@@ -257,10 +257,10 @@ $m = $r->match(get => '2009/12');
 ok not defined $m;
 
 $m = $r->match(get => '2009/12/2');
-is_deeply $m->params => {year => 2009, month => 12, day => 2};
+is_deeply $m->[0]->params => {year => 2009, month => 12, day => 2};
 
 $m = $r->match(get => '2009//2');
-is_deeply $m->params => {year => 2009, day => 2};
+is_deeply $m->[0]->params => {year => 2009, day => 2};
 
 # build path
 try { $r->build_path('foo', year => 2009, month => 12)->{path}; } catch { $e = $_; };
@@ -279,10 +279,10 @@ $m = $r->match(get => '2009/12/2');
 ok not defined $m;
 
 $m = $r->match(get => '2009/month/2');
-is_deeply $m->params => {year => 2009, day => 2};
+is_deeply $m->[0]->params => {year => 2009, day => 2};
 
 $m = $r->match(get => '2009/month08/2');
-is_deeply $m->params => {year => 2009, month => '08', day => 2};
+is_deeply $m->[0]->params => {year => 2009, month => '08', day => 2};
 
 # build path
 is $r->build_path('foo', year => 2009, month => 12, day => 2)->{path}, '2009/month12/2';
@@ -295,10 +295,10 @@ $r = Forward::Routes->new;
 $r->add_route('/hello/world(-:city)?')->name('foo');
 
 $m = $r->match(get => 'hello/world');
-is_deeply $m->params => {};
+is_deeply $m->[0]->params => {};
 
 $m = $r->match(get => 'hello/world-paris');
-is_deeply $m->params => {city => 'paris'};
+is_deeply $m->[0]->params => {city => 'paris'};
 
 # build path
 is $r->build_path('foo', city => "berlin")->{path}, 'hello/world-berlin';
@@ -311,10 +311,10 @@ $r = Forward::Routes->new;
 $r->add_route('/hello/world(-(:city))?')->name('foo');
 
 $m = $r->match(get => 'hello/world');
-is_deeply $m->params => {};
+is_deeply $m->[0]->params => {};
 
 $m = $r->match(get => 'hello/world-paris');
-is_deeply $m->params => {city => 'paris'};
+is_deeply $m->[0]->params => {city => 'paris'};
 
 # build path
 is $r->build_path('foo', city => "berlin")->{path}, 'hello/world-berlin';
@@ -326,13 +326,13 @@ $r = Forward::Routes->new;
 $r->add_route('world/(:country)?-(:cities)?')->name('hello');
 
 $m = $r->match(get => 'world/us-');
-is_deeply $m->params => {country => 'us'};
+is_deeply $m->[0]->params => {country => 'us'};
 
 $m = $r->match(get => 'world/-new_york');
-is_deeply $m->params => {cities => 'new_york'};
+is_deeply $m->[0]->params => {cities => 'new_york'};
 
 $m = $r->match(get => 'world/us-new_york');
-is_deeply $m->params => {country => 'us', cities => 'new_york'};
+is_deeply $m->[0]->params => {country => 'us', cities => 'new_york'};
 
 # build path
 is $r->build_path('hello', country => 'us', cities => 'new_york')->{path}, 'world/us-new_york';
@@ -351,10 +351,10 @@ $m = $r->match(get => '2009');
 ok not defined $m;
 
 $m = $r->match(get => '2009/12');
-is_deeply $m->params => {year => 2009, month => 1, day => 12};
+is_deeply $m->[0]->params => {year => 2009, month => 1, day => 12};
 
 $m = $r->match(get => '2009/2/3');
-is_deeply $m->params => {year => 2009, month => 2, day => 3};
+is_deeply $m->[0]->params => {year => 2009, month => 2, day => 3};
 
 # build path
 try { $r->build_path('foo', year => 2009)->{path}; } catch { $e = $_; };
@@ -373,10 +373,10 @@ $m = $r->match(get => '2009');
 ok not defined $m;
 
 $m = $r->match(get => '2009//12');
-is_deeply $m->params => {year => 2009, month => 1, day => 12};
+is_deeply $m->[0]->params => {year => 2009, month => 1, day => 12};
 
 $m = $r->match(get => '2009/2/3');
-is_deeply $m->params => {year => 2009, month => 2, day => 3};
+is_deeply $m->[0]->params => {year => 2009, month => 2, day => 3};
 
 # build path
 try { $r->build_path('foo', year => 2009)->{path}; } catch { $e = $_; };
@@ -397,13 +397,13 @@ $r->add_route('world/(:country)?-(:cities)?')
   ->defaults(country => 'foo', cities => 'baz')->name('hello');
 
 $m = $r->match(get => 'world/us-');
-is_deeply $m->params => {country => 'us', cities => 'baz'};
+is_deeply $m->[0]->params => {country => 'us', cities => 'baz'};
 
 $m = $r->match(get => 'world/-new_york');
-is_deeply $m->params => {country => 'foo', cities => 'new_york'};
+is_deeply $m->[0]->params => {country => 'foo', cities => 'new_york'};
 
 $m = $r->match(get => 'world/us-new_york');
-is_deeply $m->params => {country => 'us', cities => 'new_york'};
+is_deeply $m->[0]->params => {country => 'us', cities => 'new_york'};
 
 # build path
 is $r->build_path('hello', country => 'us', cities => 'new_york')->{path}, 'world/us-new_york';
@@ -425,7 +425,7 @@ $m = $r->match(get => 'world/-new_york');
 is $m, undef;
 
 $m = $r->match(get => 'world/us-new_york');
-is_deeply $m->params => {country => 'us', cities => 'new_york'};
+is_deeply $m->[0]->params => {country => 'us', cities => 'new_york'};
 
 # build path
 try { $r->build_path('foo')->{path}; } catch { $e = $_; };
@@ -454,7 +454,7 @@ $m = $r->match(get => 'world/us-new_york-');
 is $m, undef;
 
 $m = $r->match(get => 'world/us-new_york-52_str');
-is_deeply $m->params => {country => 'us', cities => 'new_york', street => '52_str'};
+is_deeply $m->[0]->params => {country => 'us', cities => 'new_york', street => '52_str'};
 
 try { $r->build_path('foo', country => 'us', cities => 'new_york')->{path}; } catch { $e = $_; };
 like $e => qr/Required param 'street' was not passed when building a path/;
@@ -488,7 +488,7 @@ $m = $r->match(get => 'world/-new_york');
 is $m, undef;
 
 $m = $r->match(get => 'world/us-new_york');
-is_deeply $m->params => {country => 'us', cities => 'new_york'};
+is_deeply $m->[0]->params => {country => 'us', cities => 'new_york'};
 
 # build path
 is $r->build_path('hello', country => 'us', cities => 'new_york')->{path}, 'world/us-new_york';
@@ -510,7 +510,7 @@ $m = $r->match(get => 'world/-new_york');
 ok not defined $m;
 
 $m = $r->match(get => 'world/us-new_york');
-is_deeply $m->params => {country => 'us', cities => 'new_york'};
+is_deeply $m->[0]->params => {country => 'us', cities => 'new_york'};
 
 # build path
 is $r->build_path('hello', country => 'us', cities => 'new_york')->{path}, 'world/us-new_york';
@@ -530,13 +530,13 @@ $r = Forward::Routes->new;
 $r->add_route('world/(:country)?(-and-)(:cities)?')->name('hello');
 
 $m = $r->match(get => 'world/us-and-');
-is_deeply $m->params => {country => 'us'};
+is_deeply $m->[0]->params => {country => 'us'};
 
 $m = $r->match(get => 'world/-and-new_york');
-is_deeply $m->params => {cities => 'new_york'};
+is_deeply $m->[0]->params => {cities => 'new_york'};
 
 $m = $r->match(get => 'world/us-and-new_york');
-is_deeply $m->params => {country => 'us', cities => 'new_york'};
+is_deeply $m->[0]->params => {country => 'us', cities => 'new_york'};
 
 # build path
 is $r->build_path('hello', country => 'us', cities => 'new_york')->{path}, 'world/us-and-new_york';
@@ -550,13 +550,13 @@ $r = Forward::Routes->new;
 $r->add_route('world/(:country)?(-and-)(:cities)?-text')->name('hello');
 
 $m = $r->match(get => 'world/us-and--text');
-is_deeply $m->params => {country => 'us'};
+is_deeply $m->[0]->params => {country => 'us'};
 
 $m = $r->match(get => 'world/-and-new_york-text');
-is_deeply $m->params => {cities => 'new_york'};
+is_deeply $m->[0]->params => {cities => 'new_york'};
 
 $m = $r->match(get => 'world/us-and-new_york-text');
-is_deeply $m->params => {country => 'us', cities => 'new_york'};
+is_deeply $m->[0]->params => {country => 'us', cities => 'new_york'};
 
 # build path
 is $r->build_path('hello', country => 'us', cities => 'new_york')->{path}, 'world/us-and-new_york-text';
@@ -572,13 +572,13 @@ $r = Forward::Routes->new;
 $r->add_route(':year(/:month(/:day)?)?')->name('foo');
 
 $m = $r->match(get => '2009');
-is_deeply $m->params => {year => 2009};
+is_deeply $m->[0]->params => {year => 2009};
 
 $m = $r->match(get => '2009/12');
-is_deeply $m->params => {year => 2009, month => 12};
+is_deeply $m->[0]->params => {year => 2009, month => 12};
 
 $m = $r->match(get => '2009/12/10');
-is_deeply $m->params => {year => 2009, month => 12, day => 10};
+is_deeply $m->[0]->params => {year => 2009, month => 12, day => 10};
 
 # build path
 is $r->build_path('foo', year => 2009)->{path}, '2009';
@@ -599,13 +599,13 @@ $r = Forward::Routes->new;
 $r->add_route(':year(/:month(/:day)?)?-text')->name('foo');
 
 $m = $r->match(get => '2009-text');
-is_deeply $m->params => {year => 2009};
+is_deeply $m->[0]->params => {year => 2009};
 
 $m = $r->match(get => '2009/12-text');
-is_deeply $m->params => {year => 2009, month => 12};
+is_deeply $m->[0]->params => {year => 2009, month => 12};
 
 $m = $r->match(get => '2009/12/10-text');
-is_deeply $m->params => {year => 2009, month => 12, day => 10};
+is_deeply $m->[0]->params => {year => 2009, month => 12, day => 10};
 
 # build path
 is $r->build_path('foo', year => 2009)->{path}, '2009-text';
@@ -626,13 +626,13 @@ $r = Forward::Routes->new;
 $r->add_route(':year((/:month)?/:day)?')->name('foo');
 
 $m = $r->match(get => '2009');
-is_deeply $m->params => {year => 2009};
+is_deeply $m->[0]->params => {year => 2009};
 
 $m = $r->match(get => '2009/12');
-is_deeply $m->params => {year => 2009, day => 12};
+is_deeply $m->[0]->params => {year => 2009, day => 12};
 
 $m = $r->match(get => '2009/12/10');
-is_deeply $m->params => {year => 2009, month => 12, day => 10};
+is_deeply $m->[0]->params => {year => 2009, month => 12, day => 10};
 
 # build path
 is $r->build_path('foo', year => 2009)->{path}, '2009';
@@ -650,22 +650,22 @@ $r = Forward::Routes->new;
 $r->add_route('year(:year)(/month(:month)-monthend(/day(:day)(hour-(:hour)-hourend)?-dayend)?)?-text')->name('foo');
 
 $m = $r->match(get => 'year2009-text');
-is_deeply $m->params => {year => 2009};
+is_deeply $m->[0]->params => {year => 2009};
 
 $m = $r->match(get => 'year2009/month11-monthend-text');
-is_deeply $m->params => {year => 2009, month => 11};
+is_deeply $m->[0]->params => {year => 2009, month => 11};
 
 $m = $r->match(get => 'year2009/month11-monthend/day3-text');
 is $m, undef;
 
 $m = $r->match(get => 'year2009/month11-monthend/day3-dayend-text');
-is_deeply $m->params => {year => 2009, month => 11, day => 3};
+is_deeply $m->[0]->params => {year => 2009, month => 11, day => 3};
 
 $m = $r->match(get => 'year2009/month11-monthend/day3hour-5-dayend-text');
-is_deeply $m->params => {year => 2009, month => 11, day => "3hour-5"};
+is_deeply $m->[0]->params => {year => 2009, month => 11, day => "3hour-5"};
 
 #$m = $r->match(get => 'year2009/month11-monthend/day3hour-5-hourend-dayend-text');
-#is_deeply $m->params => {year => 2009, month => 11, day => 3};
+#is_deeply $m->[0]->params => {year => 2009, month => 11, day => 3};
 
 # build path
 is $r->build_path('foo', year => 2009)->{path}, 'year2009-text';
@@ -679,10 +679,10 @@ $r = Forward::Routes->new;
 $r->add_route('year(:year)(/month(:month)-monthend(/day(:day)(hour-(:hour)-hourend)-dayend)?)?-text')->name('foo');
 
 $m = $r->match(get => 'year2009-text');
-is_deeply $m->params => {year => 2009};
+is_deeply $m->[0]->params => {year => 2009};
 
 $m = $r->match(get => 'year2009/month11-monthend-text');
-is_deeply $m->params => {year => 2009, month => 11};
+is_deeply $m->[0]->params => {year => 2009, month => 11};
 
 $m = $r->match(get => 'year2009/month11-monthend/day3-text');
 is $m, undef;
@@ -691,7 +691,7 @@ $m = $r->match(get => 'year2009/month11-monthend/day3-dayend-text');
 is $m, undef;
 
 $m = $r->match(get => 'year2009/month11-monthend/day3hour-5-hourend-dayend-text');
-is_deeply $m->params => {year => 2009, month => 11, day => 3, hour => 5};
+is_deeply $m->[0]->params => {year => 2009, month => 11, day => 3, hour => 5};
 
 $m = $r->match(get => 'year2009/month11-monthend/day3hour-5--dayend-text');
 is $m, undef;
@@ -716,31 +716,31 @@ $r = Forward::Routes->new;
 $r->add_route('year(:year)(/month(:month)m(/day(:day)d(((((/hours-(:hours)h-minutes-(:minutes)m-seconds(:seconds)s)?)?)?)))?)?-location(-country-(:country)(/city-(:city)(/street-(:street))?)?)?')->name('foo');
 
 $m = $r->match(get => 'year2009-location');
-is_deeply $m->params => {year => 2009};
+is_deeply $m->[0]->params => {year => 2009};
 
 $m = $r->match(get => 'year2009/month11m-location');
-is_deeply $m->params => {year => 2009, month => 11};
+is_deeply $m->[0]->params => {year => 2009, month => 11};
 
 $m = $r->match(get => 'year2009/month11m/day3-location');
 is $m, undef;
 
 $m = $r->match(get => 'year2009/month11m/day3d-location');
-is_deeply $m->params => {year => 2009, month => 11, day => 3};
+is_deeply $m->[0]->params => {year => 2009, month => 11, day => 3};
 
 $m = $r->match(get => 'year2009/month11m/day3d-location-country-france');
-is_deeply $m->params => {year => 2009, month => 11, day => 3, country => 'france'};
+is_deeply $m->[0]->params => {year => 2009, month => 11, day => 3, country => 'france'};
 
 $m = $r->match(get => 'year2009/month11m/day3d-location-country-france/city-paris');
-is_deeply $m->params => {year => 2009, month => 11, day => 3, country => 'france', city => 'paris'};
+is_deeply $m->[0]->params => {year => 2009, month => 11, day => 3, country => 'france', city => 'paris'};
 
 $m = $r->match(get => 'year2009/month11m/day3d-location-country-france/city-paris/street-test');
-is_deeply $m->params => {year => 2009, month => 11, day => 3, country => 'france', city => 'paris', street => 'test'};
+is_deeply $m->[0]->params => {year => 2009, month => 11, day => 3, country => 'france', city => 'paris', street => 'test'};
 
 $m = $r->match(get => 'year2009/month11m/day3d/hours-5h-minutes-27m-seconds33s-location-country-france/city-paris/street-test');
-is_deeply $m->params => {year => 2009, month => 11, day => 3, hours => 5, minutes => 27, seconds => 33, country => 'france', city => 'paris', street => 'test'};
+is_deeply $m->[0]->params => {year => 2009, month => 11, day => 3, hours => 5, minutes => 27, seconds => 33, country => 'france', city => 'paris', street => 'test'};
 
 $m = $r->match(get => 'year2009/month11m/day3d/hours-5h-minutes-27m-seconds33s-location');
-is_deeply $m->params => {year => 2009, month => 11, day => 3, hours => 5, minutes => 27, seconds => 33};
+is_deeply $m->[0]->params => {year => 2009, month => 11, day => 3, hours => 5, minutes => 27, seconds => 33};
 
 $m = $r->match(get => 'year2009/month11m/day3d/hours-5h-location');
 is $m, undef;
@@ -777,13 +777,13 @@ $r = Forward::Routes->new;
 $r->add_route(':year(/:month/((((:day)))))?')->name('foo');
 
 $m = $r->match(get => '2009');
-is_deeply $m->params => {year => 2009};
+is_deeply $m->[0]->params => {year => 2009};
 
 $m = $r->match(get => '2009/12');
 is $m, undef;
 
 $m = $r->match(get => '2009/12/10');
-is_deeply $m->params => {year => 2009, month => 12, day => 10};
+is_deeply $m->[0]->params => {year => 2009, month => 12, day => 10};
 
 # build path
 is $r->build_path('foo', year => 2009)->{path}, '2009';
@@ -801,13 +801,13 @@ $r = Forward::Routes->new;
 $r->add_route(':year(/:month(/:day)?)?')->name('foo')->defaults(month => 1);
 
 $m = $r->match(get => '2009');
-is_deeply $m->params => {year => 2009, month => 1};
+is_deeply $m->[0]->params => {year => 2009, month => 1};
 
 $m = $r->match(get => '2009/12');
-is_deeply $m->params => {year => 2009, month => 12};
+is_deeply $m->[0]->params => {year => 2009, month => 12};
 
 $m = $r->match(get => '2009/12/10');
-is_deeply $m->params => {year => 2009, month => 12, day => 10};
+is_deeply $m->[0]->params => {year => 2009, month => 12, day => 10};
 
 # build path
 is $r->build_path('foo', year => 2009, month => 1)->{path}, '2009/1';
@@ -822,13 +822,13 @@ $r = Forward::Routes->new;
 $r->add_route(':year(/:month(/:day)?)?')->name('foo')->defaults(day => 2);
 
 $m = $r->match(get => '2009');
-is_deeply $m->params => {year => 2009, day => 2};
+is_deeply $m->[0]->params => {year => 2009, day => 2};
 
 $m = $r->match(get => '2009/12');
-is_deeply $m->params => {year => 2009, month => 12, day => 2};
+is_deeply $m->[0]->params => {year => 2009, month => 12, day => 2};
 
 $m = $r->match(get => '2009/12/10');
-is_deeply $m->params => {year => 2009, month => 12, day => 10};
+is_deeply $m->[0]->params => {year => 2009, month => 12, day => 10};
 
 # build path
 try { $r->build_path('foo', year => 2009, day => 2)->{path}; } catch { $e = $_; };
@@ -850,13 +850,13 @@ $r->add_route(':year(/:month(((((((/:day)?)))?)?)))?')->name('foo')->defaults(da
 # same as $r->add_route(':year(/:month(/:day)?)?')->name('foo')->defaults(day => 2);
 
 $m = $r->match(get => '2009');
-is_deeply $m->params => {year => 2009, day => 2};
+is_deeply $m->[0]->params => {year => 2009, day => 2};
 
 $m = $r->match(get => '2009/12');
-is_deeply $m->params => {year => 2009, month => 12, day => 2};
+is_deeply $m->[0]->params => {year => 2009, month => 12, day => 2};
 
 $m = $r->match(get => '2009/12/10');
-is_deeply $m->params => {year => 2009, month => 12, day => 10};
+is_deeply $m->[0]->params => {year => 2009, month => 12, day => 10};
 
 # build path
 
@@ -877,13 +877,13 @@ $r = Forward::Routes->new;
 $r->add_route(':year(/:month(/:day))?')->defaults(day => 2)->name('foo');
 
 $m = $r->match(get => '2009');
-is_deeply $m->params => {year => 2009, day => 2};
+is_deeply $m->[0]->params => {year => 2009, day => 2};
 
 $m = $r->match(get => '2009/12');
 is $m, undef;
 
 $m = $r->match(get => '2009/12/10');
-is_deeply $m->params => {year => 2009, month => 12, day => 10};
+is_deeply $m->[0]->params => {year => 2009, month => 12, day => 10};
 
 # build path
 try { $r->build_path('foo')->{path}; } catch { $e = $_; };
@@ -907,13 +907,13 @@ $r = Forward::Routes->new;
 $r->add_route(':year((/:month)?/:day)?')->defaults(month => 1);
 
 $m = $r->match(get => '2009');
-is_deeply $m->params => {year => 2009, month => 1};
+is_deeply $m->[0]->params => {year => 2009, month => 1};
 
 $m = $r->match(get => '2009/12');
-is_deeply $m->params => {year => 2009, month => 1, day => 12};
+is_deeply $m->[0]->params => {year => 2009, month => 1, day => 12};
 
 $m = $r->match(get => '2009/12/10');
-is_deeply $m->params => {year => 2009, month => 12, day => 10};
+is_deeply $m->[0]->params => {year => 2009, month => 12, day => 10};
 
 
 
@@ -921,13 +921,13 @@ $r = Forward::Routes->new;
 $r->add_route(':year((/:month)?/:day)?')->defaults(day => 2);
 
 $m = $r->match(get => '2009');
-is_deeply $m->params => {year => 2009, day => 2};
+is_deeply $m->[0]->params => {year => 2009, day => 2};
 
 $m = $r->match(get => '2009/12');
-is_deeply $m->params => {year => 2009, day => 12};
+is_deeply $m->[0]->params => {year => 2009, day => 12};
 
 $m = $r->match(get => '2009/12/10');
-is_deeply $m->params => {year => 2009, month => 12, day => 10};
+is_deeply $m->[0]->params => {year => 2009, month => 12, day => 10};
 
 
 #############################################################################
@@ -940,10 +940,10 @@ $nested->add_route->via('post')->to('foo#post')->defaults( test => 2);
 $nested->add_route->via('put')->to('foo#put');
 
 $m = $r->match(post => 'foo');
-is_deeply $m->params => {controller => 'foo', action => 'post', test => 2};
+is_deeply $m->[0]->params => {controller => 'foo', action => 'post', test => 2};
 
 $m = $r->match(get => 'foo');
-is_deeply $m->params => {controller => 'foo', action => 'get', test => 1};
+is_deeply $m->[0]->params => {controller => 'foo', action => 'get', test => 1};
 
 $m = $r->match(delete => 'foo');
 ok not defined $m;
@@ -958,14 +958,14 @@ $r->add_route('books/*section/:title');
 $r->add_route('*a/foo/*b');
 
 $m = $r->match(get => 'photos/foo/bar/baz');
-is_deeply $m->params => {other => 'foo/bar/baz'};
+is_deeply $m->[0]->params => {other => 'foo/bar/baz'};
 
 $m = $r->match(get => 'books/some/section/last-words-a-memoir');
-is_deeply $m->params =>
+is_deeply $m->[0]->params =>
   {section => 'some/section', title => 'last-words-a-memoir'};
 
 $m = $r->match(get => 'zoo/woo/foo/bar/baz');
-is_deeply $m->params => {a => 'zoo/woo', b => 'bar/baz'};
+is_deeply $m->[0]->params => {a => 'zoo/woo', b => 'bar/baz'};
 
 
 #############################################################################
@@ -1035,7 +1035,7 @@ my $articles = $r->add_route('articles/:id')
 is ref $articles, 'Forward::Routes';
 
 $m = $r->match(post => 'articles/123');
-is_deeply $m->params => {first_name => 'foo', last_name => 'bar', id => 123,
+is_deeply $m->[0]->params => {first_name => 'foo', last_name => 'bar', id => 123,
   controller => 'hello', action => 'world'};
 is $r->build_path('hot', id => 234)->{path}, 'articles/234';
 
@@ -1057,7 +1057,7 @@ $articles = $r->add_route('articles/:id')
 is ref $articles, 'Forward::Routes';
 
 $m = $r->match(post => 'articles/123');
-is_deeply $m->params => {first_name => 'foo', last_name => 'bar', id => 123};
+is_deeply $m->[0]->params => {first_name => 'foo', last_name => 'bar', id => 123};
 
 $m = $r->match(get => 'articles/abc');
 ok not defined $m;
@@ -1075,22 +1075,22 @@ $r = Forward::Routes->new;
 $r->add_resource('geocoder');
 
 $m = $r->match(get => 'geocoder/new');
-is_deeply $m->params => {controller => 'geocoder', action => 'create_form'};
+is_deeply $m->[0]->params => {controller => 'geocoder', action => 'create_form'};
 
 $m = $r->match(post => 'geocoder');
-is_deeply $m->params => {controller => 'geocoder', action => 'create'};
+is_deeply $m->[0]->params => {controller => 'geocoder', action => 'create'};
 
 $m = $r->match(get => 'geocoder');
-is_deeply $m->params => {controller => 'geocoder', action => 'show'};
+is_deeply $m->[0]->params => {controller => 'geocoder', action => 'show'};
 
 $m = $r->match(get => 'geocoder/edit');
-is_deeply $m->params => {controller => 'geocoder', action => 'update_form'};
+is_deeply $m->[0]->params => {controller => 'geocoder', action => 'update_form'};
 
 $m = $r->match(put => 'geocoder');
-is_deeply $m->params => {controller => 'geocoder', action => 'update'};
+is_deeply $m->[0]->params => {controller => 'geocoder', action => 'update'};
 
 $m = $r->match(delete => 'geocoder');
-is_deeply $m->params => {controller => 'geocoder', action => 'delete'};
+is_deeply $m->[0]->params => {controller => 'geocoder', action => 'delete'};
 
 
 is ref $r->find_route('geocoder_create_form'), 'Forward::Routes';
@@ -1117,32 +1117,32 @@ $r = Forward::Routes->new;
 $r->add_resources('users','photos','tags');
 
 $m = $r->match(get => 'photos');
-is_deeply $m->params => {controller => 'photos', action => 'index'};
+is_deeply $m->[0]->params => {controller => 'photos', action => 'index'};
 
 $m = $r->match(get => 'photos/new');
-is_deeply $m->params => {controller => 'photos', action => 'create_form'};
+is_deeply $m->[0]->params => {controller => 'photos', action => 'create_form'};
 
 $m = $r->match(post => 'photos');
-is_deeply $m->params => {controller => 'photos', action => 'create'};
+is_deeply $m->[0]->params => {controller => 'photos', action => 'create'};
 
 $m = $r->match(get => 'photos/1');
-is_deeply $m->params =>
+is_deeply $m->[0]->params =>
   {controller => 'photos', action => 'show', id => 1};
 
 $m = $r->match(get => 'photos/1/edit');
-is_deeply $m->params =>
+is_deeply $m->[0]->params =>
   {controller => 'photos', action => 'update_form', id => 1};
 
 $m = $r->match(get => 'photos/1/delete');
-is_deeply $m->params =>
+is_deeply $m->[0]->params =>
   {controller => 'photos', action => 'delete_form', id => 1};
 
 $m = $r->match(put => 'photos/1');
-is_deeply $m->params =>
+is_deeply $m->[0]->params =>
   {controller => 'photos', action => 'update', id => 1};
 
 $m = $r->match(delete => 'photos/1');
-is_deeply $m->params => {
+is_deeply $m->[0]->params => {
     controller => 'photos',
     action     => 'delete',
     id         => 1
@@ -1185,28 +1185,28 @@ $r = Forward::Routes->new;
 $r->add_resources('users','photos','tags');
 
 $m = $r->match(get => 'photos.html');
-is_deeply $m->params => {controller => 'photos', action => 'index', format => 'html'};
+is_deeply $m->[0]->params => {controller => 'photos', action => 'index', format => 'html'};
 
 $m = $r->match(get => 'photos/new.html');
-is_deeply $m->params => {controller => 'photos', action => 'create_form', format => 'html'};
+is_deeply $m->[0]->params => {controller => 'photos', action => 'create_form', format => 'html'};
 
 $m = $r->match(post => 'photos.html');
-is_deeply $m->params => {controller => 'photos', action => 'create', format => 'html'};
+is_deeply $m->[0]->params => {controller => 'photos', action => 'create', format => 'html'};
 
 $m = $r->match(get => 'photos/1.html');
-is_deeply $m->params =>
+is_deeply $m->[0]->params =>
   {controller => 'photos', action => 'show', id => 1, format => 'html'};
 
 $m = $r->match(get => 'photos/1/edit.html');
-is_deeply $m->params =>
+is_deeply $m->[0]->params =>
   {controller => 'photos', action => 'update_form', id => 1, format => 'html'};
 
 $m = $r->match(put => 'photos/1.html');
-is_deeply $m->params =>
+is_deeply $m->[0]->params =>
   {controller => 'photos', action => 'update', id => 1, format => 'html'};
 
 $m = $r->match(delete => 'photos/1.html');
-is_deeply $m->params => {
+is_deeply $m->[0]->params => {
     controller => 'photos',
     action     => 'delete',
     id         => 1,
@@ -1238,55 +1238,55 @@ my $magazines = $r->add_resources('magazines');
 $magazines->add_resources('ads');
 
 $m = $r->match(get => 'magazines/1/ads');
-is_deeply $m->params => {controller => 'ads', action => 'index', magazines_id => 1};
+is_deeply $m->[0]->params => {controller => 'ads', action => 'index', magazines_id => 1};
 
 $m = $r->match(get => 'magazines/1/ads/new');
-is_deeply $m->params => {controller => 'ads', action => 'create_form', magazines_id => 1};
+is_deeply $m->[0]->params => {controller => 'ads', action => 'create_form', magazines_id => 1};
 
 $m = $r->match(post => 'magazines/1/ads');
-is_deeply $m->params => {controller => 'ads', action => 'create', magazines_id => 1};
+is_deeply $m->[0]->params => {controller => 'ads', action => 'create', magazines_id => 1};
 
 $m = $r->match(get => 'magazines/1/ads/4');
-is_deeply $m->params => {controller => 'ads', action => 'show', magazines_id => 1, ads_id => 4};
+is_deeply $m->[0]->params => {controller => 'ads', action => 'show', magazines_id => 1, ads_id => 4};
 
 $m = $r->match(get => 'magazines/1/ads/5/edit');
-is_deeply $m->params => {controller => 'ads', action => 'update_form', magazines_id => 1, ads_id => 5};
+is_deeply $m->[0]->params => {controller => 'ads', action => 'update_form', magazines_id => 1, ads_id => 5};
 
 $m = $r->match(put => 'magazines/1/ads/2');
-is_deeply $m->params => {controller => 'ads', action => 'update', magazines_id => 1, ads_id => 2};
+is_deeply $m->[0]->params => {controller => 'ads', action => 'update', magazines_id => 1, ads_id => 2};
 
 $m = $r->match(delete => 'magazines/0/ads/1');
-is_deeply $m->params => {controller => 'ads', action => 'delete', magazines_id => 0, ads_id => 1};
+is_deeply $m->[0]->params => {controller => 'ads', action => 'delete', magazines_id => 0, ads_id => 1};
 
 $m = $r->match(get => 'magazines/11/ads/12/delete');
-is_deeply $m->params => {controller => 'ads', action => 'delete_form', magazines_id => 11, ads_id => 12};
+is_deeply $m->[0]->params => {controller => 'ads', action => 'delete_form', magazines_id => 11, ads_id => 12};
 
 
 # magazine routes still work
 
 $m = $r->match(get => 'magazines');
-is_deeply $m->params => {controller => 'magazines', action => 'index'};
+is_deeply $m->[0]->params => {controller => 'magazines', action => 'index'};
 
 $m = $r->match(get => 'magazines/new');
-is_deeply $m->params => {controller => 'magazines', action => 'create_form'};
+is_deeply $m->[0]->params => {controller => 'magazines', action => 'create_form'};
 
 $m = $r->match(post => 'magazines');
-is_deeply $m->params => {controller => 'magazines', action => 'create'};
+is_deeply $m->[0]->params => {controller => 'magazines', action => 'create'};
 
 $m = $r->match(get => 'magazines/1');
-is_deeply $m->params => {controller => 'magazines', action => 'show', magazines_id => 1};
+is_deeply $m->[0]->params => {controller => 'magazines', action => 'show', magazines_id => 1};
 
 $m = $r->match(get => 'magazines/1/edit');
-is_deeply $m->params => {controller => 'magazines', action => 'update_form', magazines_id => 1};
+is_deeply $m->[0]->params => {controller => 'magazines', action => 'update_form', magazines_id => 1};
 
 $m = $r->match(get => 'magazines/1/delete');
-is_deeply $m->params => {controller => 'magazines', action => 'delete_form', magazines_id => 1};
+is_deeply $m->[0]->params => {controller => 'magazines', action => 'delete_form', magazines_id => 1};
 
 $m = $r->match(put => 'magazines/1');
-is_deeply $m->params => {controller => 'magazines', action => 'update', magazines_id => 1};
+is_deeply $m->[0]->params => {controller => 'magazines', action => 'update', magazines_id => 1};
 
 $m = $r->match(delete => 'magazines/1');
-is_deeply $m->params => {controller => 'magazines', action => 'delete', magazines_id => 1};
+is_deeply $m->[0]->params => {controller => 'magazines', action => 'delete', magazines_id => 1};
 
 
 # build path
@@ -1330,11 +1330,11 @@ ok !$r->match(get => 'foo');
 
 $m = $r->match(get => 'admin/foo');
 
-#is_deeply $m->params => {controller => 'admin-foo', action => 'bar'};
+#is_deeply $m->[0]->params => {controller => 'admin-foo', action => 'bar'};
 
 $m = $r->match(get => 'hello/prefixed');
 
-#is_deeply $m->params => {controller => 'hello-foo', action => 'bar'};
+#is_deeply $m->[0]->params => {controller => 'hello-foo', action => 'bar'};
 
 
 #############################################################################

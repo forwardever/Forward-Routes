@@ -273,8 +273,10 @@ sub match {
     my $path   = shift || die 'missing path';
 
     # Search for match
-    return $self->_match(lc($method) => $path);
+    my $match = $self->_match(lc($method) => $path);
+    return unless $match;
 
+    return [$match];
 }
 
 sub method {
