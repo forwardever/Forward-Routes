@@ -1,6 +1,6 @@
 =pod
 
-=head1 NAME
+=head1 Name
 
 Forward::Routes
 
@@ -8,11 +8,11 @@ Forward::Routes
 
 L<Forward::Routes>: routes for framework builders, experimental, so API might change
 
-=head1 AUTHOR
+=head1 Author
 
 ForwardEver
 
-=head1 COPYRIGHT AND LICENSE
+=head1 Copyright and License
 
 Copyright (C) 2011, ForwardEver
 
