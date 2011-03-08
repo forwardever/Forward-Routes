@@ -363,6 +363,7 @@ sub _match {
 
     if (!$matches->[0] || $self->_is_bridge) {
         $match = Forward::Routes::Match->new;
+        $match->is_bridge(1) if $self->_is_bridge;
         unshift @$matches, $match;
     }
     else {

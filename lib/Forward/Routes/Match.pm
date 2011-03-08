@@ -40,5 +40,16 @@ sub params {
 }
 
 
+sub is_bridge {
+    my $self = shift;
+
+    return $self->{is_bridge} unless defined $_[0];
+
+    $self->{is_bridge} = $_[0];
+
+    return $self;
+}
+
+
 
 1;

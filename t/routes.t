@@ -8,7 +8,7 @@ use Test::More;
 
 use Forward::Routes;
 
-use Test::More tests => 434;
+use Test::More tests => 436;
 
 #############################################################################
 ### empty
@@ -1140,7 +1140,9 @@ is $m, undef;
 
 $m = $r->match(get => 'admin/foo');
 is_deeply $m->[0]->params, {controller => 'check', action => 'authentication'};
+is $m->[0]->is_bridge, 1;
 is_deeply $m->[1]->params, {controller => 'no', action => 'placeholders'};
+is $m->[1]->is_bridge, undef;
 
 $m = $r->match(get => '/admin/hello/there');
 is_deeply $m->[0]->params, {controller => 'check', action => 'authentication'};
