@@ -1,8 +1,9 @@
 Changes for Forward::Routes
 
-0.06    open 00:00:00
+0.06    2011-03-08 00:00:00
         - Added bridge support inspired by Sebastian Riedel's
           Mojolicous::Routes module
+        - Removed Try::Tiny from test file
 
 0.05    2011-03-08 00:00:00
         - Fixed serious path matching bug for nested routes
