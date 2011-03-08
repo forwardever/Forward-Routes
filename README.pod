@@ -57,6 +57,16 @@ L<Forward::Routes>: routes for framework builders, experimental, so API might ch
     is_deeply $m->[0]->params => {foo => 'hello', bar => 'there'};
 
 
+=head2 Bridges
+    $r = Forward::Routes->new;
+    my $bridge = $r->bridge('admin')->to('check#authentication');
+    $bridge->add_route('foo')->to('my#stuff');
+    
+    $m = $r->match(get => 'admin/foo');
+    is_deeply $m->[0]->params, {controller => 'check', action => 'authentication'};
+    is_deeply $m->[1]->params, {controller => 'my', action => 'stuff'};
+
+
 =head2 Defaults for action and controller params
 
     $r = Forward::Routes->new;
