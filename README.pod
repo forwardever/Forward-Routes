@@ -58,6 +58,7 @@ L<Forward::Routes>: routes for framework builders, experimental, so API might ch
 
 
 =head2 Bridges
+
     $r = Forward::Routes->new;
     my $bridge = $r->bridge('admin')->to('check#authentication');
     $bridge->add_route('foo')->to('my#stuff');
