@@ -8,7 +8,7 @@ use Test::More;
 
 use Forward::Routes;
 
-use Test::More tests => 428;
+use Test::More tests => 429;
 
 #############################################################################
 ### empty
@@ -1227,6 +1227,9 @@ $r->add_resources('users','photos','tags');
 $m = $r->match(get => 'photos');
 is_deeply $m->[0]->params => {controller => 'photos', action => 'index'};
 
+$m = $r->match(get => 'photos2');
+is $m, undef;
+
 $m = $r->match(get => 'photos/new');
 is_deeply $m->[0]->params => {controller => 'photos', action => 'create_form'};
 
@@ -1320,6 +1323,7 @@ is_deeply $m->[0]->params => {
     id         => 1,
     format => 'html'
 };
+
 
 
 ### empty format

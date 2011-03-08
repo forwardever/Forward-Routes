@@ -274,6 +274,9 @@ sub match {
     my $method = shift;
     my $path   = shift || die 'missing path';
 
+    # Leading slash
+    $path = "/$path" unless $path =~ m{ \A / }x;
+
     # Search for match
     my $match = $self->_match(lc($method) => $path);
     return unless $match;
@@ -347,9 +350,6 @@ sub _match {
 sub _match_current_pattern {
     my $self     = shift;
     my $path_ref = shift;
-
-    # Leading slash
-    $$path_ref = "/$$path_ref" unless $$path_ref =~ m{ \A / }x;
 
     # Pattern
     my $regex = $self->pattern->compile->pattern;
