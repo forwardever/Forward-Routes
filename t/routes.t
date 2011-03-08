@@ -3,7 +3,6 @@
 use strict;
 use warnings;
 
-use Try::Tiny;
 use Test::More;
 
 use Forward::Routes;
@@ -329,9 +328,8 @@ is_deeply $m->[0]->params => {year => 2009, month => 12, day => 10};
 # build path
 is $r->build_path('foo', year => 2009)->{path}, '2009';
 
-my $e;
-try { $r->build_path('foo', year => 2009, month => 12)->{path}; } catch { $e = $_; };
-like $e => qr/Required param 'day' was not passed when building a path/;
+my $e = eval {$r->build_path('foo', year => 2009, month => 12)->{path}; };
+like $@ => qr/Required param 'day' was not passed when building a path/;
 undef $e;
 
 is $r->build_path('foo', year => 2009, month => 12, day => 10)->{path}, '2009/12/10';
@@ -350,8 +348,8 @@ is_deeply $m->[0]->params => {year => 2009, month => 12, day => 2};
 # build path
 is $r->build_path('foo', year => 2009, day => 12)->{path}, '2009/12';
 
-try { $r->build_path('foo', year => 2009)->{path}; } catch { $e = $_; };
-like $e => qr/Required param 'day' was not passed when building a path/;
+$e = eval {$r->build_path('foo', year => 2009)->{path}; };
+like $@ => qr/Required param 'day' was not passed when building a path/;
 undef $e;
 
 is $r->build_path('foo', year => 2009, day => 2, month => 12)->{path}, '2009/12/2';
@@ -371,8 +369,8 @@ $m = $r->match(get => '2009//2');
 is_deeply $m->[0]->params => {year => 2009, day => 2};
 
 # build path
-try { $r->build_path('foo', year => 2009, month => 12)->{path}; } catch { $e = $_; };
-like $e => qr/Required param 'day' was not passed when building a path/;
+$e = eval{$r->build_path('foo', year => 2009, month => 12)->{path}; };
+like $@ => qr/Required param 'day' was not passed when building a path/;
 undef $e;
 
 is $r->build_path('foo', year => 2009, month => 12, day => 2)->{path}, '2009/12/2';
@@ -465,8 +463,8 @@ $m = $r->match(get => '2009/2/3');
 is_deeply $m->[0]->params => {year => 2009, month => 2, day => 3};
 
 # build path
-try { $r->build_path('foo', year => 2009)->{path}; } catch { $e = $_; };
-like $e => qr/Required param 'day' was not passed when building a path/;
+$e = eval {$r->build_path('foo', year => 2009)->{path}; };
+like $@ => qr/Required param 'day' was not passed when building a path/;
 undef $e;
 
 is $r->build_path('foo', year => 2009, month => 2, day => 12)->{path}, '2009/2/12';
@@ -487,12 +485,12 @@ $m = $r->match(get => '2009/2/3');
 is_deeply $m->[0]->params => {year => 2009, month => 2, day => 3};
 
 # build path
-try { $r->build_path('foo', year => 2009)->{path}; } catch { $e = $_; };
-like $e => qr/Required param 'day' was not passed when building a path/;
+$e = eval {$r->build_path('foo', year => 2009)->{path}; };
+like $@ => qr/Required param 'day' was not passed when building a path/;
 undef $e;
 
-try { $r->build_path('foo')->{path}; } catch { $e = $_; };
-like $e => qr/Required param 'year' was not passed when building a path/;
+$e = eval {$r->build_path('foo')->{path}; };
+like $@ => qr/Required param 'year' was not passed when building a path/;
 undef $e;
 
 is $r->build_path('foo', year => 2009, month => 2, day => 12)->{path}, '2009/2/12';
@@ -536,16 +534,16 @@ $m = $r->match(get => 'world/us-new_york');
 is_deeply $m->[0]->params => {country => 'us', cities => 'new_york'};
 
 # build path
-try { $r->build_path('foo')->{path}; } catch { $e = $_; };
-like $e => qr/Required param 'country' was not passed when building a path/;
+$e = eval {$r->build_path('foo')->{path}; };
+like $@ => qr/Required param 'country' was not passed when building a path/;
 undef $e;
 
-try { $r->build_path('foo', country => 'us')->{path}; } catch { $e = $_; };
-like $e => qr/Required param 'cities' was not passed when building a path/;
+$e = eval {$r->build_path('foo', country => 'us')->{path}; };
+like $@ => qr/Required param 'cities' was not passed when building a path/;
 undef $e;
 
-try { $r->build_path('foo', cities => 'new_york')->{path}; } catch { $e = $_; };
-like $e => qr/Required param 'country' was not passed when building a path/;
+$e = eval {$r->build_path('foo', cities => 'new_york')->{path}; };
+like $@ => qr/Required param 'country' was not passed when building a path/;
 undef $e;
 
 is $r->build_path('foo', country => 'us', cities => 'new_york')->{path}, 'world/us-new_york';
@@ -564,16 +562,16 @@ is $m, undef;
 $m = $r->match(get => 'world/us-new_york-52_str');
 is_deeply $m->[0]->params => {country => 'us', cities => 'new_york', street => '52_str'};
 
-try { $r->build_path('foo', country => 'us', cities => 'new_york')->{path}; } catch { $e = $_; };
-like $e => qr/Required param 'street' was not passed when building a path/;
+$e = eval {$r->build_path('foo', country => 'us', cities => 'new_york')->{path}; };
+like $@ => qr/Required param 'street' was not passed when building a path/;
 undef $e;
 
-try { $r->build_path('foo', country => 'us', street => '52_str')->{path}; } catch { $e = $_; };
-like $e => qr/Required param 'cities' was not passed when building a path/;
+$e = eval {$r->build_path('foo', country => 'us', street => '52_str')->{path}; };
+like $@ => qr/Required param 'cities' was not passed when building a path/;
 undef $e;
 
-try { $r->build_path('foo', cities => 'new_york', street => 'baker_str')->{path}; } catch { $e = $_; };
-like $e => qr/Required param 'country' was not passed when building a path/;
+$e = eval {$r->build_path('foo', cities => 'new_york', street => 'baker_str')->{path}; };
+like $@ => qr/Required param 'country' was not passed when building a path/;
 undef $e;
 
 is $r->build_path('foo', country => 'us', cities => 'new_york', street => '52_str')->{path}, 'world/us-new_york-52_str';
@@ -624,12 +622,12 @@ is_deeply $m->[0]->params => {country => 'us', cities => 'new_york'};
 is $r->build_path('hello', country => 'us', cities => 'new_york')->{path}, 'world/us-new_york';
 is $r->build_path('hello')->{path}, 'world/';
 
-try { $r->build_path('hello', cities => 'new_york')->{path}; } catch { $e = $_; };
-like $e => qr/Required param 'country' was not passed when building a path/;
+$e = eval {$r->build_path('hello', cities => 'new_york')->{path}; };
+like $@ => qr/Required param 'country' was not passed when building a path/;
 undef $e;
 
-try { $r->build_path('hello', country => 'us')->{path}; } catch { $e = $_; };
-like $e => qr/Required param 'cities' was not passed when building a path/;
+$e = eval {$r->build_path('hello', country => 'us')->{path}; };
+like $@ => qr/Required param 'cities' was not passed when building a path/;
 undef $e;
 
 
@@ -693,12 +691,12 @@ is $r->build_path('foo', year => 2009)->{path}, '2009';
 is $r->build_path('foo', year => 2009, month => 12)->{path}, '2009/12';
 is $r->build_path('foo', year => 2009, month => 12, day => 10)->{path}, '2009/12/10';
 
-try { $r->build_path('foo', year => 2009, day => 12)->{path}; } catch { $e = $_; };
-like $e => qr/Required param 'month' was not passed when building a path/;
+$e = eval {$r->build_path('foo', year => 2009, day => 12)->{path}; };
+like $@ => qr/Required param 'month' was not passed when building a path/;
 undef $e;
 
-try { $r->build_path('foo')->{path}; } catch { $e = $_; };
-like $e => qr/Required param 'year' was not passed when building a path/;
+$e = eval {$r->build_path('foo')->{path}; };
+like $@ => qr/Required param 'year' was not passed when building a path/;
 undef $e;
 
 
@@ -720,12 +718,12 @@ is $r->build_path('foo', year => 2009)->{path}, '2009-text';
 is $r->build_path('foo', year => 2009, month => 12)->{path}, '2009/12-text';
 is $r->build_path('foo', year => 2009, month => 12, day => 10)->{path}, '2009/12/10-text';
 
-try { $r->build_path('foo', year => 2009, day => 12)->{path}; } catch { $e = $_; };
-like $e => qr/Required param 'month' was not passed when building a path/;
+$e = eval {$r->build_path('foo', year => 2009, day => 12)->{path}; };
+like $@ => qr/Required param 'month' was not passed when building a path/;
 undef $e;
 
-try { $r->build_path('foo')->{path}; } catch { $e = $_; };
-like $e => qr/Required param 'year' was not passed when building a path/;
+$e = eval {$r->build_path('foo')->{path}; };
+like $@ => qr/Required param 'year' was not passed when building a path/;
 undef $e;
 
 
@@ -747,8 +745,8 @@ is $r->build_path('foo', year => 2009)->{path}, '2009';
 is $r->build_path('foo', year => 2009, day => 12)->{path}, '2009/12';
 is $r->build_path('foo', year => 2009, month => 12, day => 10)->{path}, '2009/12/10';
 
-try { $r->build_path('foo', year => 2009, month => 3)->{path}; } catch { $e = $_; };
-like $e => qr/Required param 'day' was not passed when building a path/;
+$e = eval {$r->build_path('foo', year => 2009, month => 3)->{path}; };
+like $@ => qr/Required param 'day' was not passed when building a path/;
 undef $e;
 
 
@@ -809,12 +807,12 @@ is $r->build_path('foo', year => 2009)->{path}, 'year2009-text';
 is $r->build_path('foo', year => 2009, month => 11)->{path}, 'year2009/month11-monthend-text';
 is $r->build_path('foo', year => 2009, month => 11, day => 3, hour => 5)->{path}, 'year2009/month11-monthend/day3hour-5-hourend-dayend-text';
 
-try { $r->build_path('foo', year => 2009, month => 3, day => 2)->{path}; } catch { $e = $_; };
-like $e => qr/Required param 'hour' was not passed when building a path/;
+$e = eval {$r->build_path('foo', year => 2009, month => 3, day => 2)->{path}; };
+like $@ => qr/Required param 'hour' was not passed when building a path/;
 undef $e;
 
-try { $r->build_path('foo', year => 2009, month => 3, hour => 2)->{path}; } catch { $e = $_; };
-like $e => qr/Required param 'day' was not passed when building a path/;
+$e = eval {$r->build_path('foo', year => 2009, month => 3, hour => 2)->{path}; };
+like $@ => qr/Required param 'day' was not passed when building a path/;
 undef $e;
 
 
@@ -862,19 +860,19 @@ is $r->build_path('foo', year => 2009, month => 11)->{path}, 'year2009/month11m-
 is $r->build_path('foo', year => 2009, month => 11, day => 3)->{path}, 'year2009/month11m/day3d-location';
 is $r->build_path('foo', year => 2009, month => 11, day => 3, hours => 5, minutes => 27, seconds => 33)->{path}, 'year2009/month11m/day3d/hours-5h-minutes-27m-seconds33s-location';
 
-try { $r->build_path('foo', year => 2009, month => 11, day => 3, hours => 5, minutes => 27)->{path}; } catch { $e = $_; };
-like $e => qr/Required param 'seconds' was not passed when building a path/;
+$e = eval {$r->build_path('foo', year => 2009, month => 11, day => 3, hours => 5, minutes => 27)->{path}; };
+like $@ => qr/Required param 'seconds' was not passed when building a path/;
 undef $e;
 
-try { $r->build_path('foo', year => 2009, month => 11, day => 3, minutes => 27, seconds => 33)->{path}; } catch { $e = $_; };
-like $e => qr/Required param 'hours' was not passed when building a path/;
+$e = eval {$r->build_path('foo', year => 2009, month => 11, day => 3, minutes => 27, seconds => 33)->{path}; };
+like $@ => qr/Required param 'hours' was not passed when building a path/;
 undef $e;
 
 is $r->build_path('foo', year => 2009, month => 11, day => 3, country => 'france', city => 'paris', street => 'test')->{path}, 'year2009/month11m/day3d-location-country-france/city-paris/street-test';
 is $r->build_path('foo', year => 2009, month => 11, day => 3, hours => 5, minutes => 27, seconds => 33, country => 'france', city => 'paris', street => 'test')->{path}, 'year2009/month11m/day3d/hours-5h-minutes-27m-seconds33s-location-country-france/city-paris/street-test';
 
-try { $r->build_path('foo', year => 2009, month => 11, day => 3, hours => 5, seconds => 33, country => 'france', city => 'paris', street => 'test')->{path}; } catch { $e = $_; };
-like $e => qr/Required param 'minutes' was not passed when building a path/;
+$e = eval {$r->build_path('foo', year => 2009, month => 11, day => 3, hours => 5, seconds => 33, country => 'france', city => 'paris', street => 'test')->{path}; };
+like $@ => qr/Required param 'minutes' was not passed when building a path/;
 undef $e;
 
 
@@ -897,8 +895,8 @@ is_deeply $m->[0]->params => {year => 2009, month => 12, day => 10};
 is $r->build_path('foo', year => 2009)->{path}, '2009';
 is $r->build_path('foo', year => 2009, month => 12, day => 10)->{path}, '2009/12/10';
 
-try { $r->build_path('foo', year => 2009, month => 12)->{path}; } catch { $e = $_; };
-like $e => qr/Required param 'day' was not passed when building a path/;
+$e = eval {$r->build_path('foo', year => 2009, month => 12)->{path}; };
+like $@ => qr/Required param 'day' was not passed when building a path/;
 undef $e;
 
 
@@ -939,12 +937,12 @@ $m = $r->match(get => '2009/12/10');
 is_deeply $m->[0]->params => {year => 2009, month => 12, day => 10};
 
 # build path
-try { $r->build_path('foo', year => 2009, day => 2)->{path}; } catch { $e = $_; };
-like $e => qr/Required param 'month' was not passed when building a path/;
+$e = eval {$r->build_path('foo', year => 2009, day => 2)->{path}; };
+like $@ => qr/Required param 'month' was not passed when building a path/;
 undef $e;
 
-try { $r->build_path('foo', year => 2009)->{path}; } catch { $e = $_; };
-like $e => qr/Required param 'month' was not passed when building a path/;
+$e = eval {$r->build_path('foo', year => 2009)->{path}; };
+like $@ => qr/Required param 'month' was not passed when building a path/;
 undef $e;
 
 is $r->build_path('foo', year => 2009, month => 12, day => 10)->{path}, '2009/12/10';
@@ -968,12 +966,12 @@ is_deeply $m->[0]->params => {year => 2009, month => 12, day => 10};
 
 # build path
 
-try { $r->build_path('foo', year => 2009, day => 2)->{path}; } catch { $e = $_; };
-like $e => qr/Required param 'month' was not passed when building a path/;
+$e = eval {$r->build_path('foo', year => 2009, day => 2)->{path}; };
+like $@ => qr/Required param 'month' was not passed when building a path/;
 undef $e;
 
-try { $r->build_path('foo', year => 2009)->{path}; } catch { $e = $_; };
-like $e => qr/Required param 'month' was not passed when building a path/;
+$e = eval {$r->build_path('foo', year => 2009)->{path}; };
+like $@ => qr/Required param 'month' was not passed when building a path/;
 undef $e;
 
 is $r->build_path('foo', year => 2009, month => 12, day => 10)->{path}, '2009/12/10';
@@ -994,16 +992,16 @@ $m = $r->match(get => '2009/12/10');
 is_deeply $m->[0]->params => {year => 2009, month => 12, day => 10};
 
 # build path
-try { $r->build_path('foo')->{path}; } catch { $e = $_; };
-like $e => qr/Required param 'year' was not passed when building a path/;
+$e = eval {$r->build_path('foo')->{path}; };
+like $@ => qr/Required param 'year' was not passed when building a path/;
 undef $e;
 
-try { $r->build_path('foo', year => 2009)->{path}; } catch { $e = $_; };
-like $e => qr/Required param 'month' was not passed when building a path/;
+$e = eval {$r->build_path('foo', year => 2009)->{path}; };
+like $@ => qr/Required param 'month' was not passed when building a path/;
 undef $e;
 
-try { $r->build_path('foo', year => 2009, day => 1)->{path}; } catch { $e = $_; };
-like $e => qr/Required param 'month' was not passed when building a path/;
+$e = eval {$r->build_path('foo', year => 2009, day => 1)->{path}; };
+like $@ => qr/Required param 'month' was not passed when building a path/;
 undef $e;
 
 is $r->build_path('foo', year => 2009, month => 1)->{path}, '2009/1/2';
@@ -1523,20 +1521,20 @@ is $r->build_path('ads_delete', magazines_id => 4, ads_id => 0)->{path} => 'maga
 is $r->build_path('ads_update_form', magazines_id => 3, ads_id => 4)->{path} => 'magazines/3/ads/4/edit';
 is $r->build_path('ads_delete_form', magazines_id => 3, ads_id => 4)->{path} => 'magazines/3/ads/4/delete';
 
-try { $r->build_path('ads_index')->{path}; } catch { $e = $_; };
-like $e => qr/Required param 'magazines_id' was not passed when building a path/;
+$e = eval {$r->build_path('ads_index')->{path}; };
+like $@ => qr/Required param 'magazines_id' was not passed when building a path/;
 undef $e;
 
-try { $r->build_path('ads_show')->{path}; } catch { $e = $_; };
-like $e => qr/Required param 'magazines_id' was not passed when building a path/;
+$e = eval {$r->build_path('ads_show')->{path}; };
+like $@ => qr/Required param 'magazines_id' was not passed when building a path/;
 undef $e;
 
-try { $r->build_path('ads_show', magazines_id => 3)->{path}; } catch { $e = $_; };
-like $e => qr/Required param 'ads_id' was not passed when building a path/;
+$e = eval {$r->build_path('ads_show', magazines_id => 3)->{path}; };
+like $@ => qr/Required param 'ads_id' was not passed when building a path/;
 undef $e;
 
-try { $r->build_path('ads_delete_form', magazines_id => 3)->{path}; } catch { $e = $_; };
-like $e => qr/Required param 'ads_id' was not passed when building a path/;
+$e = eval {$r->build_path('ads_delete_form', magazines_id => 3)->{path}; };
+like $@ => qr/Required param 'ads_id' was not passed when building a path/;
 undef $e;
 
 
@@ -1579,21 +1577,21 @@ $r->add_route('archive/:year(/:month/:day)?',    name => 'optional1');
 $r->add_route('archive/:year(/:month(/:day)?)?', name => 'optional2');
 
 
-try { $r->build_path('unknown')->{path}; } catch { $e = $_; };
-like $e => qr/Unknown name 'unknown' used to build a path/;
+$e = eval {$r->build_path('unknown')->{path}; };
+like $@ => qr/Unknown name 'unknown' used to build a path/;
 undef $e;
 
-try { $r->build_path('article')->{path}; } catch { $e = $_; };
-like $e => qr/Required param 'id' was not passed when building a path/;
+$e = eval {$r->build_path('article')->{path}; };
+like $@ => qr/Required param 'id' was not passed when building a path/;
 undef $e;
 
-try { $r->build_path('glob2')->{path}; } catch { $e = $_; };
-like $e =>
+$e = eval {$r->build_path('glob2')->{path}; };
+like $@ =>
   qr/Required glob param 'section' was not passed when building a path/;
 undef $e;
 
-try { $r->build_path('article', id => 'abc')->{path}; } catch { $e = $_; };
-like $e => qr/Param 'id' fails a constraint/;
+$e = eval {$r->build_path('article', id => 'abc')->{path}; };
+like $@ => qr/Param 'id' fails a constraint/;
 undef $e;
 
 is $r->build_path('one')->{path} => 'foo';
@@ -1611,9 +1609,8 @@ is $r->build_path('glob3', a => 'foo/bar', b => 'baz/zab')->{path} =>
 
 is $r->build_path('optional1', year => 2010)->{path} => 'archive/2010';
 
-try { $r->build_path('optional1', year => 2010, month => 5)->{path}; }
-catch { $e = $_ };
-like $e => qr/Required param 'day' was not passed when building a path/;
+$e = eval {$r->build_path('optional1', year => 2010, month => 5)->{path}; };
+like $@ => qr/Required param 'day' was not passed when building a path/;
 undef $e;
 
 is $r->build_path('optional1', year => 2010, month => 5, day => 4)->{path} =>
