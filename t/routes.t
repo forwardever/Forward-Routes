@@ -8,7 +8,7 @@ use Test::More;
 
 use Forward::Routes;
 
-use Test::More tests => 381;
+use Test::More tests => 428;
 
 #############################################################################
 ### empty
@@ -82,7 +82,8 @@ is_deeply $m->[0]->params => {};
 #############################################################################
 ### format
 
-$r = Forward::Routes->new;
+### one format constraint
+$r = Forward::Routes->new->format('html');
 $r->add_route('foo');
 $r->add_route(':foo/:bar');
 
@@ -95,6 +96,113 @@ is_deeply $m->[0]->params => {foo => 'hello', bar => 'there', format => 'html'};
 # match again (params empty again)
 $m = $r->match(get => 'foo.html');
 is_deeply $m->[0]->params => {format => 'html'};
+
+# now paths without format
+$m = $r->match(get => 'foo');
+is $m, undef;
+
+$m = $r->match(get => 'hello/there');
+is $m, undef;
+
+# now paths with wrong format
+$m = $r->match(get => 'foo.xml');
+is $m, undef;
+
+$m = $r->match(get => 'hello/there.xml');
+is $m, undef;
+
+
+
+### pass empty format explicitly
+$r = Forward::Routes->new->format('');
+$r->add_route('foo');
+$r->add_route(':foo/:bar');
+
+$m = $r->match(get => 'foo');
+is_deeply $m->[0]->params => {};
+
+$m = $r->match(get => 'hello/there');
+is_deeply $m->[0]->params => {foo => 'hello', bar => 'there'};
+
+# match again (params empty again)
+$m = $r->match(get => 'foo');
+is_deeply $m->[0]->params => {};
+
+
+# now paths with format
+$m = $r->match(get => 'foo.html');
+is $m, undef;
+
+$m = $r->match(get => 'hello/there.html');
+is $m, undef;
+
+
+
+### multiple format constraints
+$r = Forward::Routes->new->format('html','xml');
+$r->add_route('foo');
+$r->add_route(':foo/:bar');
+
+$m = $r->match(get => 'foo.html');
+is_deeply $m->[0]->params => {format => 'html'};
+
+$m = $r->match(get => 'hello/there.html');
+is_deeply $m->[0]->params => {foo => 'hello', bar => 'there', format => 'html'};
+
+$m = $r->match(get => 'foo.xml');
+is_deeply $m->[0]->params => {format => 'xml'};
+
+$m = $r->match(get => 'hello/there.xml');
+is_deeply $m->[0]->params => {foo => 'hello', bar => 'there', format => 'xml'};
+
+# match again (params empty again)
+$m = $r->match(get => 'foo.xml');
+is_deeply $m->[0]->params => {format => 'xml'};
+
+# now paths without format
+$m = $r->match(get => 'foo');
+is $m, undef;
+
+$m = $r->match(get => 'hello/there');
+is $m, undef;
+
+# now paths with wrong format
+$m = $r->match(get => 'foo.jpeg');
+is $m, undef;
+
+$m = $r->match(get => 'hello/there.jpeg');
+is $m, undef;
+
+
+### multiple format constraints, with empty format allowed
+$r = Forward::Routes->new->format('html','');
+$r->add_route('foo');
+$r->add_route(':foo/:bar');
+
+$m = $r->match(get => 'foo.html');
+is_deeply $m->[0]->params => {format => 'html'};
+
+$m = $r->match(get => 'hello/there.html');
+is_deeply $m->[0]->params => {foo => 'hello', bar => 'there', format => 'html'};
+
+$m = $r->match(get => 'foo');
+is_deeply $m->[0]->params => {};
+
+$m = $r->match(get => 'hello/there');
+is_deeply $m->[0]->params => {foo => 'hello', bar => 'there'};
+
+# match again (params empty again)
+$m = $r->match(get => 'foo');
+is_deeply $m->[0]->params => {};
+
+# now paths with wrong format
+$m = $r->match(get => 'foo.jpeg');
+is $m, undef;
+
+$m = $r->match(get => 'hello/there.jpeg');
+is $m, undef;
+
+
 
 
 #############################################################################
@@ -1181,7 +1289,7 @@ is $r->build_path('photos_delete_form', id => 222)->{method} => 'get';
 #############################################################################
 ### resources_with_format
 
-$r = Forward::Routes->new;
+$r = Forward::Routes->new->format('html');
 $r->add_resources('users','photos','tags');
 
 $m = $r->match(get => 'photos.html');
@@ -1212,6 +1320,96 @@ is_deeply $m->[0]->params => {
     id         => 1,
     format => 'html'
 };
+
+
+### empty format
+$r = Forward::Routes->new->format('');
+$r->add_resources('users','photos','tags');
+
+$m = $r->match(get => 'photos');
+is_deeply $m->[0]->params => {controller => 'photos', action => 'index'};
+
+$m = $r->match(get => 'photos/new');
+is_deeply $m->[0]->params => {controller => 'photos', action => 'create_form'};
+
+$m = $r->match(post => 'photos');
+is_deeply $m->[0]->params => {controller => 'photos', action => 'create'};
+
+$m = $r->match(get => 'photos/1');
+is_deeply $m->[0]->params =>
+  {controller => 'photos', action => 'show', id => 1};
+
+$m = $r->match(get => 'photos/1/edit');
+is_deeply $m->[0]->params =>
+  {controller => 'photos', action => 'update_form', id => 1};
+
+$m = $r->match(get => 'photos/1/delete');
+is_deeply $m->[0]->params =>
+  {controller => 'photos', action => 'delete_form', id => 1};
+
+$m = $r->match(put => 'photos/1');
+is_deeply $m->[0]->params =>
+  {controller => 'photos', action => 'update', id => 1};
+
+$m = $r->match(delete => 'photos/1');
+is_deeply $m->[0]->params => {
+    controller => 'photos',
+    action     => 'delete',
+    id         => 1
+};
+
+
+# wrong format
+$r = Forward::Routes->new->format('');
+$r->add_resources('users','photos','tags');
+
+$m = $r->match(get => 'photos.html');
+is $m, undef;
+
+$m = $r->match(get => 'photos/new.html');
+is $m, undef;
+
+$m = $r->match(post => 'photos.html');
+is $m, undef;
+
+$m = $r->match(get => 'photos/1.html');
+is $m, undef;
+
+$m = $r->match(get => 'photos/1/edit.html');
+is $m, undef;
+
+$m = $r->match(put => 'photos/1.html');
+is $m, undef;
+
+$m = $r->match(delete => 'photos/1.html');
+is $m, undef;
+
+
+
+# wrong format
+$r = Forward::Routes->new->format('html');
+$r->add_resources('users','photos','tags');
+
+$m = $r->match(get => 'photos.xml');
+is $m, undef;
+
+$m = $r->match(get => 'photos/new.xml');
+is $m, undef;
+
+$m = $r->match(post => 'photos.xml');
+is $m, undef;
+
+$m = $r->match(get => 'photos/1.xml');
+is $m, undef;
+
+$m = $r->match(get => 'photos/1/edit.xml');
+is $m, undef;
+
+$m = $r->match(put => 'photos/1.xml');
+is $m, undef;
+
+$m = $r->match(delete => 'photos/1.xml');
+is $m, undef;
 
 
 #############################################################################

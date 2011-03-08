@@ -19,6 +19,9 @@ L<Forward::Routes>: routes for framework builders, experimental, so API might ch
     my $m = $r->match(get => 'foo/bar');
     is_deeply $m->[0]->params => {};
 
+    my $m = $r->match(get => 'foo/hello');
+    is $m, undef;
+
 
 =head2 Placeholders
 
@@ -29,13 +32,19 @@ L<Forward::Routes>: routes for framework builders, experimental, so API might ch
     is_deeply $m->[0]->params => {foo => 'hello', bar => 'there'};
 
 
-=head2 Format Detection
+=head2 Format Constraints and Detection
 
-    $r = Forward::Routes->new;
+    $r = Forward::Routes->new->format('html','xml');
     $r->add_route(':foo/:bar');
 
     $m = $r->match(get => 'hello/there.html');
     is_deeply $m->[0]->params => {foo => 'hello', bar => 'there', format => 'html'};
+
+    $m = $r->match(get => 'hello/there.xml');
+    is_deeply $m->[0]->params => {foo => 'hello', bar => 'there', format => 'xml'};
+
+    $m = $r->match(get => 'hello/there.jpeg');
+    is $m, undef;
 
 
 =head2 Nested Routes

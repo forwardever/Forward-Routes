@@ -8,7 +8,7 @@ use Forward::Routes::Pattern;
 use Scalar::Util qw/weaken/;
 use Carp 'croak';
 
-our $VERSION = '0.04';
+our $VERSION = '0.01';
 
 sub new {
     my $class = shift;
@@ -319,9 +319,11 @@ sub _match {
     # Children match
     my $match;
 
-    my @format = ($path =~m/\.([\a-zA-Z0-9]{1,4})$/);
-    $path =~s/\.[\a-zA-Z0-9]{1,4}$// if @format;
+    # Format
+    my $format = $self->_match_format(\$path);
+    return unless defined $format;
 
+    # Children
     if (@{$self->children}) {
         foreach my $child (@{$self->children}) {
 
@@ -337,7 +339,7 @@ sub _match {
     $match ||= Forward::Routes::Match->new;
     my $params = $self->prepare_params(@$captures);
     $match->add_params($params);
-    $match->add_params({format => $format[0]}) if $format[0];
+    $match->add_params({format => $format}) if length($format);
 
     return $match;
 }
@@ -639,5 +641,38 @@ sub _parent_is_plural_resource {
     return $self;
 }
 
+sub format {
+    my $self = shift;
+
+    return $self->{format} unless defined $_[0];
+
+    my $formats = ref $_[0] eq 'ARRAY' ? $_[0] : [@_];
+
+    @$formats = map {lc $_} @$formats;
+
+    $self->{format} = $formats;
+
+    return $self;
+}
+
+sub _match_format {
+    my $self = shift;
+    my $path = shift;
+
+    return '' unless defined $self->format;
+
+    my @match = ($$path =~m/\.([\a-zA-Z0-9]{1,4})$/);
+
+    my $format = defined $1 ? $1 : '';
+
+    my @success = grep { $_ eq $format } @{$self->format};
+
+    return unless @success;
+
+    $$path =~s/\.[\a-zA-Z0-9]{1,4}$//;
+
+    return $format;
+
+}
 
 1;
