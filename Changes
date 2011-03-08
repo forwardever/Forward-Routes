@@ -1,0 +1,10 @@
+Changes for Forward::Routes
+
+0.05    2011-03-08 00:00:00
+        - Fixed serious path matching bug for nested routes
+        - Made format detection significantly smarter and added format method
+          to allow format constraints
+
+
+0.04    2011-03-07 00:00:00
+        - First release
