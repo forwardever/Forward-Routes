@@ -68,6 +68,25 @@ sub add_route {
     return $child;
 }
 
+
+sub bridge {
+    my $self = shift;
+
+    return $self->add_route(@_)->_is_bridge(1);
+}
+
+
+sub _is_bridge {
+    my $self = shift;
+
+    return $self->{_is_bridge} unless defined $_[0];
+
+    $self->{_is_bridge} = $_[0];
+
+    return $self;
+}
+
+
 sub add_resource {
     my $self = shift;
     my $name = shift;
@@ -278,10 +297,10 @@ sub match {
     $path = "/$path" unless $path =~ m{ \A / }x;
 
     # Search for match
-    my $match = $self->_match(lc($method) => $path);
-    return unless $match;
+    my $matches = $self->_match(lc($method) => $path);
+    return unless $matches;
 
-    return [$match];
+    return $matches;
 }
 
 sub method {
@@ -302,6 +321,7 @@ sub via {
     shift->method(@_);
 }
 
+
 sub _match {
     my $self   = shift;
     my $method = shift;
@@ -320,7 +340,7 @@ sub _match {
     return if length($path) && !@{$self->children};
 
     # Children match
-    my $match;
+    my $matches = [];
 
     # Format
     my $format = $self->_match_format(\$path);
@@ -331,21 +351,31 @@ sub _match {
         foreach my $child (@{$self->children}) {
 
             # Match?
-            $match = $child->_match($method => $path);
-            last if $match;
+            $matches = $child->_match($method => $path);
+            last if $matches;
 
         }
-        return unless $match;
+        return unless $matches;
     }
 
     # Match object
-    $match ||= Forward::Routes::Match->new;
+    my $match;
+
+    if (!$matches->[0] || $self->_is_bridge) {
+        $match = Forward::Routes::Match->new;
+        unshift @$matches, $match;
+    }
+    else {
+        $match = $matches->[0];
+    }
+
     my $params = $self->prepare_params(@$captures);
     $match->add_params($params);
     $match->add_params({format => $format}) if length($format);
 
-    return $match;
+    return $matches;
 }
+
 
 sub _match_current_pattern {
     my $self     = shift;

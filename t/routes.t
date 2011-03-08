@@ -8,7 +8,7 @@ use Test::More;
 
 use Forward::Routes;
 
-use Test::More tests => 429;
+use Test::More tests => 434;
 
 #############################################################################
 ### empty
@@ -1128,6 +1128,27 @@ ok !$r->match(post => 'logout');
 
 
 #############################################################################
+### bridges
+
+$r = Forward::Routes->new;
+my $bridge = $r->bridge('admin')->to('check#authentication');
+$bridge->add_route('foo')->to('no#placeholders');
+$bridge->add_route(':foo/:bar')->to('two#placeholders');
+
+$m = $r->match(get => 'foo');
+is $m, undef;
+
+$m = $r->match(get => 'admin/foo');
+is_deeply $m->[0]->params, {controller => 'check', action => 'authentication'};
+is_deeply $m->[1]->params, {controller => 'no', action => 'placeholders'};
+
+$m = $r->match(get => '/admin/hello/there');
+is_deeply $m->[0]->params, {controller => 'check', action => 'authentication'};
+is_deeply $m->[1]->params, {controller => 'two', action => 'placeholders',
+  foo => 'hello', bar => 'there'};
+
+
+#############################################################################
 ### chained
 
 # Simple
@@ -1216,7 +1237,6 @@ is $r->build_path('geocoder_show', id => 456)->{path} => 'geocoder';
 is $r->build_path('geocoder_update_form', id => 789)->{path} => 'geocoder/edit';
 is $r->build_path('geocoder_update', id => 987)->{path} => 'geocoder';
 is $r->build_path('geocoder_delete', id => 654)->{path} => 'geocoder';
-
 
 #############################################################################
 ### resources
