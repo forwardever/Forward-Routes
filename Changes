@@ -1,5 +1,8 @@
 Changes for Forward::Routes
 
+0.07    2011-03-09 00:00:00
+        - Fixed Makefile.PL
+
 0.06    2011-03-08 00:00:00
         - Added bridge support inspired by Sebastian Riedel's
           Mojolicous::Routes module
