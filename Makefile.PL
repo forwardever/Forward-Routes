@@ -34,8 +34,8 @@ WriteMakefile(
             },
         )
     ),
-
-    test      => {TESTS         => 't/*.t'}
+    PREREQ_PM => {'Carp' => 0},
+    test      => {TESTS => 't/*.t'}
 );
 
 1;
