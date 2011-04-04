@@ -1,5 +1,9 @@
 Changes for Forward::Routes
 
+0.10    2011-04-04 00:00:00
+        - Make Forward::Routes compatible with older versions of Perl
+          (remove logical defined or //, which requires Perl 5.10)
+
 0.09    2011-04-04 00:00:00
         - Use method chaining for (internal) generation of resources
 
