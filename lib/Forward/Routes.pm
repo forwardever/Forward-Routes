@@ -555,7 +555,8 @@ sub _build_path {
             }
 
             # Constraint
-            if (defined(my $constraint = $part->{constraint})) {
+            my $constraint = $part->{constraint};
+            if (defined $constraint) {
                 croak qq/Param '$name' fails a constraint/
                   unless $path_part =~ m/^$constraint$/;
             }
