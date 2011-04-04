@@ -110,7 +110,7 @@ sub add_resource {
 
     my $nested = $resource->add_route;
     $nested->add_route
-      ->method('post')
+      ->via('post')
       ->to("$controller#create")
       ->name($name.'_create');
 
@@ -120,12 +120,12 @@ sub add_resource {
       ->name($name.'_show');
 
     $nested->add_route
-      ->method('put')
+      ->via('put')
       ->to("$controller#update")
       ->name($name.'_update');
 
     $nested->add_route
-      ->method('delete')
+      ->via('delete')
       ->to("$name#delete")
       ->name($name.'_delete');
 
@@ -166,18 +166,18 @@ sub add_resources {
 
         # resource
         $resource->add_route
-          ->method('get')
+          ->via('get')
           ->to("$name#index")
           ->name($name.'_index');
 
         $resource->add_route
-          ->method('post')
+          ->via('post')
           ->to("$name#create")
           ->name($name.'_create');
 
         # new resource item
         $resource->add_route('/new')
-          ->method('get')
+          ->via('get')
           ->to("$name#create_form")
           ->name($name.'_create_form');
 
@@ -187,27 +187,27 @@ sub add_resources {
         );
 
         $nested->add_route
-          ->method('get')
+          ->via('get')
           ->to("$name#show")
           ->name($name.'_show');
 
         $nested->add_route
-          ->method('put')
+          ->via('put')
           ->to("$name#update")
           ->name($name.'_update');
 
         $nested->add_route
-          ->method('delete')
+          ->via('delete')
           ->to("$name#delete")
           ->name($name.'_delete');
 
         $nested->add_route('edit')
-          ->method('get')
+          ->via('get')
           ->to("$name#update_form")
           ->name($name.'_update_form');
 
         $nested->add_route('delete')
-          ->method('get')
+          ->via('get')
           ->to("$name#delete_form")
           ->name($name.'_delete_form');
 
