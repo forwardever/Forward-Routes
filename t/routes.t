@@ -29,14 +29,13 @@ is ref $r, 'Forward::Routes';
 ### initialize
 
 $r = Forward::Routes->new;
-my $pattern = $r->{pattern};
 
 is $r->{method}, undef;
-is_deeply $r->{defaults}, {};
+is $r->{defaults}, undef;
+is $r->{prefix}, undef;
 is $r->{name}, undef;
 is $r->{to}, undef;
-is ref $pattern, 'Forward::Routes::Pattern';
-is_deeply $pattern->{constraints}, {};
+is $r->{pattern}, undef;
 
 
 #############################################################################
@@ -215,7 +214,7 @@ ok not defined $m;
 #############################################################################
 ### match_nested_routes
 $r = Forward::Routes->new;
-$pattern = $r->add_route('foo');
+my $pattern = $r->add_route('foo');
 $pattern->add_route('bar');
 
 $pattern = $r->add_route(':foo');

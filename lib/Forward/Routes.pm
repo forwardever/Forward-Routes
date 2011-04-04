@@ -17,6 +17,10 @@ sub new {
 
     my $self = bless {}, $class;
 
+    # Shortcut in case of chained API
+    return $self unless @_;
+
+    # Process params
     return $self->initialize(@_);
 }
 
@@ -468,7 +472,7 @@ sub _build_path {
     $path->{method} = $self->{method}->[0] if $self->{method};
 
     # Return path if current route has no pattern
-    return $path unless defined $self->{pattern}->pattern;
+    return $path unless $self->{pattern} && defined $self->{pattern}->pattern;
 
     $self->{pattern}->compile;
 
