@@ -699,7 +699,7 @@ sub _match_format {
 __END__
 =head1 Name
 
-Forward::Routes - restful routes for web framework builders
+Forward::Routes - restful routes for web framework developers
 
 =head1 Description
 
@@ -707,22 +707,26 @@ Instead of letting a web server like Apache decide which files to serve based
 on the provided URL, the whole work can be done by your framework using the
 L<Forward::Routes> module.
 
+=head2 1. Routes setup
+
 Think of routes as kind of simplified regular expressions!
 
-Each route represents a certain URL path pattern and holds a set of default
-values.
+Each route represents a URL path pattern and holds a set of default values.
 
     # create a routes root object
     my $routes = Forward::Routes->new;
 
-    # add a route with a :city placeholder and controller and action defaults
-    $routes->add_route('/towns/:city')
-      ->defaults(controller => 'world', action => 'cities');
+    # add a new route with a :city placeholder and controller and action defaults
+    $routes->add_route('/towns/:city')->defaults(controller => 'world', action => 'cities');
 
-After all routes have been defined, you just pass a specific path to search
-all routes, and if there is a match, the search ends and an array ref of
-L<Forward::Routes::Match> objects is returned with the necessary parameters
-needed for further action.
+=head2 2. Search for a matching route
+
+After the setup has been done, the method and path of a current HTTP request
+can be passed to the routes root object using the "match" method to search for
+a matching route.
+
+The match method returns an array ref of L<Forward::Routes::Match> objects in
+case of a match, or undef if there is no match.
 
     # get request path and method (e.g. from a Plack::Request object)
     my $path   = $req->path_info;
@@ -731,10 +735,17 @@ needed for further action.
     # search routes
     my $matches = $routes->match($method => $path);
 
-Unless you use advanced techniques such as bridges, only one match object
-($matches->[0]) is returned.
 
-The match object contains two kinds of parameters:
+Unless advanced techniques such as bridges are used, the array ref contains
+no more than one match object ($matches->[0]).
+
+The search ends as soon as a matching route has been found. As a result, if
+there are multiple routes that might match, the route that has been defined
+first wins.
+
+=head2 3. Search for a matching route
+
+The match object holds two types of parameters:
 
 =over 2
 
@@ -749,27 +760,33 @@ placeholder values extracted from the passed URL path
 
 =back
 
-    # $matches is an array ref of Forward::Routes::Match objects
+Controller and action parameters can be used by your framework to execute the
+desired controller method, while making default and placeholder values of the
+matching route available to that method for further use.
+
+    # $matches is an array ref
     my $matches = $routes->match(get => '/towns/paris');
 
+    # $match is a Forward::Routes::Match object
+    my $match = $matches->[0]
+
     # $controller is "world"
-    my $controller = $match->[0]->params->{controller};
+    my $controller = $match->params->{controller};
 
     # $action is "cities"
-    my $action = $match->[0]->params->{action};
+    my $action = $match->params->{action};
 
     # $city is "paris" (placeholder)
-    my $city = $match->[0]->params->{city};
+    my $city = $match->params->{city};
 
-If no route matches the passed path, an undefined value is returned. Your
-framework might render 404 not found in such cases.
+
+If the passed path and method do not match against a defined route, an
+undefined value is returned. Frameworks might render a 404 not found page in
+such cases.
 
     # $matches is undef
     my $matches = $routes->match(get => '/hello_world');
 
-Controller and action parameters can be used by your framework to execute the
-desired controller method, while making defaults and placeholder values of the
-matching route available to that method for further use.
 
 =head1 Features
 
