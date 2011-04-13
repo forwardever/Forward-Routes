@@ -697,9 +697,6 @@ sub _match_format {
 
 1;
 __END__
-
-=pod
-
 =head1 Name
 
 Forward::Routes - restful routes for web framework builders
@@ -728,44 +725,45 @@ all routes, and if there is a match, the search ends and an array ref of
 L<Forward::Routes::Match> objects is returned with the necessary parameters
 needed for further action.
 
-    # get request path and the request method (in this case from a
+    # get request path and the request method (in this case from a 
     # Plack::Request object)
     my $path   = $req->path_info;
     my $method = $req->method;
 
     # search routes
-    my $match = $routes->match($method => $path);
+    my $matches = $routes->match($method => $path);
 
 Unless you use advanced techniques such as bridges, only one match object
-($match->[0]) is returned.
+($matches->[0]) is returned.
 
 The match object contains two kinds of parameters:
 
-- default values as defined with the route
+- default values of the matching route as defined earlier via the "defaults"
+  method
 
-- placeholder values extracted from the URL for further use
-
-
-    # $matches is undef, as there is no matching route
-    # your framework might render 404 not found
-    my $matches = $routes->match(get => '/hello_world');
+- placeholder values extracted from the passed URL path
 
     # $matches is an array ref of Forward::Routes::Match objects
     my $matches = $routes->match(get => '/towns/paris');
 
-    # $controller is "world" (default)
+    # $controller is "world"
     my $controller = $match->[0]->params->{controller};
 
-    # $action is "cities" (default)
+    # $action is "cities"
     my $action = $match->[0]->params->{action};
 
-    # $city is "paris" (placeholder value of :city)
+    # $city is "paris" (placeholder)
     my $city = $match->[0]->params->{city};
 
-Now, your framework can use the controller and action parameters to create
-a controller instance and execute the action on this instance. You should also
-make sure that placeholder parameters can be accessed from your controller
-action for further use (e.g. to query a database using the name of a city).
+If no route matches the passed path, an undefined value is returned. Your
+framework might render 404 not found in such cases.
+
+    # $matches is undef
+    my $matches = $routes->match(get => '/hello_world');
+
+Controller and action parameters can be used by your framework to execute the
+desired controller method, while making defaults and placeholder values of the
+matching route available to that method for further use.
 
 =head1 Features
 
