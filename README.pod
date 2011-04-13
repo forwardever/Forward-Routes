@@ -46,7 +46,7 @@ The search ends as soon as a matching route has been found. As a result, if
 there are multiple routes that might match, the route that has been defined
 first wins.
 
-=head3 3. Search for a matching route
+=head3 3. Parameters
 
 The match object holds two types of parameters:
 

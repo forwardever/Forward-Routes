@@ -707,7 +707,7 @@ Instead of letting a web server like Apache decide which files to serve based
 on the provided URL, the whole work can be done by your framework using the
 L<Forward::Routes> module.
 
-=head2 1. Routes setup
+=head3 1. Routes setup
 
 Think of routes as kind of simplified regular expressions!
 
@@ -719,7 +719,7 @@ Each route represents a URL path pattern and holds a set of default values.
     # add a new route with a :city placeholder and controller and action defaults
     $routes->add_route('/towns/:city')->defaults(controller => 'world', action => 'cities');
 
-=head2 2. Search for a matching route
+=head3 2. Search for a matching route
 
 After the setup has been done, the method and path of a current HTTP request
 can be passed to the routes root object using the "match" method to search for
@@ -743,7 +743,7 @@ The search ends as soon as a matching route has been found. As a result, if
 there are multiple routes that might match, the route that has been defined
 first wins.
 
-=head2 3. Search for a matching route
+=head3 3. Parameters
 
 The match object holds two types of parameters:
 
