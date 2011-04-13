@@ -1,5 +1,8 @@
 Changes for Forward::Routes
 
+0.12    2011-04-13 00:00:00
+        - Added .gitignore file
+
 0.11    2011-04-13 00:00:00
         - Added description to pod
 
