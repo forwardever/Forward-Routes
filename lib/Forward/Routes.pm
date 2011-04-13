@@ -736,10 +736,16 @@ Unless you use advanced techniques such as bridges, only one match object
 
 The match object contains two kinds of parameters:
 
-- default values of the matching route as defined earlier via the "defaults"
-  method
+=item *
 
-- placeholder values extracted from the passed URL path
+default values of the matching route as defined earlier via the "defaults"
+method
+
+=item *
+
+placeholder values extracted from the passed URL path
+
+=back
 
     # $matches is an array ref of Forward::Routes::Match objects
     my $matches = $routes->match(get => '/towns/paris');
