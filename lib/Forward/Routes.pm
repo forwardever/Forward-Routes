@@ -743,6 +743,14 @@ The search ends as soon as a matching route has been found. As a result, if
 there are multiple routes that might match, the route that has been defined
 first wins.
 
+If the passed path and method do not match against a defined route, an
+undefined value is returned. Frameworks might render a 404 not found page in
+such cases.
+
+    # $matches is undef
+    my $matches = $routes->match(get => '/hello_world');
+
+
 =head3 3. Parameters
 
 The match object holds two types of parameters:
@@ -778,14 +786,6 @@ matching route available to that method for further use.
 
     # $city is "paris" (placeholder)
     my $city = $match->params->{city};
-
-
-If the passed path and method do not match against a defined route, an
-undefined value is returned. Frameworks might render a 404 not found page in
-such cases.
-
-    # $matches is undef
-    my $matches = $routes->match(get => '/hello_world');
 
 
 =head1 Features
