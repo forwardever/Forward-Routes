@@ -696,3 +696,288 @@ sub _match_format {
 }
 
 1;
+__END__
+
+=pod
+
+=head1 Name
+
+Forward::Routes - restful routes for web framework builders
+
+=head1 Description
+
+Instead of letting a web server like Apache decide which files to serve based
+on the provided URL, the whole work can be done by your framework using the
+L<Forward::Routes> module.
+
+Think of routes as kind of simplified regular expressions!
+
+Each route represents a certain URL path pattern and holds a set of default
+values.
+
+    # create a routes root object
+    my $routes = Forward::Routes->new;
+
+    # add a route with a :city placeholder and controller and action defaults
+    # the :city placeholder matches everything except slashes
+    $routes->add_route('/towns/:city')
+      ->defaults(controller => 'world', action => 'cities');
+
+After all routes have been defined, you just pass a specific path to search
+all routes, and if there is a match, the search ends and an array ref of
+L<Forward::Routes::Match> objects is returned with the necessary parameters
+needed for further action.
+
+    # get request path and the request method (in this case from a
+    # Plack::Request object)
+    my $path   = $req->path_info;
+    my $method = $req->method;
+
+    # search routes
+    my $match = $routes->match($method => $path);
+
+Unless you use advanced techniques such as bridges, only one match object
+($match->[0]) is returned.
+
+The match object contains two kinds of parameters:
+
+- default values as defined with the route
+
+- placeholder values extracted from the URL for further use
+
+
+    # $matches is undef, as there is no matching route
+    # your framework might render 404 not found
+    my $matches = $routes->match(get => '/hello_world');
+
+    # $matches is an array ref of Forward::Routes::Match objects
+    my $matches = $routes->match(get => '/towns/paris');
+
+    # $controller is "world" (default)
+    my $controller = $match->[0]->params->{controller};
+
+    # $action is "cities" (default)
+    my $action = $match->[0]->params->{action};
+
+    # $city is "paris" (placeholder value of :city)
+    my $city = $match->[0]->params->{city};
+
+Now, your framework can use the controller and action parameters to create
+a controller instance and execute the action on this instance. You should also
+make sure that placeholder parameters can be accessed from your controller
+action for further use (e.g. to query a database using the name of a city).
+
+=head1 Features
+
+=head2 Basic Routes
+
+    $r = Forward::Routes->new;
+    $r->add_route('foo/bar');
+
+    my $m = $r->match(get => 'foo/bar');
+    is_deeply $m->[0]->params => {};
+
+    my $m = $r->match(get => 'foo/hello');
+    is $m, undef;
+
+
+=head2 Placeholders
+
+    $r = Forward::Routes->new;
+    $r->add_route(':foo/:bar');
+
+    $m = $r->match(get => 'hello/there');
+    is_deeply $m->[0]->params => {foo => 'hello', bar => 'there'};
+
+
+=head2 Format Constraints and Detection
+
+    $r = Forward::Routes->new->format('html','xml');
+    $r->add_route(':foo/:bar');
+
+    $m = $r->match(get => 'hello/there.html');
+    is_deeply $m->[0]->params => {foo => 'hello', bar => 'there', format => 'html'};
+
+    $m = $r->match(get => 'hello/there.xml');
+    is_deeply $m->[0]->params => {foo => 'hello', bar => 'there', format => 'xml'};
+
+    $m = $r->match(get => 'hello/there.jpeg');
+    is $m, undef;
+
+
+=head2 Nested Routes
+
+    $r = Forward::Routes->new;
+    $nested = $r->add_route(':foo');
+    $nested->add_route(':bar');
+
+    $m = $r->match(get => 'hello/there');
+    is_deeply $m->[0]->params => {foo => 'hello', bar => 'there'};
+
+
+=head2 Bridges
+
+    $r = Forward::Routes->new;
+    my $bridge = $r->bridge('admin')->to('check#authentication');
+    $bridge->add_route('foo')->to('my#stuff');
+    
+    $m = $r->match(get => 'admin/foo');
+    is_deeply $m->[0]->params, {controller => 'check', action => 'authentication'};
+    is_deeply $m->[1]->params, {controller => 'my', action => 'stuff'};
+
+
+=head2 Defaults for action and controller params
+
+    $r = Forward::Routes->new;
+    $r->add_route('articles')->to('foo#bar');
+
+    $m = $r->match(get => 'articles');
+    is_deeply $m->[0]->params => {controller => 'foo', action => 'bar'};
+
+    
+=head2 Constraints
+
+    $r = Forward::Routes->new;
+    $r->add_route('articles/:id')->constraints(id => qr/\d+/);
+    
+    $m = $r->match(get => 'articles/abc');
+    ok not defined $m;
+    
+    $m = $r->match(get => 'articles/123');
+    is_deeply $m->[0]->params => {id => 123};
+
+
+=head2 Grouping
+
+    $r = Forward::Routes->new;
+    $r->add_route('world/(:country)-(:cities)')->name('hello');
+    
+    $m = $r->match(get => 'world/us-new_york');
+    is_deeply $m->[0]->params => {country => 'us', cities => 'new_york'};
+
+
+=head2 Path Building
+
+    # build path
+    is $r->build_path('hello', country => 'us', cities => 'new_york')->{path},
+      'world/us-new_york';
+
+
+=head2 Optional Placeholders    
+
+    $r = Forward::Routes->new;
+    $r->add_route(':year(/:month/:day)?')->name('foo');
+    
+    $m = $r->match(get => '2009');
+    is_deeply $m->[0]->params => {year => 2009};
+    
+    $m = $r->match(get => '2009/12');
+    ok !defined $m;
+    
+    $m = $r->match(get => '2009/12/10');
+    is_deeply $m->[0]->params => {year => 2009, month => 12, day => 10};
+
+
+
+    $r = Forward::Routes->new;
+    $r->add_route('/hello/world(-:city)?')->name('foo');
+    
+    $m = $r->match(get => 'hello/world');
+    is_deeply $m->[0]->params => {};
+    
+    $m = $r->match(get => 'hello/world-paris');
+    is_deeply $m->[0]->params => {city => 'paris'};   
+
+
+=head2 Optional Placeholders and Defaults
+
+    $r = Forward::Routes->new;
+    $r->add_route(':year(/:month)?/:day')->defaults(month => 1);
+    
+    $m = $r->match(get => '2009');
+    ok not defined $m;
+    
+    $m = $r->match(get => '2009/12');
+    is_deeply $m->[0]->params => {year => 2009, month => 1, day => 12};
+    
+    $m = $r->match(get => '2009/2/3');
+    is_deeply $m->[0]->params => {year => 2009, month => 2, day => 3};
+
+
+=head2 Method Matching
+
+    $r = Forward::Routes->new;
+    $r->add_route('logout')->via('get');
+    ok $r->match(get => 'logout');
+    ok !$r->match(post => 'logout');
+
+
+=head2 Chaining
+
+    $r = Forward::Routes->new;
+    my $articles = $r->add_route('articles/:id')
+      ->defaults(first_name => 'foo', last_name => 'bar')
+      ->constraints(id => qr/\d+/)
+      ->name('hot')
+      ->to('hello#world')
+      ->via('get','post');
+
+
+=head2 Resources
+
+    $r = Forward::Routes->new;
+    $r->add_resources('users','photos','tags');
+    
+    $m = $r->match(get => 'photos');
+    is_deeply $m->[0]->params => {controller => 'photos', action => 'index'};
+    
+    $m = $r->match(get => 'photos/1');
+    is_deeply $m->[0]->params => {controller => 'photos', action => 'show', id => 1};
+    
+    $m = $r->match(put => 'photos/1');
+    is_deeply $m->[0]->params => {controller => 'photos', action => 'update', id => 1};
+
+
+=head2 Path Building and Resources
+
+    $r = Forward::Routes->new;
+    $r->add_resources('users','photos','tags');
+
+    is $r->build_path('photos_update', id => 987)->{path} => 'photos/987';
+
+
+=head2 Nested Resources
+
+    $r = Forward::Routes->new;
+    my $magazines = $r->add_resources('magazines');
+    $magazines->add_resources('ads');
+
+    $m = $r->match(get => 'magazines/1/ads/4');
+    is_deeply $m->[0]->params =>
+      {controller => 'ads', action => 'show', magazines_id => 1, ads_id => 4};
+
+
+
+
+=head1 Author
+
+ForwardEver
+
+=head1 Copyright and License
+
+Copyright (C) 2011, ForwardEver
+
+This program is free software, you can redistribute it and/or modify it under
+the terms of the Artistic License version 2.0.
+
+=head1 Credits
+
+Path matching and path building inspired by Viacheslav Tykhanovskyi's Router module
+L<https://github.com/vti/router>
+
+Concept of nested routes and bridges inspired by Sebastian Riedel's Mojolicious::Routes module
+L<https://github.com/kraih/mojo/tree/master/lib/Mojolicious/Routes>
+
+Concept of restful resources inspired by Ruby on Rails
+
+=cut

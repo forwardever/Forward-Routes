@@ -2,14 +2,72 @@
 
 =head1 Name
 
-Forward::Routes
+Forward::Routes - restful routes for web framework builders
 
 =head1 Description
 
-L<Forward::Routes>: routes for framework builders, experimental, so API might change
+Instead of letting a web server like Apache decide which files to serve based
+on the provided URL, the whole work can be done by your framework using the
+L<Forward::Routes> module.
+
+Think of routes as kind of simplified regular expressions!
+
+Each route represents a certain URL path pattern and holds a set of default
+values.
+
+    # create a routes root object
+    my $routes = Forward::Routes->new;
+
+    # add a route with a :city placeholder and controller and action defaults
+    # the :city placeholder matches everything except slashes
+    $routes->add_route('/towns/:city')
+      ->defaults(controller => 'world', action => 'cities');
+
+After all routes have been defined, you just pass a specific path to search
+all routes, and if there is a match, the search ends and an array ref of
+L<Forward::Routes::Match> objects is returned with the necessary parameters
+needed for further action.
+
+    # get request path and the request method (in this case from a
+    # Plack::Request object)
+    my $path   = $req->path_info;
+    my $method = $req->method;
+
+    # search routes
+    my $match = $routes->match($method => $path);
+
+Unless you use advanced techniques such as bridges, only one match object
+($match->[0]) is returned.
+
+The match object contains two kinds of parameters:
+
+- default values as defined with the route
+
+- placeholder values extracted from the URL for further use
+
+
+    # $matches is undef, as there is no matching route
+    # your framework might render 404 not found
+    my $matches = $routes->match(get => '/hello_world');
+
+    # $matches is an array ref of Forward::Routes::Match objects
+    my $matches = $routes->match(get => '/towns/paris');
+
+    # $controller is "world" (default)
+    my $controller = $match->[0]->params->{controller};
+
+    # $action is "cities" (default)
+    my $action = $match->[0]->params->{action};
+
+    # $city is "paris" (placeholder value of :city)
+    my $city = $match->[0]->params->{city};
+
+Now, your framework can use the controller and action parameters to create
+a controller instance and execute the action on this instance. You should also
+make sure that placeholder parameters can be accessed from your controller
+action for further use (e.g. to query a database using the name of a city).
 
 =head1 Features
-
 
 =head2 Basic Routes
 
@@ -197,8 +255,6 @@ L<Forward::Routes>: routes for framework builders, experimental, so API might ch
     $m = $r->match(get => 'magazines/1/ads/4');
     is_deeply $m->[0]->params =>
       {controller => 'ads', action => 'show', magazines_id => 1, ads_id => 4};
-
-
 
 
 =head1 Author

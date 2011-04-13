@@ -24,7 +24,7 @@ WriteMakefile(
                 requires  => {perl => '5.008007'},
                 resources => {
                     license    => 'http://dev.perl.org/licenses/',
-                    repository => 'https://github.com/forwardever/Forward-Routes'
+                    repository => 'http://github.com/forwardever/Forward-Routes'
                 },
                 no_index => {directory => [qw/t/]}
             },
