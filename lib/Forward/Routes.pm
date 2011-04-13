@@ -736,6 +736,8 @@ Unless you use advanced techniques such as bridges, only one match object
 
 The match object contains two kinds of parameters:
 
+=over 2
+
 =item *
 
 default values of the matching route as defined earlier via the "defaults"
