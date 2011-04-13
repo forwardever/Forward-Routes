@@ -716,7 +716,6 @@ values.
     my $routes = Forward::Routes->new;
 
     # add a route with a :city placeholder and controller and action defaults
-    # the :city placeholder matches everything except slashes
     $routes->add_route('/towns/:city')
       ->defaults(controller => 'world', action => 'cities');
 
@@ -725,8 +724,7 @@ all routes, and if there is a match, the search ends and an array ref of
 L<Forward::Routes::Match> objects is returned with the necessary parameters
 needed for further action.
 
-    # get request path and the request method (in this case from a 
-    # Plack::Request object)
+    # get request path and method (e.g. from a Plack::Request object)
     my $path   = $req->path_info;
     my $method = $req->method;
 
