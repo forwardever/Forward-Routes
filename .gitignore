@@ -1,0 +1,7 @@
+MANIFEST
+Makefile
+META.yml
+.*
+!.gitignore
+blib
+pm_to_blib
