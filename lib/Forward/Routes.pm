@@ -790,7 +790,7 @@ matching route available to that method for further use.
 The C<add_route> method adds a new route to the parent route object (in simple
 use cases, to the routes root object) and returns the new route object.
 
-The passed paramter is the URL path pattern of the new route object. The URL
+The passed parameter is the URL path pattern of the new route object. The URL
 path pattern is kind of a simplified reqular expression for the path part of a
 URL and is transformed to a real regular expression internally. It is used
 later on to check whether the passed request path matches the route.
@@ -864,7 +864,7 @@ is put between slashes (grouping).
 =head2 Constraints
 
 By default, placeholders match everything except slashes. The C<constraints>
-method allows to make placeholders more restricted. The first passed
+method allows to make placeholders more restrictive. The first passed
 parameter is the name of the placeholder, the second parameter is a
 Perl regular expression.
 
@@ -978,19 +978,20 @@ Routes are reversible, i.e. paths can be generated through the C<build_path>
 method. The first parameter is the name of the route. If the route consists of
 placeholders which are not optional, placeholder values have to be passed as
 well to generate the path, otherwise an exception is thrown.
+The C<build_path> method returns a hash ref with the keys "method" and "path".
 
     $r = Forward::Routes->new;
-    $r->add_route('world/(:country)-(:cities)')->name('hello');
+    $r->add_route('world/(:country)-(:cities)')->name('hello')->via('post');
 
-    # build path
-    # $r->build_path('hello', country => 'us', cities => 'new_york')->{path} is
-    # 'world/us-new_york';
+    my $path = $r->build_path('hello', country => 'us', cities => 'new_york')
+    # $path->{path}   is 'world/us-new_york';
+    # $path->{method} is 'post';
 
 Path building is useful to build tag helpers that can be used in templates.
 For example, a link_to helper might generate a link with the help of a route
 name: link_to('route_name', placeholder => 'value'). In contrast to hard
-coding the URL in templates, routes can be changed an all links in your
-templates are adjusted automatically.
+coding the URL in templates, routes could be changed an all links in your
+templates would get adjusted automatically.
 
 
 =head2 Chaining
@@ -1037,7 +1038,7 @@ be reduced this way.
     $root->add_route('foo1/bar4');
     $root->add_route('foo1/bar5');
     $root->add_route('foo2/bar5');
-    # 6 regular expression matches performed
+    # 6 regular expression searches performed
 
 
 =head2 Resources
@@ -1083,8 +1084,8 @@ The C<resources> method allows to generate Rails like resources.
     $bridge->add_route('foo')->to('my#stuff');
 
     $m = $r->match(get => 'admin/foo');
-    is_deeply $m->[0]->params, {controller => 'check', action => 'authentication'};
-    is_deeply $m->[1]->params, {controller => 'my', action => 'stuff'};
+    # $m->[0]->params is {controller => 'check', action => 'authentication'}
+    # $m->[1]->params is {controller => 'my', action => 'stuff'}
 
 
 =head1 Author
