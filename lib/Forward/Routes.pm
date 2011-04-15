@@ -778,193 +778,291 @@ matching route available to that method for further use.
     # $match is a Forward::Routes::Match object
     my $match = $matches->[0]
 
-    # $controller is "world"
-    my $controller = $match->params->{controller};
-
-    # $action is "cities"
-    my $action = $match->params->{action};
-
-    # $city is "paris" (placeholder)
-    my $city = $match->params->{city};
+    # $match->params->{controller} is "world"
+    # $match->params->{action}     is "cities"
+    # $match->params->{city}       is "paris"
 
 
-=head1 Features
+=head1 Features and Methods
 
-=head2 Basic Routes
+=head2 Add new routes
 
-    $r = Forward::Routes->new;
-    $r->add_route('foo/bar');
+The C<add_route> method adds a new route to the parent route object (in simple
+use cases, to the routes root object) and returns the new route object.
 
-    my $m = $r->match(get => 'foo/bar');
-    is_deeply $m->[0]->params => {};
+The passed paramter is the URL path pattern of the new route object. The URL
+path pattern is kind of a simplified reqular expression for the path part of a
+URL and is transformed to a real regular expression internally. It is used
+later on to check whether the passed request path matches the route.
+
+    $root = Forward::Routes->new;
+    my $new_route = $root->add_route('foo/bar');
+
+    my $m = $root->match(get => 'foo/bar');
+    # $m->[0]->params is {}
 
     my $m = $r->match(get => 'foo/hello');
-    is $m, undef;
+    # $m is undef;
 
 
 =head2 Placeholders
 
+Placeholders start with a colon and match everything except slashes. If the
+route matches against the passed request method and path, placeholder values
+can be retrieved from the returned match object.
+
     $r = Forward::Routes->new;
     $r->add_route(':foo/:bar');
 
     $m = $r->match(get => 'hello/there');
-    is_deeply $m->[0]->params => {foo => 'hello', bar => 'there'};
+    # $m->[0]->params is {foo => 'hello', bar => 'there'};
+
+    $m = $r->match(get => 'hello/there/you');
+    # $m is undef
 
 
-=head2 Format Constraints and Detection
+=head2 Optional Placeholders
 
-    $r = Forward::Routes->new->format('html','xml');
-    $r->add_route(':foo/:bar');
-
-    $m = $r->match(get => 'hello/there.html');
-    is_deeply $m->[0]->params => {foo => 'hello', bar => 'there', format => 'html'};
-
-    $m = $r->match(get => 'hello/there.xml');
-    is_deeply $m->[0]->params => {foo => 'hello', bar => 'there', format => 'xml'};
-
-    $m = $r->match(get => 'hello/there.jpeg');
-    is $m, undef;
-
-
-=head2 Nested Routes
+Placeholders can be marked as optional by surrounding them with brackets and
+a trailing question mark.
 
     $r = Forward::Routes->new;
-    $nested = $r->add_route(':foo');
-    $nested->add_route(':bar');
+    $r->add_route(':year(/:month/:day)?');
 
-    $m = $r->match(get => 'hello/there');
-    is_deeply $m->[0]->params => {foo => 'hello', bar => 'there'};
+    $m = $r->match(get => '2009');
+    # $m->[0]->params is {year => 2009}
 
+    $m = $r->match(get => '2009/12');
+    # $m is undef
 
-=head2 Bridges
+    $m = $r->match(get => '2009/12/10');
+    # $m->[0]->params is {year => 2009, month => 12, day => 10}
+
 
     $r = Forward::Routes->new;
-    my $bridge = $r->bridge('admin')->to('check#authentication');
-    $bridge->add_route('foo')->to('my#stuff');
-    
-    $m = $r->match(get => 'admin/foo');
-    is_deeply $m->[0]->params, {controller => 'check', action => 'authentication'};
-    is_deeply $m->[1]->params, {controller => 'my', action => 'stuff'};
+    $r->add_route('/hello/world(-:city)?');
 
+    $m = $r->match(get => 'hello/world');
+    # $m->[0]->params is {}
 
-=head2 Defaults for action and controller params
-
-    $r = Forward::Routes->new;
-    $r->add_route('articles')->to('foo#bar');
-
-    $m = $r->match(get => 'articles');
-    is_deeply $m->[0]->params => {controller => 'foo', action => 'bar'};
-
-    
-=head2 Constraints
-
-    $r = Forward::Routes->new;
-    $r->add_route('articles/:id')->constraints(id => qr/\d+/);
-    
-    $m = $r->match(get => 'articles/abc');
-    ok not defined $m;
-    
-    $m = $r->match(get => 'articles/123');
-    is_deeply $m->[0]->params => {id => 123};
+    $m = $r->match(get => 'hello/world-paris');
+    # $m->[0]->params is {city => 'paris'}
 
 
 =head2 Grouping
 
+Placeholders have to be surrounded with brackets if more than one placeholder
+is put between slashes (grouping).
+
     $r = Forward::Routes->new;
-    $r->add_route('world/(:country)-(:cities)')->name('hello');
-    
+    $r->add_route('world/(:country)-(:cities)');
+
     $m = $r->match(get => 'world/us-new_york');
-    is_deeply $m->[0]->params => {country => 'us', cities => 'new_york'};
+    # $m->[0]->params is {country => 'us', cities => 'new_york'}
 
 
-=head2 Path Building
+=head2 Constraints
 
-    # build path
-    is $r->build_path('hello', country => 'us', cities => 'new_york')->{path},
-      'world/us-new_york';
-
-
-=head2 Optional Placeholders    
+By default, placeholders match everything except slashes. The C<constraints>
+method allows to make placeholders more restricted. The first passed
+parameter is the name of the placeholder, the second parameter is a
+Perl regular expression.
 
     $r = Forward::Routes->new;
-    $r->add_route(':year(/:month/:day)?')->name('foo');
+
+    # placeholder only matches integers
+    $r->add_route('articles/:id')->constraints(id => qr/\d+/);
     
-    $m = $r->match(get => '2009');
-    is_deeply $m->[0]->params => {year => 2009};
+    $m = $r->match(get => 'articles/abc');
+    # $m is undef
     
-    $m = $r->match(get => '2009/12');
-    ok !defined $m;
-    
-    $m = $r->match(get => '2009/12/10');
-    is_deeply $m->[0]->params => {year => 2009, month => 12, day => 10};
+    $m = $r->match(get => 'articles/123');
+    # $m->[0]->params is {id => 123}
 
 
+=head2 Defaults
+
+The C<defaults> method allows to add default values to a route. If the route
+matches against the passed request method and path, default values can be
+retrieved from the returned match object.
 
     $r = Forward::Routes->new;
-    $r->add_route('/hello/world(-:city)?')->name('foo');
-    
-    $m = $r->match(get => 'hello/world');
-    is_deeply $m->[0]->params => {};
-    
-    $m = $r->match(get => 'hello/world-paris');
-    is_deeply $m->[0]->params => {city => 'paris'};   
+    $r->add_route('articles')
+      ->defaults(first_name => 'Kevin', last_name => 'Smith');
+
+    $m = $r->match(get => 'articles');
+    # $m->[0]->params is {first_name => 'Kevin', last_name => 'Smith'}
 
 
 =head2 Optional Placeholders and Defaults
 
+Placeholders are automatically filled with default values if the route
+would not match otherwise.
+
     $r = Forward::Routes->new;
     $r->add_route(':year(/:month)?/:day')->defaults(month => 1);
-    
+
     $m = $r->match(get => '2009');
-    ok not defined $m;
-    
+    # $m is undef
+
     $m = $r->match(get => '2009/12');
-    is_deeply $m->[0]->params => {year => 2009, month => 1, day => 12};
-    
+    # $m->[0]->params is {year => 2009, month => 1, day => 12}
+
     $m = $r->match(get => '2009/2/3');
-    is_deeply $m->[0]->params => {year => 2009, month => 2, day => 3};
+    # $m->[0]->params is {year => 2009, month => 2, day => 3};
 
 
-=head2 Method Matching
+=head2 Shortcut for Action and Controller Defaults
+
+The C<to> method provides a shortcut for action and controller defaults.
 
     $r = Forward::Routes->new;
-    $r->add_route('logout')->via('get');
-    ok $r->match(get => 'logout');
-    ok !$r->match(post => 'logout');
+
+    $r->add_route('articles')
+      ->to('foo#bar');
+
+    # is a shortcut for
+    $r->add_route('articles')
+      ->defaults(controller => 'foo', action => 'bar');
+
+    $m = $r->match(get => 'articles');
+    # $m->[0]->params is {controller => 'foo', action => 'bar'}
+
+
+=head2 Request Method Constraints
+
+The C<via> method sets the HTTP request method required for a route to match.
+If no method is set, the request method has no influence on the search for a
+matching route.
+
+    $r = Forward::Routes->new;
+    $r->add_route('logout')->via('post');
+
+    my $m = $r->match(get => 'logout');
+    # $m is undef
+    
+    my $m = $r->match(post => 'logout');
+    # $m->[0] is {}
+
+
+=head2 Format Constraints
+
+The C<format> method restricts the allowed formats of a URL path. If the route
+matches against the passed request method and path, the format value can be
+retrieved from the returned match object.
+
+    $r = Forward::Routes->new;
+    $r->add_route(':foo/:bar')->format('html','xml');
+
+    $m = $r->match(get => 'hello/there.html');
+    # $m->[0]->params is {foo => 'hello', bar => 'there', format => 'html'}
+
+    $m = $r->match(get => 'hello/there.xml');
+    # $m->[0]->params is {foo => 'hello', bar => 'there', format => 'xml'}
+
+    $m = $r->match(get => 'hello/there.jpeg');
+    # $m is undef
+
+=head2 Naming
+
+Each route can get a name through the C<name> method. Names are required to
+make routes reversible (see C<build_path>).
+
+    $r = Forward::Routes->new;
+    $r->add_route('logout')->name('foo');
+
+
+=head2 Path Building
+
+Routes are reversible, i.e. paths can be generated through the C<build_path>
+method. The first parameter is the name of the route. If the route consists of
+placeholders which are not optional, placeholder values have to be passed as
+well to generate the path, otherwise an exception is thrown.
+
+    $r = Forward::Routes->new;
+    $r->add_route('world/(:country)-(:cities)')->name('hello');
+
+    # build path
+    # $r->build_path('hello', country => 'us', cities => 'new_york')->{path} is
+    # 'world/us-new_york';
+
+Path building is useful to build tag helpers that can be used in templates.
+For example, a link_to helper might generate a link with the help of a route
+name: link_to('route_name', placeholder => 'value'). In contrast to hard
+coding the URL in templates, routes can be changed an all links in your
+templates are adjusted automatically.
 
 
 =head2 Chaining
 
+All methods can be chained.
+
     $r = Forward::Routes->new;
     my $articles = $r->add_route('articles/:id')
       ->defaults(first_name => 'foo', last_name => 'bar')
+      ->format('html')
       ->constraints(id => qr/\d+/)
       ->name('hot')
       ->to('hello#world')
       ->via('get','post');
 
 
+=head2 Nested Routes
+
+New routes cannot only be added to the routes root object, but to any route.
+Building deep routes trees might result in performance gains in larger
+projects with many routes, as the amount of regular expression searches can
+be reduced this way.
+
+    # nested routes
+    $root = Forward::Routes->new;
+    $nested1 = $root->add_route('foo1');
+    $nested1->add_route('bar1');
+    $nested1->add_route('bar2');
+    $nested1->add_route('bar3');
+    $nested1->add_route('bar4');
+    $nested1->add_route('bar5');
+
+    $nested2 = $root->add_route('foo2');
+    $nested2->add_route('bar5');
+
+    $m = $r->match(get => 'foo2/bar5');
+    # 3 regular expression searches performed
+
+    # alternative:
+    $root = Forward::Routes->new;
+    $root->add_route('foo1/bar1');
+    $root->add_route('foo1/bar2');
+    $root->add_route('foo1/bar3');
+    $root->add_route('foo1/bar4');
+    $root->add_route('foo1/bar5');
+    $root->add_route('foo2/bar5');
+    # 6 regular expression matches performed
+
+
 =head2 Resources
 
+The C<resources> method allows to generate Rails like resources.
+
     $r = Forward::Routes->new;
-    $r->add_resources('users','photos','tags');
-    
+    $r->add_resources('users', 'photos', 'tags');
+
     $m = $r->match(get => 'photos');
-    is_deeply $m->[0]->params => {controller => 'photos', action => 'index'};
-    
+    # $m->[0]->params is {controller => 'photos', action => 'index'}
+
     $m = $r->match(get => 'photos/1');
-    is_deeply $m->[0]->params => {controller => 'photos', action => 'show', id => 1};
-    
+    # $m->[0]->params is {controller => 'photos', action => 'show', id => 1}
+
     $m = $r->match(put => 'photos/1');
-    is_deeply $m->[0]->params => {controller => 'photos', action => 'update', id => 1};
+    # $m->[0]->params is {controller => 'photos', action => 'update', id => 1}
 
 
 =head2 Path Building and Resources
 
     $r = Forward::Routes->new;
-    $r->add_resources('users','photos','tags');
+    $r->add_resources('users', 'photos', 'tags');
 
-    is $r->build_path('photos_update', id => 987)->{path} => 'photos/987';
+    # $r->build_path('photos_update', id => 987)->{path} is 'photos/987'
 
 
 =head2 Nested Resources
@@ -974,10 +1072,19 @@ matching route available to that method for further use.
     $magazines->add_resources('ads');
 
     $m = $r->match(get => 'magazines/1/ads/4');
-    is_deeply $m->[0]->params =>
-      {controller => 'ads', action => 'show', magazines_id => 1, ads_id => 4};
+    # $m->[0]->params is
+    # {controller => 'ads', action => 'show', magazines_id => 1, ads_id => 4}
 
 
+=head2 Bridges
+
+    $r = Forward::Routes->new;
+    my $bridge = $r->bridge('admin')->to('check#authentication');
+    $bridge->add_route('foo')->to('my#stuff');
+
+    $m = $r->match(get => 'admin/foo');
+    is_deeply $m->[0]->params, {controller => 'check', action => 'authentication'};
+    is_deeply $m->[1]->params, {controller => 'my', action => 'stuff'};
 
 
 =head1 Author
