@@ -284,8 +284,13 @@ sub match {
     # Leading slash
     $path = "/$path" unless $path =~ m{ \A / }x;
 
+    # Format
+    $path =~m/\.([\a-zA-Z0-9]{1,4})$/;
+    my $format = defined $1 ? $1 : '';
+    $path =~s/\.[\a-zA-Z0-9]{1,4}$// if $format;
+
     # Search for match
-    my $matches = $self->_match(lc($method) => $path);
+    my $matches = $self->_match(lc($method) => $path, $format);
     return unless $matches;
 
     return $matches;
@@ -315,6 +320,11 @@ sub _match {
     my $method = shift;
     my $path   = shift;
 
+    # gather format data
+    my $request_format  = shift;
+    my $required_format = shift;
+    $required_format    = $self->format || $required_format;
+
     # Method
     return unless $self->_match_method($method);
 
@@ -330,21 +340,24 @@ sub _match {
     # Children match
     my $matches = [];
 
-    # Format
-    my $format = $self->_match_format(\$path);
-    return unless defined $format;
-
     # Children
     if (@{$self->children}) {
         foreach my $child (@{$self->children}) {
 
             # Match?
-            $matches = $child->_match($method => $path);
+            $matches = $child->_match($method => $path, $request_format, $required_format);
             last if $matches;
 
         }
         return unless $matches;
     }
+
+    # Format
+    unless (@{$self->children}) {
+        $self->_match_format($request_format, $required_format)
+          || return;
+    }
+
 
     # Match object
     my $match;
@@ -360,7 +373,7 @@ sub _match {
 
     my $params = $self->prepare_params(@$captures);
     $match->add_params($params);
-    $match->add_params({format => $format}) if length($format);
+    $match->add_params({format => $request_format}) if length($request_format);
 
     return $matches;
 }
@@ -676,23 +689,17 @@ sub format {
 }
 
 sub _match_format {
-    my $self = shift;
-    my $path = shift;
+    my $self            = shift;
+    my $request_format  = shift;
+    my $required_format = shift;
 
-    return '' unless defined $self->format;
+    $required_format ||= [''];
 
-    my @match = ($$path =~m/\.([\a-zA-Z0-9]{1,4})$/);
-
-    my $format = defined $1 ? $1 : '';
-
-    my @success = grep { $_ eq $format } @{$self->format};
+    my @success = grep { $_ eq $request_format } @{$required_format};
 
     return unless @success;
 
-    $$path =~s/\.[\a-zA-Z0-9]{1,4}$//;
-
-    return $format;
-
+    return 1;
 }
 
 1;
