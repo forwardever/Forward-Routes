@@ -970,6 +970,25 @@ retrieved from the returned match object.
     $m = $r->match(get => 'hello/there.jpeg');
     # $m is undef
 
+The format constraint defaults to '' (no format).
+
+    $r = Forward::Routes->new;
+    $r->add_route(':foo/:bar');
+
+    $m = $r->match(get => 'hello/there.html');
+    # $m is undef
+
+The file format is extracted from the passed request path right at the
+beginning of the search, as a result it cannot be captured by placeholders.
+
+    # same example as before
+    $r = Forward::Routes->new;
+    $r->add_route(':foo/:bar');
+    $m = $r->match(get => 'hello/there.html');
+
+    # $m->[0]->params IS NOT!!! {foo => 'hello', bar => 'there.html'}
+
+
 =head2 Naming
 
 Each route can get a name through the C<name> method. Names are required to
