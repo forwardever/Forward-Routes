@@ -11,7 +11,7 @@ use Test::More tests => 8;
 
 
 #############################################################################
-### nested routes with format
+### resources with format constraint
 
 # no format requirement (defaults to format ''), but format passed
 
