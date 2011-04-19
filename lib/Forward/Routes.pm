@@ -995,9 +995,9 @@ child routes added via C<add_route>.
     $m = $root->match(get => 'baz.xml');
     # $m is undef;
 
-If no format constraint is added to a route, there is also no format
-validation. This might cause kind of unexpected behaviour when dealing with
-placeholders:
+If no format constraint is added to a route and the route's parents also have
+no format constraints, there is also no format validation taking place. This
+might cause kind of unexpected behaviour when dealing with placeholders:
 
     $r = Forward::Routes->new;
     $r->add_route(':foo/:bar');
