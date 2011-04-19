@@ -320,7 +320,7 @@ sub _match {
     $required_format    = $self->format || $required_format;
 
     # Format
-    if ($required_format && !$request_format) {
+    if ($required_format && !defined($request_format)) {
         $path =~m/\.([\a-zA-Z0-9]{1,4})$/;
         $request_format = defined $1 ? $1 : '';
 
