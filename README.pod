@@ -266,6 +266,27 @@ retrieved from the returned match object.
     $m = $r->match(get => 'hello/there.jpeg');
     # $m is undef
 
+Once a format constraint has been defined, all child routes inherit the
+behaviour of their parents, unless they get format constraints themselves.
+For example, adding a format constraint to the route root object affects all
+child routes added via C<add_route>.
+    
+    my $root = Forward::Routes->new->format('html');
+    $root->add_route('foo')->format('xml');
+    $root->add_route('baz');
+
+    $m = $root->match(get => 'foo.html');
+    # $m is undef;
+    
+    $m = $root->match(get => 'foo.xml');
+    # $m->[0]->params is {format => 'xml'};
+
+    $m = $root->match(get => 'baz.html');
+    # $m->[0]->params is {format => 'html'};
+
+    $m = $root->match(get => 'baz.xml');
+    # $m is undef;
+
 If no format constraint is added to a route, there is also no format
 validation. This might cause kind of unexpected behaviour when dealing with
 placeholders:
