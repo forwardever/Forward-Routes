@@ -7,7 +7,7 @@ use Test::More;
 
 use Forward::Routes;
 
-use Test::More tests => 436;
+use Test::More tests => 407;
 
 #############################################################################
 ### empty
@@ -1306,133 +1306,6 @@ is $r->build_path('photos_update_form', id => 789)->{method} => 'get';
 is $r->build_path('photos_update', id => 987)->{method} => 'put';
 is $r->build_path('photos_delete', id => 654)->{method} => 'delete';
 is $r->build_path('photos_delete_form', id => 222)->{method} => 'get';
-
-
-#############################################################################
-### resources_with_format
-
-$r = Forward::Routes->new->format('html');
-$r->add_resources('users','photos','tags');
-
-$m = $r->match(get => 'photos.html');
-is_deeply $m->[0]->params => {controller => 'photos', action => 'index', format => 'html'};
-
-$m = $r->match(get => 'photos/new.html');
-is_deeply $m->[0]->params => {controller => 'photos', action => 'create_form', format => 'html'};
-
-$m = $r->match(post => 'photos.html');
-is_deeply $m->[0]->params => {controller => 'photos', action => 'create', format => 'html'};
-
-$m = $r->match(get => 'photos/1.html');
-is_deeply $m->[0]->params =>
-  {controller => 'photos', action => 'show', id => 1, format => 'html'};
-
-$m = $r->match(get => 'photos/1/edit.html');
-is_deeply $m->[0]->params =>
-  {controller => 'photos', action => 'update_form', id => 1, format => 'html'};
-
-$m = $r->match(put => 'photos/1.html');
-is_deeply $m->[0]->params =>
-  {controller => 'photos', action => 'update', id => 1, format => 'html'};
-
-$m = $r->match(delete => 'photos/1.html');
-is_deeply $m->[0]->params => {
-    controller => 'photos',
-    action     => 'delete',
-    id         => 1,
-    format => 'html'
-};
-
-
-
-### empty format
-$r = Forward::Routes->new->format('');
-$r->add_resources('users','photos','tags');
-
-$m = $r->match(get => 'photos');
-is_deeply $m->[0]->params => {controller => 'photos', action => 'index'};
-
-$m = $r->match(get => 'photos/new');
-is_deeply $m->[0]->params => {controller => 'photos', action => 'create_form'};
-
-$m = $r->match(post => 'photos');
-is_deeply $m->[0]->params => {controller => 'photos', action => 'create'};
-
-$m = $r->match(get => 'photos/1');
-is_deeply $m->[0]->params =>
-  {controller => 'photos', action => 'show', id => 1};
-
-$m = $r->match(get => 'photos/1/edit');
-is_deeply $m->[0]->params =>
-  {controller => 'photos', action => 'update_form', id => 1};
-
-$m = $r->match(get => 'photos/1/delete');
-is_deeply $m->[0]->params =>
-  {controller => 'photos', action => 'delete_form', id => 1};
-
-$m = $r->match(put => 'photos/1');
-is_deeply $m->[0]->params =>
-  {controller => 'photos', action => 'update', id => 1};
-
-$m = $r->match(delete => 'photos/1');
-is_deeply $m->[0]->params => {
-    controller => 'photos',
-    action     => 'delete',
-    id         => 1
-};
-
-
-# wrong format
-$r = Forward::Routes->new->format('');
-$r->add_resources('users','photos','tags');
-
-$m = $r->match(get => 'photos.html');
-is $m, undef;
-
-$m = $r->match(get => 'photos/new.html');
-is $m, undef;
-
-$m = $r->match(post => 'photos.html');
-is $m, undef;
-
-$m = $r->match(get => 'photos/1.html');
-is $m, undef;
-
-$m = $r->match(get => 'photos/1/edit.html');
-is $m, undef;
-
-$m = $r->match(put => 'photos/1.html');
-is $m, undef;
-
-$m = $r->match(delete => 'photos/1.html');
-is $m, undef;
-
-
-
-# wrong format
-$r = Forward::Routes->new->format('html');
-$r->add_resources('users','photos','tags');
-
-$m = $r->match(get => 'photos.xml');
-is $m, undef;
-
-$m = $r->match(get => 'photos/new.xml');
-is $m, undef;
-
-$m = $r->match(post => 'photos.xml');
-is $m, undef;
-
-$m = $r->match(get => 'photos/1.xml');
-is $m, undef;
-
-$m = $r->match(get => 'photos/1/edit.xml');
-is $m, undef;
-
-$m = $r->match(put => 'photos/1.xml');
-is $m, undef;
-
-$m = $r->match(delete => 'photos/1.xml');
-is $m, undef;
 
 
 #############################################################################
