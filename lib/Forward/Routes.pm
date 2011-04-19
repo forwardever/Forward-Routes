@@ -974,23 +974,26 @@ retrieved from the returned match object.
     $m = $r->match(get => 'hello/there.jpeg');
     # $m is undef
 
-The format constraint defaults to '' (no format).
+If no format constraint is added to a route, there is also no format
+validation. This might cause kind of unexpected behaviour when dealing with
+placeholders:
 
     $r = Forward::Routes->new;
     $r->add_route(':foo/:bar');
 
     $m = $r->match(get => 'hello/there.html');
-    # $m is undef
+    # $m->[0]->params is {foo => 'hello', bar => 'there.html'}
 
-The file format is extracted from the passed request path right at the
-beginning of the search, as a result it cannot be captured by placeholders.
+If this is not what you want, an empty format constraint can be passed explicitly:
 
-    # same example as before
-    $r = Forward::Routes->new;
+    $r = Forward::Routes->new->format('');
     $r->add_route(':foo/:bar');
-    $m = $r->match(get => 'hello/there.html');
 
-    # $m->[0]->params IS NOT!!! {foo => 'hello', bar => 'there.html'}
+    $m = $r->match(get => 'hello/there.html');
+    # $m->[0] is undef
+
+    $m = $r->match(get => 'hello/there');
+    # $m->[0]->params is {foo => 'hello', bar => 'there'}
 
 
 =head2 Naming
