@@ -182,9 +182,8 @@ sub add_resources {
           ->name($name.'_create_form');
 
         # modify resource item
-        my $nested = $resource->add_route(
-            ':'.$id_prefix.'id'
-        );
+        my $nested = $resource->add_route(':'.$id_prefix.'id')
+          ->constraints($id_prefix.'id' => qr/[^.\/]+/);
 
         $nested->add_route
           ->via('get')
@@ -284,13 +283,8 @@ sub match {
     # Leading slash
     $path = "/$path" unless $path =~ m{ \A / }x;
 
-    # Format
-    $path =~m/\.([\a-zA-Z0-9]{1,4})$/;
-    my $format = defined $1 ? $1 : '';
-    $path =~s/\.[\a-zA-Z0-9]{1,4}$// if $format;
-
     # Search for match
-    my $matches = $self->_match(lc($method) => $path, $format);
+    my $matches = $self->_match(lc($method) => $path);
     return unless $matches;
 
     return $matches;
@@ -324,6 +318,15 @@ sub _match {
     my $request_format  = shift;
     my $required_format = shift;
     $required_format    = $self->format || $required_format;
+
+    # Format
+    if ($required_format && !$request_format) {
+        $path =~m/\.([\a-zA-Z0-9]{1,4})$/;
+        $request_format = defined $1 ? $1 : '';
+
+        # format extension is only replaced if format constraint exists
+        $path =~s/\.[\a-zA-Z0-9]{1,4}$// if $request_format;
+    }
 
     # Method
     return unless $self->_match_method($method);
@@ -693,6 +696,7 @@ sub _match_format {
     my $request_format  = shift;
     my $required_format = shift;
 
+    $request_format ||= '';
     $required_format ||= [''];
 
     my @success = grep { $_ eq $request_format } @{$required_format};
