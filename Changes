@@ -4,6 +4,7 @@ Changes for Forward::Routes
         - Fixed format inheritance and added tests
         - Better documentation of format constraints
         - Improved format contraint tests
+        - Added path_building format constraint support
 
 0.13    2011-04-13 00:00:00
         - Added documentation
