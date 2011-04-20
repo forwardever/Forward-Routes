@@ -63,6 +63,9 @@ sub add_route {
 
     my $child = $self->new(@_);
 
+    # Format inheritance
+    $child->format([@{$self->{format}}]) if $self->{format};
+
     push @{$self->children}, $child;
 
     $child->parent($self);
@@ -315,12 +318,10 @@ sub _match {
     my $path   = shift;
 
     # gather format data
-    my $request_format  = shift;
-    my $required_format = shift;
-    $required_format    = $self->format || $required_format;
+    my $request_format = shift;
 
     # Format
-    if ($required_format && !defined($request_format)) {
+    if ($self->{format} && !defined($request_format)) {
         $path =~m/\.([\a-zA-Z0-9]{1,4})$/;
         $request_format = defined $1 ? $1 : '';
 
@@ -348,7 +349,7 @@ sub _match {
         foreach my $child (@{$self->children}) {
 
             # Match?
-            $matches = $child->_match($method => $path, $request_format, $required_format);
+            $matches = $child->_match($method => $path, $request_format);
             last if $matches;
 
         }
@@ -357,7 +358,7 @@ sub _match {
 
     # Format
     unless (@{$self->children}) {
-        $self->_match_format($request_format, $required_format)
+        $self->_match_format($request_format)
           || return;
     }
 
@@ -694,10 +695,9 @@ sub format {
 sub _match_format {
     my $self            = shift;
     my $request_format  = shift;
-    my $required_format = shift;
 
     $request_format ||= '';
-    $required_format ||= [''];
+    my $required_format = $self->{format} || [''];
 
     my @success = grep { $_ eq $request_format } @{$required_format};
 
