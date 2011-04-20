@@ -7,7 +7,7 @@ use Test::More;
 
 use Forward::Routes;
 
-use Test::More tests => 379;
+use Test::More tests => 324;
 
 #############################################################################
 ### empty
@@ -1068,119 +1068,6 @@ ok not defined $m;
 $m = $r->match(put => 'articles/123');
 ok not defined $m;
 
-
-
-#############################################################################
-### resource
-
-$r = Forward::Routes->new;
-
-$r->add_resource('geocoder');
-
-$m = $r->match(get => 'geocoder/new');
-is_deeply $m->[0]->params => {controller => 'geocoder', action => 'create_form'};
-
-$m = $r->match(post => 'geocoder');
-is_deeply $m->[0]->params => {controller => 'geocoder', action => 'create'};
-
-$m = $r->match(get => 'geocoder');
-is_deeply $m->[0]->params => {controller => 'geocoder', action => 'show'};
-
-$m = $r->match(get => 'geocoder/edit');
-is_deeply $m->[0]->params => {controller => 'geocoder', action => 'update_form'};
-
-$m = $r->match(put => 'geocoder');
-is_deeply $m->[0]->params => {controller => 'geocoder', action => 'update'};
-
-$m = $r->match(delete => 'geocoder');
-is_deeply $m->[0]->params => {controller => 'geocoder', action => 'delete'};
-
-
-is ref $r->find_route('geocoder_create_form'), 'Forward::Routes';
-is $r->find_route('geocoder_foo'), undef;
-is $r->find_route('geocoder_create_form')->name, 'geocoder_create_form';
-is $r->find_route('geocoder_create')->name, 'geocoder_create';
-is $r->find_route('geocoder_show')->name, 'geocoder_show';
-is $r->find_route('geocoder_update_form')->name, 'geocoder_update_form';
-is $r->find_route('geocoder_update')->name, 'geocoder_update';
-is $r->find_route('geocoder_delete')->name, 'geocoder_delete';
-
-is $r->build_path('geocoder_create_form')->{path} => 'geocoder/new';
-is $r->build_path('geocoder_create')->{path} => 'geocoder';
-is $r->build_path('geocoder_show', id => 456)->{path} => 'geocoder';
-is $r->build_path('geocoder_update_form', id => 789)->{path} => 'geocoder/edit';
-is $r->build_path('geocoder_update', id => 987)->{path} => 'geocoder';
-is $r->build_path('geocoder_delete', id => 654)->{path} => 'geocoder';
-
-#############################################################################
-### resources
-
-$r = Forward::Routes->new;
-$r->add_resources('users','photos','tags');
-
-$m = $r->match(get => 'photos');
-is_deeply $m->[0]->params => {controller => 'photos', action => 'index'};
-
-$m = $r->match(get => 'photos2');
-is $m, undef;
-
-$m = $r->match(get => 'photos/new');
-is_deeply $m->[0]->params => {controller => 'photos', action => 'create_form'};
-
-$m = $r->match(post => 'photos');
-is_deeply $m->[0]->params => {controller => 'photos', action => 'create'};
-
-$m = $r->match(get => 'photos/1');
-is_deeply $m->[0]->params =>
-  {controller => 'photos', action => 'show', id => 1};
-
-$m = $r->match(get => 'photos/1/edit');
-is_deeply $m->[0]->params =>
-  {controller => 'photos', action => 'update_form', id => 1};
-
-$m = $r->match(get => 'photos/1/delete');
-is_deeply $m->[0]->params =>
-  {controller => 'photos', action => 'delete_form', id => 1};
-
-$m = $r->match(put => 'photos/1');
-is_deeply $m->[0]->params =>
-  {controller => 'photos', action => 'update', id => 1};
-
-$m = $r->match(delete => 'photos/1');
-is_deeply $m->[0]->params => {
-    controller => 'photos',
-    action     => 'delete',
-    id         => 1
-};
-
-is ref $r->find_route('photos_index'), 'Forward::Routes';
-is $r->find_route('photos_foo'), undef;
-is $r->find_route('photos_index')->name, 'photos_index';
-is $r->find_route('photos_create_form')->name, 'photos_create_form';
-is $r->find_route('photos_create')->name, 'photos_create';
-is $r->find_route('photos_show')->name, 'photos_show';
-is $r->find_route('photos_update_form')->name, 'photos_update_form';
-is $r->find_route('photos_update')->name, 'photos_update';
-is $r->find_route('photos_delete')->name, 'photos_delete';
-is $r->find_route('photos_delete_form')->name, 'photos_delete_form';
-
-is $r->build_path('photos_index')->{path} => 'photos';
-is $r->build_path('photos_create_form')->{path} => 'photos/new';
-is $r->build_path('photos_create')->{path} => 'photos';
-is $r->build_path('photos_show', id => 456)->{path} => 'photos/456';
-is $r->build_path('photos_update_form', id => 789)->{path} => 'photos/789/edit';
-is $r->build_path('photos_update', id => 987)->{path} => 'photos/987';
-is $r->build_path('photos_delete', id => 654)->{path} => 'photos/654';
-is $r->build_path('photos_delete_form', id => 222)->{path} => 'photos/222/delete';
-
-is $r->build_path('photos_index')->{method} => 'get';
-is $r->build_path('photos_create_form')->{method} => 'get';
-is $r->build_path('photos_create')->{method} => 'post';
-is $r->build_path('photos_show', id => 456)->{method} => 'get';
-is $r->build_path('photos_update_form', id => 789)->{method} => 'get';
-is $r->build_path('photos_update', id => 987)->{method} => 'put';
-is $r->build_path('photos_delete', id => 654)->{method} => 'delete';
-is $r->build_path('photos_delete_form', id => 222)->{method} => 'get';
 
 
 #############################################################################
