@@ -7,7 +7,7 @@ use Test::More;
 
 use Forward::Routes;
 
-use Test::More tests => 9;
+use Test::More tests => 12;
 
 
 
@@ -16,9 +16,9 @@ use Test::More tests => 9;
 
 my $root = Forward::Routes->new->format('html');
 my $nested = $root->add_route('foo')->format('xml');
-$nested->add_route('bar');
-$root->add_route('baz');
-$root->add_route('buz')->format('jpeg');
+$nested->add_route('bar')->name('one');
+$root->add_route('baz')->name('two');
+$root->add_route('buz')->name('three')->format('jpeg');
 
 
 my $m = $root->match(get => 'foo/bar');
@@ -50,3 +50,8 @@ is $m, undef;
 $m = $root->match(get => '/buz.jpeg');
 is_deeply $m->[0]->params => {format => 'jpeg'};
 
+
+# build path
+is $root->build_path('one')->{path}, 'foo/bar.xml';
+is $root->build_path('two')->{path}, 'baz.html';
+is $root->build_path('three')->{path}, 'buz.jpeg';

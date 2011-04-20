@@ -7,7 +7,7 @@ use Test::More;
 
 use Forward::Routes;
 
-use Test::More tests => 44;
+use Test::More tests => 68;
 
 
 #############################################################################
@@ -93,6 +93,25 @@ $m = $r->match(delete => 'photos/1');
 is $m, undef;
 
 
+is $r->build_path('photos_index')->{path} => 'photos.html';
+is $r->build_path('photos_create_form')->{path} => 'photos/new.html';
+is $r->build_path('photos_create')->{path} => 'photos.html';
+is $r->build_path('photos_show', id => 456)->{path} => 'photos/456.html';
+is $r->build_path('photos_update_form', id => 789)->{path} => 'photos/789/edit.html';
+is $r->build_path('photos_update', id => 987)->{path} => 'photos/987.html';
+is $r->build_path('photos_delete', id => 654)->{path} => 'photos/654.html';
+is $r->build_path('photos_delete_form', id => 222)->{path} => 'photos/222/delete.html';
+
+is $r->build_path('photos_index')->{method} => 'get';
+is $r->build_path('photos_create_form')->{method} => 'get';
+is $r->build_path('photos_create')->{method} => 'post';
+is $r->build_path('photos_show', id => 456)->{method} => 'get';
+is $r->build_path('photos_update_form', id => 789)->{method} => 'get';
+is $r->build_path('photos_update', id => 987)->{method} => 'put';
+is $r->build_path('photos_delete', id => 654)->{method} => 'delete';
+is $r->build_path('photos_delete_form', id => 222)->{method} => 'get';
+
+
 
 ### empty format (explicitly)
 
@@ -122,6 +141,15 @@ is_deeply $m->[0]->params => {controller => 'photos', action => 'update', id => 
 
 $m = $r->match(delete => 'photos/1');
 is_deeply $m->[0]->params => {controller => 'photos', action => 'delete', id => 1};
+
+is $r->build_path('photos_index')->{path} => 'photos';
+is $r->build_path('photos_create_form')->{path} => 'photos/new';
+is $r->build_path('photos_create')->{path} => 'photos';
+is $r->build_path('photos_show', id => 456)->{path} => 'photos/456';
+is $r->build_path('photos_update_form', id => 789)->{path} => 'photos/789/edit';
+is $r->build_path('photos_update', id => 987)->{path} => 'photos/987';
+is $r->build_path('photos_delete', id => 654)->{path} => 'photos/654';
+is $r->build_path('photos_delete_form', id => 222)->{path} => 'photos/222/delete';
 
 
 $r = Forward::Routes->new->format('');

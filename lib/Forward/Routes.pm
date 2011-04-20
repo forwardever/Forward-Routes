@@ -451,6 +451,9 @@ sub build_path {
 
     my $path = $child->_build_path(@_) if $child;
 
+    # Format extension
+    $path->{path} .= '.'.$child->{format}->[0] if $child->{format} && $child->{format}->[0];
+
     $path->{path} =~s/^\/// if $path;
 
     return $path if $path;
