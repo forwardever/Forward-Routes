@@ -29,7 +29,7 @@ sub new {
 }
 
 sub initialize {
-    my $self   = shift;
+    my $self = shift;
 
     # Remaining params
     my $params = ref $_[0] eq 'HASH' ? {%{$_[0]}} : {@_};
@@ -49,8 +49,7 @@ sub initialize {
 }
 
 sub prefixed_with {
-    my $self = shift;
-    my $prefix = shift;
+    my ($self, $prefix) = @_;
 
     my $router = Forward::Routes->new(prefix => $prefix);
     $router->{patterns} = $self->{patterns};
@@ -94,8 +93,7 @@ sub _is_bridge {
 
 
 sub add_resource {
-    my $self = shift;
-    my $name = shift;
+    my ($self, $name) = @_;
 
     my $controller = $name;
 
@@ -139,7 +137,6 @@ sub add_resource {
 
 sub add_resources {
     my $self = shift;
-
 
     # Nestes resources
     my $parent_resource = $self->_parent_is_plural_resource
@@ -234,8 +231,7 @@ sub defaults {
 }
 
 sub name {
-    my $self = shift;
-    my $name = shift;
+    my ($self, $name) = @_;
 
     return $self->{name} unless defined $name;
 
@@ -245,8 +241,7 @@ sub name {
 }
 
 sub to {
-    my $self = shift;
-    my $to   = shift;
+    my ($self, $to) = @_;
 
     unless ($to) {
         my $d = $self->defaults;
@@ -262,8 +257,7 @@ sub to {
 }
 
 sub find_route {
-    my $self = shift;
-    my $name = shift;
+    my ($self, $name) = @_;
 
     $self->{routes_by_name} ||= {};
     return $self->{routes_by_name}->{$name} if $self->{routes_by_name}->{$name};
@@ -280,9 +274,9 @@ sub find_route {
 }
 
 sub match {
-    my $self   = shift;
-    my $method = shift;
-    my $path   = shift || die 'missing path';
+    my ($self, $method, $path) = @_;
+
+    $path || die 'missing path';
 
     # Leading slash
     $path = "/$path" unless $path =~ m{ \A / }x;
@@ -314,12 +308,7 @@ sub via {
 
 
 sub _match {
-    my $self   = shift;
-    my $method = shift;
-    my $path   = shift;
-
-    # gather format data
-    my $request_format = shift;
+    my ($self, $method, $path, $request_format) = @_;
 
     # Format
     if ($self->{format} && !defined($request_format)) {
@@ -382,8 +371,7 @@ sub _match {
 
 
 sub _match_current_pattern {
-    my $self     = shift;
-    my $path_ref = shift;
+    my ($self, $path_ref) = @_;
 
     # Pattern
     my $regex = $self->pattern->compile->pattern;
@@ -402,8 +390,7 @@ sub _match_current_pattern {
 }
 
 sub prepare_params {
-    my $self = shift;
-    my @captures = @_;
+    my ($self, @captures) = @_;
 
     # Copy! of defaults
     my $params = {%{$self->defaults}};
@@ -431,8 +418,7 @@ sub constraints {
 }
 
 sub _match_method {
-    my $self  = shift;
-    my $value = shift;
+    my ($self, $value) = @_;
 
     return 1 unless defined $self->method;
 
@@ -460,8 +446,7 @@ sub build_path {
 }
 
 sub _build_path {
-    my $self   = shift;
-    my %params = @_;
+    my ($self, %params) = @_;
 
     my $path = {};
     $path->{path} = '';
@@ -617,8 +602,7 @@ sub _build_path {
 }
 
 sub capture_error {
-    my $self         = shift;
-    my $capture_name = shift;
+    my ($self, $capture_name) = @_;
 
     croak qq/Required param '$capture_name' was not passed when building a path/;
 }
@@ -694,8 +678,7 @@ sub format {
 }
 
 sub _match_format {
-    my $self            = shift;
-    my $request_format  = shift;
+    my ($self, $request_format) = @_;
 
     $request_format ||= '';
     my $required_format = $self->{format} || [''];
