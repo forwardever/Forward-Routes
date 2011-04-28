@@ -1,0 +1,49 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use Test::More;
+
+use Forward::Routes;
+
+use Test::More tests => 8;
+
+
+
+#############################################################################
+### nested routes with method inheritance
+
+my $root = Forward::Routes->new->via('post');
+my $nested = $root->add_route('foo')->via('put');
+$nested->add_route('bar')->name('one');
+$root->add_route('baz')->name('two');
+$root->add_route('buz')->name('three')->via('delete');
+
+
+my $m = $root->match(get => 'foo/bar');
+is $m, undef;
+
+$m = $root->match(post => 'foo/bar');
+is $m, undef;
+
+$m = $root->match(put => 'foo/bar');
+is_deeply $m->[0]->params => {};
+
+
+$m = $root->match(get => '/baz');
+is $m, undef;
+
+$m = $root->match(post => '/baz');
+is_deeply $m->[0]->params => {};
+
+
+$m = $root->match(get => '/buz');
+is $m, undef;
+
+$m = $root->match(post => '/buz');
+is $m, undef;
+
+$m = $root->match(delete => '/buz');
+is_deeply $m->[0]->params => {};
+

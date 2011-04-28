@@ -65,6 +65,7 @@ sub add_route {
 
     # Format inheritance
     $child->format([@{$self->{format}}]) if $self->{format};
+    $child->method([@{$self->{method}}]) if $self->{method};
 
     push @{$self->children}, $child;
 
@@ -329,9 +330,6 @@ sub _match {
         $path =~s/\.[\a-zA-Z0-9]{1,4}$// if $request_format;
     }
 
-    # Method
-    return unless $self->_match_method($method);
-
     # Current pattern match
     my $captures = [];
     if (defined $self->pattern->pattern) {
@@ -356,12 +354,12 @@ sub _match {
         return unless $matches;
     }
 
-    # Format
-    unless (@{$self->children}) {
-        $self->_match_format($request_format)
-          || return;
-    }
 
+    # Format and Method
+    unless (@{$self->children}) {
+        $self->_match_method($method) || return;
+        $self->_match_format($request_format) || return;
+    }
 
     # Match object
     my $match;
