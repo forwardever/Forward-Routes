@@ -428,12 +428,11 @@ sub _match_method {
 }
 
 sub build_path {
-    my $self = shift;
-    my $name = shift;
+    my ($self, $name, @params) = @_;
 
     my $child = $self->find_route($name);
 
-    my $path = $child->_build_path(@_) if $child;
+    my $path = $child->_build_path(@params) if $child;
 
     # Format extension
     $path->{path} .= '.'.$child->{format}->[0] if $child->{format} && $child->{format}->[0];
