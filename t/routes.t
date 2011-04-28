@@ -7,7 +7,7 @@ use Test::More;
 
 use Forward::Routes;
 
-use Test::More tests => 321;
+use Test::More tests => 305;
 
 #############################################################################
 ### empty
@@ -929,49 +929,9 @@ $m = $r->match(get => 'zoo/woo/foo/bar/baz');
 is_deeply $m->[0]->params => {a => 'zoo/woo', b => 'bar/baz'};
 
 
-#############################################################################
-### method
-
-$r = Forward::Routes->new;
-
-$r->add_route('articles');
-ok $r->match(get => 'articles');
-
-$r->add_route('logout')->via('get');
-ok $r->match(get => 'logout');
-ok !$r->match(post => 'logout');
-
-$r = Forward::Routes->new;
-$r->add_route('logout')->via('GET');
-ok $r->match(get => 'logout');
-ok $r->match(GET => 'logout');
-ok !$r->match(post => 'logout');
-
-$r = Forward::Routes->new;
-$r->add_route('logout')->via('get');
-ok $r->match(GET => 'logout');
-ok !$r->match(POST => 'logout');
-
-$r = Forward::Routes->new;
-$r->add_route('photos/:id', method => [qw/get post/]);
-ok $r->match(get => 'photos/1');
-ok $r->match(post => 'photos/1');
-ok !$r->match(head => 'photos/1');
-
 
 #############################################################################
-### via
-$r = Forward::Routes->new;
-
-$r->add_route('logout')->via('get');
-ok $r->match(get => 'logout');
-ok !$r->match(post => 'logout');
-
-$r->add_route('photos/:id')->via([qw/get post/]);
-ok $r->match(get => 'photos/1');
-ok $r->match(post => 'photos/1');
-ok !$r->match(head => 'photos/1');
-
+### via (no chaining)
 
 $r = Forward::Routes->new;
 $r->add_route('logout', via => 'put');
