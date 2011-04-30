@@ -49,7 +49,6 @@ is_deeply $m->[0]->params => {};
 
 
 # build path
-
 my $path = $root->build_path('one');
 is $path->{method}, 'put';
 
@@ -103,7 +102,6 @@ is_deeply $m->[0]->params => {};
 
 
 # build path
-
 $path = $root->build_path('one');
 is $path->{method}, 'put';
 
