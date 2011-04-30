@@ -437,6 +437,9 @@ sub build_path {
     # Format extension
     $path->{path} .= '.'.$child->{format}->[0] if $child->{format} && $child->{format}->[0];
 
+    # Method
+    $path->{method} = $child->{method}->[0] if $child->{method};
+
     $path->{path} =~s/^\/// if $path;
 
     return $path if $path;
@@ -453,9 +456,6 @@ sub _build_path {
     if ($self->{parent}) {
         $path = $self->{parent}->_build_path(%params);
     }
-
-    # Method
-    $path->{method} = $self->{method}->[0] if $self->{method};
 
     # Return path if current route has no pattern
     return $path unless $self->{pattern} && defined $self->{pattern}->pattern;

@@ -7,7 +7,7 @@ use Test::More;
 
 use Forward::Routes;
 
-use Test::More tests => 18;
+use Test::More tests => 24;
 
 
 
@@ -46,6 +46,18 @@ is $m, undef;
 
 $m = $root->match(delete => '/buz');
 is_deeply $m->[0]->params => {};
+
+
+# build path
+
+my $path = $root->build_path('one');
+is $path->{method}, 'put';
+
+$path = $root->build_path('two');
+is $path->{method}, 'post';
+
+$path = $root->build_path('three');
+is $path->{method}, 'delete';
 
 
 #############################################################################
@@ -88,3 +100,15 @@ is_deeply $m->[0]->params => {};
 
 $m = $root->match(put => '/buz');
 is_deeply $m->[0]->params => {};
+
+
+# build path
+
+$path = $root->build_path('one');
+is $path->{method}, 'put';
+
+$path = $root->build_path('two');
+is $path->{method}, 'post';
+
+$path = $root->build_path('three');
+is $path->{method}, 'delete';
