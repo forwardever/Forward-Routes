@@ -1,5 +1,9 @@
 Changes for Forward::Routes
 
+0.15    2011-04-30 00:00:00
+        - fixed request method inheritance and added tests
+        - test cleanup
+
 0.14    2011-04-20 00:00:00
         - Fixed format inheritance and added tests
         - Better documentation of format constraints
