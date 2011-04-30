@@ -7,7 +7,7 @@ use Test::More;
 
 use Forward::Routes;
 
-use Test::More tests => 244;
+use Test::More tests => 243;
 
 #############################################################################
 ### empty
@@ -88,16 +88,6 @@ is $m, undef;
 # match again (params empty again)
 $m = $r->match(get => 'foo/bar');
 is_deeply $m->[0]->params => {};
-
-
-#############################################################################
-### match_with_defaults
-
-$r = Forward::Routes->new;
-$r->add_route('articles')->defaults(controller => 'foo', action => 'bar');
-
-$m = $r->match(get => 'articles');
-is_deeply $m->[0]->params => {controller => 'foo', action => 'bar'};
 
 
 #############################################################################
