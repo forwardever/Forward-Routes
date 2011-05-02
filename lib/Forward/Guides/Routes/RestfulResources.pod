@@ -41,8 +41,8 @@ Use of routes:
     cities_delete_form    display a form to confirm the deletion of an existing item
     cities_index          list all items
     cities_create         create a new item
-    cities_update         update a new item
-    cities_delete         delete a new item
+    cities_update         update an existing item
+    cities_delete         delete an existing item
 
 
 The internal code to generate a resource makes use of nested routes:
