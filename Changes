@@ -4,6 +4,7 @@ Changes for Forward::Routes
         - fixed request method inheritance and added tests
         - test cleanup
         - replaced method add_resource by add_singular_resources
+        - added docs for restful resources 
 
 0.14    2011-04-20 00:00:00
         - Fixed format inheritance and added tests
