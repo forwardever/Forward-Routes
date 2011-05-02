@@ -1,0 +1,105 @@
+=head1 Name
+
+Forward::Guides::Routes::RestfulResources - Rails like resources for Perl
+Plack web framework developers
+
+=head1 Description
+
+L<Forward::Routes> enables web framework developers to build Rails like
+resources with a single command. The C<add_resources> command automatically
+generates a bunch of routes to read, create, update or delete a resource
+or to display a form to perform a create, update or delete action.
+
+    # Routes root object
+    my $routes = Forward::Routes->new;
+
+    # Add a resource
+    $routes->add_resources('cities');
+
+The following routes are generated:
+
+    HTTP     Path                 Controller  Action        Route name
+    request                       parameter   parameter
+    method          
+
+    GET      /cities/new          cities      create_form   cities_create_form
+    GET      /cities/:id          cities      show          cities_show
+    GET      /cities/:id/edit     cities      update_form   cities_update_form
+    GET      /cities/:id/delete   cities      delete_form   cities_delete_form
+    GET      /cities              cities      index         cities_index
+    POST     /cities              cities      create        cities_create
+    PUT      /cities/:id          cities      update        cities_update
+    DELETE   /cities/:id          cities      delete        cities_delete
+
+Use of routes:
+
+    Route name            Used to
+
+    cities_create_form    display a form to create a new item
+    cities_show           display an individual item
+    cities_update_form    display a form to update an existing item
+    cities_delete_form    display a form to confirm the deletion of an existing item
+    cities_index          list all items
+    cities_create         create a new item
+    cities_update         update a new item
+    cities_delete         delete a new item
+
+
+The internal code to generate a resource makes use of nested routes:
+
+    my $resource = $routes->add_route('cities');
+
+    # get => /cities
+    $resource->add_route
+      ->via('get')
+      ->to("cities#index")
+      ->name('cities_index');
+
+    # post => /cities
+    $resource->add_route
+      ->via('post')
+      ->to("cities#create")
+      ->name('cities_create');
+
+    # get => /cities/new
+    $resource->add_route('/new')
+      ->via('get')
+      ->to("cities#create_form")
+      ->name('cities_create_form');
+
+    # nested route with id placeholder, placeholder can contain everything
+    # but dots and slashed (constraint)
+    my $nested = $resource->add_route(':id')
+      ->constraints('id' => qr/[^.\/]+/);
+
+    # get => /cities/paris
+    $nested->add_route
+      ->via('get')
+      ->to("cities#show")
+      ->name('cities_show');
+
+    # put => /cities/paris
+    $nested->add_route
+      ->via('put')
+      ->to("cities#update")
+      ->name('cities_update');
+
+    # delete => /cities/paris
+    $nested->add_route
+      ->via('delete')
+      ->to("cities#delete")
+      ->name('cities_delete');
+
+    # get => /cities/paris/edit
+    $nested->add_route('edit')
+      ->via('get')
+      ->to("cities#update_form")
+      ->name('cities_update_form');
+
+    # get => /cities/paris/delete
+    $nested->add_route('delete')
+      ->via('get')
+      ->to("cities#delete_form")
+      ->name('cities_delete_form');
+
+=cut

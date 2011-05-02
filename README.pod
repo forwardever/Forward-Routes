@@ -391,6 +391,9 @@ be reduced this way.
 
 The C<resources> method allows to generate Rails like resources.
 
+Please look at L<Forward::Guides::Routes::RestfulResources> for more in depth
+documentation.
+
     $r = Forward::Routes->new;
     $r->add_resources('users', 'photos', 'tags');
 
