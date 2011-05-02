@@ -92,7 +92,7 @@ sub _is_bridge {
 }
 
 
-sub add_resource {
+sub add_singular_resources {
     my ($self, $name) = @_;
 
     my $controller = $name;
