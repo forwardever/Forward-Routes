@@ -1,14 +1,14 @@
 =head1 Name
 
-Forward::Guides::Routes::RestfulResources - Rails like resources for Perl
-Plack web framework developers
+Forward::Guides::Routes::RestfulResources - Rails like resources for Plack web
+framework developers (Perl)
 
 =head1 Description
 
 L<Forward::Routes> enables web framework developers to build Rails like
-resources with a single command. The C<add_resources> command automatically
-generates a bunch of routes to read, create, update or delete a resource
-or to display a form to perform a create, update or delete action.
+resources with a single command. The C<add_resources> command generates a
+bunch of routes that can be used to dispatch to a controller's read, create,
+update and delete actions and to display CRUD related forms:
 
     # Routes root object
     my $routes = Forward::Routes->new;
@@ -16,7 +16,7 @@ or to display a form to perform a create, update or delete action.
     # Add a resource
     $routes->add_resources('cities');
 
-The following routes are generated:
+    # The following routes are generated:
 
     HTTP     Path                 Controller  Action        Route name
     request                       parameter   parameter
@@ -31,7 +31,10 @@ The following routes are generated:
     PUT      /cities/:id          cities      update        cities_update
     DELETE   /cities/:id          cities      delete        cities_delete
 
-Use of routes:
+Each generated route dispatches to a specific action (see action parameter
+above) which will usually perform some sort of CRUD action.
+Framework builders are responsible for the dispatching process,
+L<Forward::Routes> just provides a match object with the needed parameters.
 
     Route name            Used to
 
@@ -101,5 +104,33 @@ The internal code to generate a resource makes use of nested routes:
       ->via('get')
       ->to("cities#delete_form")
       ->name('cities_delete_form');
+
+Multiple resources can be created with a single C<add_resources> call:
+
+    # Add multiple resources
+    $routes->add_resources('cities', 'users', 'articles');
+
+    # equals
+    $routes->add_resources('cities'');
+    $routes->add_resources('users');
+    $routes->add_resources('articles');    
+
+Resources inherit the file extension of their parent:
+
+    # in order to match get => /cities/paris/edit.html
+
+    # Routes root object
+    my $root = Forward::Routes->new;
+
+    # Create a parent route with format "html"
+    $route_with_html_extension = $root->add_route->format('html');
+
+    # add a resource on top of parent
+    $route_with_html_extension->add_resources('cities');
+    
+    $m = $root->match(get => '/cities/paris/edit.html');
+    # $m->[0]->params is
+    #   {controller => 'cities', action => 'cities_update_form',
+    #    format => 'html'};
 
 =cut
