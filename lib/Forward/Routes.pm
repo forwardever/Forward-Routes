@@ -261,6 +261,8 @@ sub to {
     my $params;
     @$params{qw/controller action/} = split '#' => $to;
 
+    $params->{controller} ||= undef;
+
     return $self->defaults($params);
 }
 
