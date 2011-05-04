@@ -223,13 +223,19 @@ sub add_resources {
 
 sub defaults {
     my $self = shift;
+    my (@params) = @_;
 
-    $self->{defaults} ||= {};
+    # Initialize
+    my $d = $self->{defaults} ||= {};
 
-    return $self->{defaults} unless defined $_[0];
+    # Getter
+    return $d unless defined $params[0];
 
-    my $defaults = ref $_[0] eq 'HASH' ? $_[0] : {@_};
-    %{$self->defaults} = (%{$self->defaults}, %$defaults);
+    # Hash ref or array?
+    my $passed_defaults = ref $params[0] eq 'HASH' ? $params[0] : {@params};
+
+    # Merge defaults
+    %$d = (%$d, %$passed_defaults);
 
     return $self;
 }
@@ -250,7 +256,7 @@ sub to {
     my $self = shift;
     my ($to) = @_;
 
-    return $self unless $to;
+    return unless $to;
 
     my $params;
     @$params{qw/controller action/} = split '#' => $to;
