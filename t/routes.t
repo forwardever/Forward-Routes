@@ -7,7 +7,7 @@ use Test::More;
 
 use Forward::Routes;
 
-use Test::More tests => 243;
+use Test::More tests => 215;
 
 #############################################################################
 ### empty
@@ -785,94 +785,6 @@ is $r->{routes_by_name}->{photos_foo}, undef;
 is $r->{routes_by_name}->{photos_index}, undef;
 is $r->find_route('photos_index')->name, 'photos_index';
 is $r->{routes_by_name}->{photos_index}->name, 'photos_index';
-
-
-#############################################################################
-### nested_resources
-
-$r = Forward::Routes->new;
-
-my $magazines = $r->add_resources('magazines');
-
-$magazines->add_resources('ads');
-
-$m = $r->match(get => 'magazines/1/ads');
-is_deeply $m->[0]->params => {controller => 'ads', action => 'index', magazines_id => 1};
-
-$m = $r->match(get => 'magazines/1/ads/new');
-is_deeply $m->[0]->params => {controller => 'ads', action => 'create_form', magazines_id => 1};
-
-$m = $r->match(post => 'magazines/1/ads');
-is_deeply $m->[0]->params => {controller => 'ads', action => 'create', magazines_id => 1};
-
-$m = $r->match(get => 'magazines/1/ads/4');
-is_deeply $m->[0]->params => {controller => 'ads', action => 'show', magazines_id => 1, ads_id => 4};
-
-$m = $r->match(get => 'magazines/1/ads/5/edit');
-is_deeply $m->[0]->params => {controller => 'ads', action => 'update_form', magazines_id => 1, ads_id => 5};
-
-$m = $r->match(put => 'magazines/1/ads/2');
-is_deeply $m->[0]->params => {controller => 'ads', action => 'update', magazines_id => 1, ads_id => 2};
-
-$m = $r->match(delete => 'magazines/0/ads/1');
-is_deeply $m->[0]->params => {controller => 'ads', action => 'delete', magazines_id => 0, ads_id => 1};
-
-$m = $r->match(get => 'magazines/11/ads/12/delete');
-is_deeply $m->[0]->params => {controller => 'ads', action => 'delete_form', magazines_id => 11, ads_id => 12};
-
-
-# magazine routes still work
-
-$m = $r->match(get => 'magazines');
-is_deeply $m->[0]->params => {controller => 'magazines', action => 'index'};
-
-$m = $r->match(get => 'magazines/new');
-is_deeply $m->[0]->params => {controller => 'magazines', action => 'create_form'};
-
-$m = $r->match(post => 'magazines');
-is_deeply $m->[0]->params => {controller => 'magazines', action => 'create'};
-
-$m = $r->match(get => 'magazines/1');
-is_deeply $m->[0]->params => {controller => 'magazines', action => 'show', magazines_id => 1};
-
-$m = $r->match(get => 'magazines/1/edit');
-is_deeply $m->[0]->params => {controller => 'magazines', action => 'update_form', magazines_id => 1};
-
-$m = $r->match(get => 'magazines/1/delete');
-is_deeply $m->[0]->params => {controller => 'magazines', action => 'delete_form', magazines_id => 1};
-
-$m = $r->match(put => 'magazines/1');
-is_deeply $m->[0]->params => {controller => 'magazines', action => 'update', magazines_id => 1};
-
-$m = $r->match(delete => 'magazines/1');
-is_deeply $m->[0]->params => {controller => 'magazines', action => 'delete', magazines_id => 1};
-
-
-# build path
-is $r->build_path('ads_index', magazines_id => 3)->{path} => 'magazines/3/ads';
-is $r->build_path('ads_create_form', magazines_id => 4)->{path} => 'magazines/4/ads/new';
-is $r->build_path('ads_create', magazines_id => 5)->{path} => 'magazines/5/ads';
-is $r->build_path('ads_show', magazines_id => 3, ads_id => 4)->{path} => 'magazines/3/ads/4';
-is $r->build_path('ads_update', magazines_id => 0, ads_id => 4)->{path} => 'magazines/0/ads/4';
-is $r->build_path('ads_delete', magazines_id => 4, ads_id => 0)->{path} => 'magazines/4/ads/0';
-is $r->build_path('ads_update_form', magazines_id => 3, ads_id => 4)->{path} => 'magazines/3/ads/4/edit';
-is $r->build_path('ads_delete_form', magazines_id => 3, ads_id => 4)->{path} => 'magazines/3/ads/4/delete';
-
-$e = eval {$r->build_path('ads_index')->{path}; };
-like $@ => qr/Required param 'magazines_id' was not passed when building a path/;
-undef $e;
-
-$e = eval {$r->build_path('ads_show')->{path}; };
-like $@ => qr/Required param 'magazines_id' was not passed when building a path/;
-undef $e;
-
-$e = eval {$r->build_path('ads_show', magazines_id => 3)->{path}; };
-like $@ => qr/Required param 'ads_id' was not passed when building a path/;
-undef $e;
-
-$e = eval {$r->build_path('ads_delete_form', magazines_id => 3)->{path}; };
-like $@ => qr/Required param 'ads_id' was not passed when building a path/;
-undef $e;
 
 
 

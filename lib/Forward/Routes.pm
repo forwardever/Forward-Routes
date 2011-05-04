@@ -142,13 +142,23 @@ sub add_resources {
     my $self = shift;
 
     # Nestes resources
-    my $parent_resource = $self->_parent_is_plural_resource
-      if defined $self->_parent_is_plural_resource;
+    my $parent_resource = $self->_parent_is_plural_resource || '';
+    my $parent_resource_prefix = $parent_resource ? $parent_resource.'_' : '';
 
     if ($parent_resource) {
 
+        shift @{$self->children};
+        shift @{$self->children};
+        shift @{$self->children};
+
         # nested :id part becomes new parent
-        $self = $self->children->[3];
+        $self = $self->children->[0];
+
+        shift @{$self->children};
+        shift @{$self->children};
+        shift @{$self->children};
+        shift @{$self->children};
+        shift @{$self->children};
 
         # rename parent placeholder
         $self->pattern->pattern(':'.$parent_resource.'_id')
@@ -162,57 +172,51 @@ sub add_resources {
     foreach my $name (@$names) {
         my $resource = $self->add_route($name, _parent_is_plural_resource => $name);
 
-        # nested resources
-        my $id_prefix = '';
-        if ($parent_resource) {
-            $id_prefix = $name.'_';
-        }
-
         # resource
         $resource->add_route
           ->via('get')
           ->to("$name#index")
-          ->name($name.'_index');
+          ->name($parent_resource_prefix.$name.'_index');
 
         $resource->add_route
           ->via('post')
           ->to("$name#create")
-          ->name($name.'_create');
+          ->name($parent_resource_prefix.$name.'_create');
 
         # new resource item
         $resource->add_route('/new')
           ->via('get')
           ->to("$name#create_form")
-          ->name($name.'_create_form');
+          ->name($parent_resource_prefix.$name.'_create_form');
 
         # modify resource item
-        my $nested = $resource->add_route(':'.$id_prefix.'id')
-          ->constraints($id_prefix.'id' => qr/[^.\/]+/);
+        my $nested = $resource->add_route(':id')
+          ->constraints('id' => qr/[^.\/]+/);
 
         $nested->add_route
           ->via('get')
           ->to("$name#show")
-          ->name($name.'_show');
+          ->name($parent_resource_prefix.$name.'_show');
 
         $nested->add_route
           ->via('put')
           ->to("$name#update")
-          ->name($name.'_update');
+          ->name($parent_resource_prefix.$name.'_update');
 
         $nested->add_route
           ->via('delete')
           ->to("$name#delete")
-          ->name($name.'_delete');
+          ->name($parent_resource_prefix.$name.'_delete');
 
         $nested->add_route('edit')
           ->via('get')
           ->to("$name#update_form")
-          ->name($name.'_update_form');
+          ->name($parent_resource_prefix.$name.'_update_form');
 
         $nested->add_route('delete')
           ->via('get')
           ->to("$name#delete_form")
-          ->name($name.'_delete_form');
+          ->name($parent_resource_prefix.$name.'_delete_form');
 
         $last_resource = $resource;
     }
