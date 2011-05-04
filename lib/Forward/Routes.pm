@@ -28,6 +28,7 @@ sub new {
     return $self->initialize(@_);
 }
 
+
 sub initialize {
     my $self = shift;
 
@@ -48,6 +49,7 @@ sub initialize {
 
 }
 
+
 sub prefixed_with {
     my ($self, $prefix) = @_;
 
@@ -56,6 +58,7 @@ sub prefixed_with {
 
     return $router;
 }
+
 
 sub add_route {
     my $self = shift;
@@ -217,6 +220,7 @@ sub add_resources {
     return $last_resource;
 }
 
+
 sub defaults {
     my $self = shift;
 
@@ -230,6 +234,7 @@ sub defaults {
     return $self;
 }
 
+
 sub name {
     my ($self, $name) = @_;
 
@@ -240,21 +245,19 @@ sub name {
     return $self;
 }
 
-sub to {
-    my ($self, $to) = @_;
 
-    unless ($to) {
-        my $d = $self->defaults;
-        return $d->{controller}.'#'.$d->{action}
-          if $d->{controller} && $d->{action};
-        return;
-    }
+sub to {
+    my $self = shift;
+    my ($to) = @_;
+
+    return $self unless $to;
 
     my $params;
     @$params{qw/controller action/} = split '#' => $to;
 
     return $self->defaults($params);
 }
+
 
 sub find_route {
     my ($self, $name) = @_;
@@ -273,6 +276,7 @@ sub find_route {
     return undef;
 }
 
+
 sub match {
     my ($self, $method, $path) = @_;
 
@@ -288,6 +292,7 @@ sub match {
     return $matches;
 }
 
+
 sub method {
     my $self = shift;
 
@@ -301,6 +306,7 @@ sub method {
 
     return $self;
 }
+
 
 sub via {
     shift->method(@_);
@@ -389,6 +395,7 @@ sub _match_current_pattern {
     return \@captures;
 }
 
+
 sub prepare_params {
     my ($self, @captures) = @_;
 
@@ -405,6 +412,7 @@ sub prepare_params {
 
 }
 
+
 sub constraints {
     my $self = shift;
 
@@ -417,6 +425,7 @@ sub constraints {
     return $self;
 }
 
+
 sub _match_method {
     my ($self, $value) = @_;
 
@@ -426,6 +435,7 @@ sub _match_method {
 
     return !!grep { $_ eq $value } @{$self->method};
 }
+
 
 sub build_path {
     my ($self, $name, @params) = @_;
@@ -446,6 +456,7 @@ sub build_path {
 
     croak qq/Unknown name '$name' used to build a path/;
 }
+
 
 sub _build_path {
     my ($self, %params) = @_;
@@ -600,11 +611,13 @@ sub _build_path {
 
 }
 
+
 sub capture_error {
     my ($self, $capture_name) = @_;
 
     croak qq/Required param '$capture_name' was not passed when building a path/;
 }
+
 
 sub children {
     my $self = shift;
@@ -662,6 +675,7 @@ sub _parent_is_plural_resource {
     return $self;
 }
 
+
 sub format {
     my $self = shift;
 
@@ -675,6 +689,7 @@ sub format {
 
     return $self;
 }
+
 
 sub _match_format {
     my ($self, $request_format) = @_;
