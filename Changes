@@ -1,10 +1,15 @@
 Changes for Forward::Routes
 
+0.16    2011-05-04 00:00:00
+        - Fixed nested resources
+        - Improved documentation on restful resources
+        - Added tests
+
 0.15    2011-05-02 00:00:00
-        - fixed request method inheritance and added tests
-        - test cleanup
-        - replaced method add_resource by add_singular_resources
-        - added docs for restful resources 
+        - Fixed request method inheritance and added tests
+        - Test cleanup
+        - Replaced method add_resource by add_singular_resources
+        - Added docs for restful resources 
 
 0.14    2011-04-20 00:00:00
         - Fixed format inheritance and added tests
