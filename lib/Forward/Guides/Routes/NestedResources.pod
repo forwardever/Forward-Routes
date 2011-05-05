@@ -8,7 +8,7 @@ framework developers (Perl)
 L<Forward::Routes> allows the creation of nested resources:
 
     # Routes root object
-    $routes = Forward::Routes->new;
+    $r = Forward::Routes->new;
 
     # Create a nested resource
     $ads = $r->add_resources('magazines')->add_resources('ads');
