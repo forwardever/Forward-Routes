@@ -147,6 +147,8 @@ sub add_resources {
 
     if ($parent_resource) {
 
+        my $id_prefix = $self->singularize->($parent_resource);
+
         shift @{$self->children};
         shift @{$self->children};
         shift @{$self->children};
@@ -161,7 +163,7 @@ sub add_resources {
         shift @{$self->children};
 
         # rename parent placeholder
-        $self->pattern->pattern(':'.$parent_resource.'_id')
+        $self->pattern->pattern(':'.$id_prefix.'_id')
           if $self->pattern->pattern eq ':id';
     }
 
@@ -222,6 +224,36 @@ sub add_resources {
     }
 
     return $last_resource;
+}
+
+
+# overwrite code ref for more advanced approach:
+# sub {
+#     require Lingua::EN::Inflect::Number;
+#     return &Lingua::EN::Inflect::Number::to_S($value);
+# }
+sub singularize {
+    my $self = shift;
+    my ($code_ref) = @_;
+
+    # Initialize very basic singularize code ref
+    $self->{singularize} ||= sub {
+        my $value = shift;
+    
+        if ($value =~ s/ies$//) {
+            $value .= 'y';
+        }
+        else {
+            $value =~ s/s$//;
+        }
+
+        return $value;
+    };
+
+    return $self->{singularize} unless $code_ref;
+
+    $self->{singularize} = $code_ref;
+
 }
 
 
