@@ -1,0 +1,59 @@
+=head1 Name
+
+Forward::Guides::Routes::NestedResources - Nested Resources for Plack web
+framework developers (Perl)
+
+=head1 Description
+
+L<Forward::Routes> allows the creation of nested resources:
+
+    # Routes root object
+    $routes = Forward::Routes->new;
+
+    # Create a nested resource
+    $ads = $r->add_resources('magazines')->add_resources('ads');
+
+    # The following routes are generated:
+
+    HTTP     Path                                 Controller Action        Route name
+    request                                       parameter  parameter
+    method          
+
+    GET      magazines/:magazine_id/ads/new        ads       create_form   magazines_ads_create_form
+    GET      magazines/:magazine_id/ads/:id        ads       show          magazines_ads_show
+    GET      magazines/:magazine_id/ads/:id/edit   ads       update_form   magazines_ads_update_form
+    GET      magazines/:magazine_id/ads/:id/delete ads       delete_form   magazines_ads_delete_form
+    GET      magazines/:magazine_id/ads            ads       index         magazines_ads_index
+    POST     magazines/:magazine_id/ads            ads       create        magazines_ads_create
+    PUT      magazines/:magazine_id/ads/:id        ads       update        magazines_ads_update
+    DELETE   magazines/:magazine_id/ads/:id        ads       delete        magazines_ads_delete
+
+The creation of routes for a nested resource does not lead to an automatic
+generation of routes for the parent resource. In order to get routes for both,
+magazines and ads, two step are required:
+
+    # Create routes for "magazines" resource
+    $ads = $r->add_resources('magazines');
+
+    # Create routes for nested "ads" resource
+    $ads = $r->add_resources('magazines')->add_resources('ads');
+
+The placeholder name for the parent resource id is singularized. That way, it
+can easily be used to search the "ads" database table with "id" and
+"magazine_id" columns (typical column naming in case of has_many
+relationships).
+
+    # resource (plural):      magazines
+    # placeholder (singular): :magazine_id
+
+The C<singularize> method is very basic, but it can be overwritten:
+
+    $routes = Forward::Routes->new;
+
+    # pass a code ref via singularize method
+    $routes->singularize( sub {
+        require Lingua::EN::Inflect::Number;
+        return &Lingua::EN::Inflect::Number::to_S($value);
+    });
+
+=cut
