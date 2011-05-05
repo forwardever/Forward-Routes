@@ -7,7 +7,7 @@ use Test::More;
 
 use Forward::Routes;
 
-use Test::More tests => 4;
+use Test::More tests => 7;
 
 
 #############################################################################
@@ -21,8 +21,13 @@ is $r->singularize->('queries'), 'query';
 
 # overwrite singularize
 my $code_ref = sub {return shift;};
-$r->singularize($code_ref);
+is ref $r->singularize($code_ref), 'Forward::Routes';
 
 is $r->singularize, $code_ref;
 is $r->singularize->('users'), 'users';
 
+# works for child routes
+my $child = $r->add_route;
+
+is $child->singularize, $code_ref;
+is $child->singularize->('users'), 'users';

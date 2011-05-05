@@ -237,7 +237,7 @@ sub singularize {
     my ($code_ref) = @_;
 
     # Initialize very basic singularize code ref
-    $self->{singularize} ||= sub {
+    $Forward::Routes::singularize ||= sub {
         my $value = shift;
     
         if ($value =~ s/ies$//) {
@@ -250,9 +250,11 @@ sub singularize {
         return $value;
     };
 
-    return $self->{singularize} unless $code_ref;
+    return $Forward::Routes::singularize unless $code_ref;
 
-    $self->{singularize} = $code_ref;
+    $Forward::Routes::singularize = $code_ref;
+
+    return $self;
 
 }
 
