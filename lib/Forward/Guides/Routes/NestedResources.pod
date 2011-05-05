@@ -5,7 +5,9 @@ framework developers (Perl)
 
 =head1 Description
 
-L<Forward::Routes> allows the creation of nested resources:
+L<Forward::Routes> allows the creation of nested resources.
+Take a look at L<Forward::Guides::Routes::RestfulResources> for more in depth
+documentation on resources.
 
     # Routes root object
     $r = Forward::Routes->new;
