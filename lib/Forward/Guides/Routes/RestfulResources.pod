@@ -31,21 +31,21 @@ update and delete actions and to display CRUD related forms:
     PUT      /cities/:id          cities      update        cities_update
     DELETE   /cities/:id          cities      delete        cities_delete
 
-Each generated route dispatches to a specific action (see action parameter
-above) which will usually perform some sort of CRUD action.
 Framework builders are responsible for the dispatching process,
 L<Forward::Routes> just provides a match object with the needed parameters.
+Each generated route will usually dispatch to a specific method (see action
+parameter above) which is used to:
 
-    Route name            Used to
+    Action (method)       Used to
 
-    cities_create_form    display a form to create a new item
-    cities_show           display an individual item
-    cities_update_form    display a form to update an existing item
-    cities_delete_form    display a form to confirm the deletion of an existing item
-    cities_index          list all items
-    cities_create         create a new item
-    cities_update         update an existing item
-    cities_delete         delete an existing item
+    create_form           display a form to create a new item
+    show                  display an individual item
+    update_form           display a form to update an existing item
+    delete_form           display a form to confirm the deletion of an existing item
+    index                 list all items
+    create                create a new item
+    update                update an existing item
+    delete                delete an existing item
 
 
 The internal code to generate a resource makes use of nested routes:
