@@ -414,7 +414,7 @@ sub _match {
         $match = $matches->[0];
     }
 
-    my $params = $self->prepare_params(@$captures);
+    my $params = $self->_merge_defaults_and_captures(@$captures);
     $match->add_params($params);
     $match->add_params({format => $request_format}) if length($request_format);
 
@@ -442,7 +442,7 @@ sub _match_current_pattern {
 }
 
 
-sub prepare_params {
+sub _merge_defaults_and_captures {
     my ($self, @captures) = @_;
 
     # Copy! of defaults
