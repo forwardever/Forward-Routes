@@ -18,6 +18,16 @@ sub add_params {
 }
 
 
+sub add_captures {
+    my $self   = shift;
+    my $params = shift;
+
+    %{$self->captures} = (%$params, %{$self->captures});
+
+    return $self;
+}
+
+
 sub pattern {
     my $self   = shift;
 
@@ -41,7 +51,21 @@ sub params {
 
     # Get hash value
     return $self->{params}->{$params[0]};
+}
 
+
+sub captures {
+    my $self = shift;
+    my (@params) = @_;
+
+    # Initialize
+    $self->{captures} ||= {};
+
+    # Get hash
+    return $self->{captures} unless $params[0];
+
+    # Get hash value
+    return $self->{captures}->{$params[0]};
 }
 
 

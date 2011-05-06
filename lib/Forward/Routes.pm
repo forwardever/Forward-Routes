@@ -417,6 +417,7 @@ sub _match {
     my $params = $self->_merge_defaults_and_captures(@$captures);
     $match->add_params($params);
     $match->add_params({format => $request_format}) if length($request_format);
+    $match->add_captures($self->_captures_to_hash(@$captures));
 
     return $matches;
 }
@@ -439,6 +440,20 @@ sub _match_current_pattern {
 
 
     return \@captures;
+}
+
+
+sub _captures_to_hash {
+    my $self = shift;
+    my (@captures) = @_;
+
+    my $captures = {};
+
+    foreach my $name (@{$self->pattern->captures}) {
+        $captures->{$name} = shift @captures;
+    }
+
+    return $captures;
 }
 
 
