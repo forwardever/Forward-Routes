@@ -414,10 +414,16 @@ sub _match {
         $match = $matches->[0];
     }
 
-    my $params = $self->_merge_defaults_and_captures(@$captures);
-    $match->add_params($params);
+    my $captures_hash = $self->_captures_to_hash(@$captures);
+
+    # Merge defaults and captures, Copy! of $self->defaults
+    $match->add_params({%{$self->defaults}, %$captures_hash});
+
+    # Format
     $match->add_params({format => $request_format}) if length($request_format);
-    $match->add_captures($self->_captures_to_hash(@$captures));
+
+    # Captures
+    $match->add_captures($captures_hash);
 
     return $matches;
 }
@@ -449,28 +455,20 @@ sub _captures_to_hash {
 
     my $captures = {};
 
+    my $defaults = $self->{defaults};
+
     foreach my $name (@{$self->pattern->captures}) {
-        $captures->{$name} = shift @captures;
+        my $capture = shift @captures;
+
+        if (defined $capture) {
+            $captures->{$name} = $capture;
+        }
+        else {
+            $captures->{$name} = $defaults->{$name} if defined $defaults->{$name};
+        }
     }
 
     return $captures;
-}
-
-
-sub _merge_defaults_and_captures {
-    my ($self, @captures) = @_;
-
-    # Copy! of defaults
-    my $params = {%{$self->defaults}};
-
-    foreach my $name (@{$self->pattern->captures}) {
-        last unless @captures;
-        my $c = shift @captures;
-        $params->{$name} = $c if defined $c;
-    }
-
-    return $params;
-
 }
 
 
