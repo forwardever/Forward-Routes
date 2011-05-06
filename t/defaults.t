@@ -19,5 +19,4 @@ $r->add_route('articles')->defaults(first_name => 'foo', last_name => 'bar')->na
 my $m = $r->match(get => 'articles');
 is_deeply $m->[0]->params => {first_name => 'foo', last_name => 'bar'};
 
-
 is $r->build_path('one')->{path}, 'articles';

@@ -31,12 +31,17 @@ sub pattern {
 
 sub params {
     my $self = shift;
+    my (@params) = @_;
 
+    # Initialize
     $self->{params} ||= {};
-    return $self->{params} unless $_[0];
 
-    $self->{params} = $_[0];
-    return $self;
+    # Get hash
+    return $self->{params} unless $params[0];
+
+    # Get hash value
+    return $self->{params}->{$params[0]};
+
 }
 
 
