@@ -7,7 +7,7 @@ use Test::More;
 
 use Forward::Routes;
 
-use Test::More tests => 6;
+use Test::More tests => 8;
 
 
 #############################################################################
@@ -50,6 +50,20 @@ $m = $r->match(get => 'foo/1/bar/4');
 
 # get hash
 is_deeply $m->[0]->captures => {id => 1, id2 => 4};
+
+
+
+#############################################################################
+### optional placeholders
+
+$r = Forward::Routes->new;
+$r->add_route('articles/(:id)?');
+
+$m = $r->match(get => 'articles/2');
+is_deeply $m->[0]->captures => {id => 2};
+
+$m = $r->match(get => 'articles/');
+is_deeply $m->[0]->captures => {};
 
 
 
