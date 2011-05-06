@@ -451,7 +451,7 @@ sub prepare_params {
     foreach my $name (@{$self->pattern->captures}) {
         last unless @captures;
         my $c = shift @captures;
-        $params->{$name} = $c unless !defined $c;
+        $params->{$name} = $c if defined $c;
     }
 
     return $params;
