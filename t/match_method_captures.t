@@ -7,15 +7,34 @@ use Test::More;
 
 use Forward::Routes;
 
-use Test::More tests => 8;
+use Test::More tests => 14;
 
 
 #############################################################################
-### match: captures method
+### method tests
+
+my $m = Forward::Routes::Match->new;
+is ref $m->captures, 'HASH';
+is_deeply $m->captures, {};
+
+is $m->_add_captures({one => 1, two => 2}), $m;
+is_deeply $m->captures, {one => 1, two => 2};
+
+# hash elements are added, hash not replaced
+$m->_add_captures({three => 3, four => 4});
+is_deeply $m->captures, {one => 1, two => 2, three => 3, four => 4};
+
+# older captures have precedence over newer captures
+$m->_add_captures({one => 'ONE'});
+is_deeply $m->captures, {one => 1, two => 2, three => 3, four => 4};
+
+
+#############################################################################
+### captures
 
 my $r = Forward::Routes->new;
 $r->add_route('articles/:id')->defaults(first_name => 'foo', last_name => 'bar')->name('one');
-my $m = $r->match(get => 'articles/2');
+$m = $r->match(get => 'articles/2');
 
 # get hash
 is_deeply $m->[0]->captures => {id => 2};
