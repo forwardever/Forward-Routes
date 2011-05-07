@@ -28,18 +28,6 @@ sub _add_captures {
 }
 
 
-sub pattern {
-    my $self = shift;
-    my ($pattern) = @_;
-
-    return $self->{pattern} unless defined $pattern;
-
-    $self->{pattern} = $pattern;
-
-    return $self;
-}
-
-
 sub params {
     my $self = shift;
     my ($key) = @_;
