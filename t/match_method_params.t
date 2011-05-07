@@ -7,7 +7,7 @@ use Test::More;
 
 use Forward::Routes;
 
-use Test::More tests => 8;
+use Test::More tests => 10;
 
 
 #############################################################################
@@ -28,6 +28,8 @@ is_deeply $m->params, {one => 1, two => 2, three => 3, four => 4};
 $m->_add_params({one => 'ONE'});
 is_deeply $m->params, {one => 1, two => 2, three => 3, four => 4};
 
+is $m->_add_params({0 => 'ZERO'}), $m;
+is_deeply $m->params, {one => 1, two => 2, three => 3, four => 4, 0 => 'ZERO'};
 
 
 #############################################################################

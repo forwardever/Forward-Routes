@@ -7,7 +7,7 @@ use Test::More;
 
 use Forward::Routes;
 
-use Test::More tests => 14;
+use Test::More tests => 16;
 
 
 #############################################################################
@@ -28,6 +28,8 @@ is_deeply $m->captures, {one => 1, two => 2, three => 3, four => 4};
 $m->_add_captures({one => 'ONE'});
 is_deeply $m->captures, {one => 1, two => 2, three => 3, four => 4};
 
+is $m->_add_captures({0 => 'ZERO'}), $m;
+is_deeply $m->captures, {one => 1, two => 2, three => 3, four => 4, 0 => 'ZERO'};
 
 #############################################################################
 ### captures

@@ -48,7 +48,7 @@ sub params {
     $self->{params} ||= {};
 
     # Get hash
-    return $self->{params} unless $key;
+    return $self->{params} unless length $key;
 
     # Get hash value
     return $self->{params}->{$key};
@@ -63,7 +63,7 @@ sub captures {
     $self->{captures} ||= {};
 
     # Get hash
-    return $self->{captures} unless $key;
+    return $self->{captures} unless length $key;
 
     # Get hash value
     return $self->{captures}->{$key};
