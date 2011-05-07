@@ -8,7 +8,7 @@ sub new {
     return bless {}, shift;
 }
 
-sub add_params {
+sub _add_params {
     my $self   = shift;
     my $params = shift;
 
@@ -18,7 +18,7 @@ sub add_params {
 }
 
 
-sub add_captures {
+sub _add_captures {
     my $self   = shift;
     my $params = shift;
 

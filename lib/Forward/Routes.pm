@@ -417,13 +417,13 @@ sub _match {
     my $captures_hash = $self->_captures_to_hash(@$captures);
 
     # Merge defaults and captures, Copy! of $self->defaults
-    $match->add_params({%{$self->defaults}, %$captures_hash});
+    $match->_add_params({%{$self->defaults}, %$captures_hash});
 
     # Format
-    $match->add_params({format => $request_format}) if length($request_format);
+    $match->_add_params({format => $request_format}) if length($request_format);
 
     # Captures
-    $match->add_captures($captures_hash);
+    $match->_add_captures($captures_hash);
 
     return $matches;
 }
