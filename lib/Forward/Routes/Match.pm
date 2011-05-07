@@ -28,6 +28,16 @@ sub _add_captures {
 }
 
 
+sub _add_name {
+    my $self = shift;
+    my ($name) = @_;
+
+    $self->{name} = $name unless length $self->{name};
+
+    return $self;
+}
+
+
 sub params {
     my $self = shift;
     my ($key) = @_;
@@ -67,6 +77,12 @@ sub is_bridge {
     $self->{is_bridge} = $is_bridge[0];
 
     return $self;
+}
+
+
+sub name {
+    my $self = shift;
+    return $self->{name};
 }
 
 

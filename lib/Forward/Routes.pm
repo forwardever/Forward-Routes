@@ -425,6 +425,9 @@ sub _match {
     # Captures
     $match->_add_captures($captures_hash);
 
+    # Name
+    $match->_add_name($self->name);
+
     return $matches;
 }
 
