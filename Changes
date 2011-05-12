@@ -8,7 +8,7 @@ Changes for Forward::Routes
           params)
         - Added "captures" method in Match class
         - Removed "pattern" method from Match class (missing use case)
-        - Added name method to Match class 
+        - Added "name" method to Match class 
 
 0.16    2011-05-04 00:00:00
         - Fixed nested resources
