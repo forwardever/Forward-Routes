@@ -417,7 +417,7 @@ documentation on restful resources.
 
 =head2 Nested Resources
 
-Please look at LL<Forward::Guides::Routes::NestedResources> for more in depth
+Please look at L<Forward::Guides::Routes::NestedResources> for more in depth
 documentation on nested resources.
 
     $r = Forward::Routes->new;
