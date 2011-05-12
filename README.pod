@@ -391,9 +391,8 @@ be reduced this way.
 
 The C<resources> method allows to generate Rails like resources.
 
-Please look at L<Forward::Guides::Routes::RestfulResources> for more in depth
-documentation. For more documentation on nested resources, look at
-L<Forward::Guides::Routes::NestedResources>
+Please look at L<Forward::Guides::Routes::Resources> for more in depth
+documentation on restful resources.
 
     $r = Forward::Routes->new;
     $r->add_resources('users', 'photos', 'tags');
@@ -417,6 +416,9 @@ L<Forward::Guides::Routes::NestedResources>
 
 
 =head2 Nested Resources
+
+Please look at LL<Forward::Guides::Routes::NestedResources> for more in depth
+documentation on nested resources.
 
     $r = Forward::Routes->new;
     my $magazines = $r->add_resources('magazines');

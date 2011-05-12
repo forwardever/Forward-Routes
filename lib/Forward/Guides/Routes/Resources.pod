@@ -1,6 +1,6 @@
 =head1 Name
 
-Forward::Guides::Routes::RestfulResources - Rails like resources for Plack web
+Forward::Guides::Routes::Resources - Rails like resources for Plack web
 framework developers (Perl)
 
 =head1 Description
