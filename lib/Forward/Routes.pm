@@ -326,7 +326,8 @@ sub find_route {
 sub match {
     my ($self, $method, $path) = @_;
 
-    $path || die 'missing path';
+    length $method || croak 'Forward::Routes->match: missing request method';
+    defined $path || croak 'Forward::Routes->match: missing path';
 
     # Leading slash
     $path = "/$path" unless $path =~ m{ \A / }x;
