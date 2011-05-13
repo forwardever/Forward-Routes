@@ -7,7 +7,7 @@ use Test::More;
 
 use Forward::Routes;
 
-use Test::More tests => 215;
+use Test::More tests => 208;
 
 #############################################################################
 ### empty
@@ -700,29 +700,6 @@ $r->add_route('logout', via => 'put');
 
 ok $r->match(put => 'logout');
 ok !$r->match(post => 'logout');
-
-
-#############################################################################
-### bridges
-
-$r = Forward::Routes->new;
-my $bridge = $r->bridge('admin')->to('check#authentication');
-$bridge->add_route('foo')->to('no#placeholders');
-$bridge->add_route(':foo/:bar')->to('two#placeholders');
-
-$m = $r->match(get => 'foo');
-is $m, undef;
-
-$m = $r->match(get => 'admin/foo');
-is_deeply $m->[0]->params, {controller => 'check', action => 'authentication'};
-is $m->[0]->is_bridge, 1;
-is_deeply $m->[1]->params, {controller => 'no', action => 'placeholders'};
-is $m->[1]->is_bridge, undef;
-
-$m = $r->match(get => '/admin/hello/there');
-is_deeply $m->[0]->params, {controller => 'check', action => 'authentication'};
-is_deeply $m->[1]->params, {controller => 'two', action => 'placeholders',
-  foo => 'hello', bar => 'there'};
 
 
 #############################################################################
