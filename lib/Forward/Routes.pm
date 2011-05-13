@@ -406,10 +406,20 @@ sub _match {
     # Match object
     my $match;
 
-    if (!$matches->[0] || $self->_is_bridge) {
+    if ($self->_is_bridge) {
         $match = Forward::Routes::Match->new;
-        $match->is_bridge(1) if $self->_is_bridge;
+        $match->is_bridge(1);
+
+        # make earlier captures available to bridge
+        if (my $m = $matches->[0]) {
+            $match->_add_params({%{$m->captures}});
+            $match->_add_captures({%{$m->captures}});
+        }
+
         unshift @$matches, $match;
+    }
+    elsif (!$matches->[0]){
+        $match = $matches->[0] =Forward::Routes::Match->new;
     }
     else {
         $match = $matches->[0];
