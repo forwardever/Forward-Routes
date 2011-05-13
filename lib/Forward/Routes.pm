@@ -412,8 +412,8 @@ sub _match {
 
         # make earlier captures available to bridge
         if (my $m = $matches->[0]) {
-            $match->_add_params({%{$m->captures}});
-            $match->_add_captures({%{$m->captures}});
+            $match->_add_params(\%{$m->captures});
+            $match->_add_captures(\%{$m->captures});
         }
 
         unshift @$matches, $match;
