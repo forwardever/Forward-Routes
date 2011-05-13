@@ -419,7 +419,7 @@ sub _match {
         unshift @$matches, $match;
     }
     elsif (!$matches->[0]){
-        $match = $matches->[0] =Forward::Routes::Match->new;
+        $match = $matches->[0] = Forward::Routes::Match->new;
     }
     else {
         $match = $matches->[0];
