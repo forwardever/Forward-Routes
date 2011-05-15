@@ -7,7 +7,7 @@ use Test::More;
 
 use Forward::Routes;
 
-use Test::More tests => 52;
+use Test::More tests => 36;
 
 
 #############################################################################
@@ -42,31 +42,31 @@ $m = $r->match(get => 'magazines/11/ads/12/delete');
 is_deeply $m->[0]->params => {controller => 'ads', action => 'delete_form', magazine_id => 11, id => 12};
 
 
-# magazine routes WON'T work
+# magazine routes also work
 
 $m = $r->match(get => 'magazines');
-is $m, undef;
+is_deeply $m->[0]->params => {controller => 'magazines', action => 'index'};
 
 $m = $r->match(get => 'magazines/new');
-is $m, undef;
+is_deeply $m->[0]->params => {controller => 'magazines', action => 'create_form'};
 
 $m = $r->match(post => 'magazines');
-is $m, undef;
+is_deeply $m->[0]->params => {controller => 'magazines', action => 'create'};
 
 $m = $r->match(get => 'magazines/1');
-is $m, undef;
+is_deeply $m->[0]->params => {controller => 'magazines', action => 'show', id => 1};
 
 $m = $r->match(get => 'magazines/1/edit');
-is $m, undef;
+is_deeply $m->[0]->params => {controller => 'magazines', action => 'update_form', id => 1};
 
 $m = $r->match(get => 'magazines/1/delete');
-is $m, undef;
+is_deeply $m->[0]->params => {controller => 'magazines', action => 'delete_form', id => 1};
 
 $m = $r->match(put => 'magazines/1');
-is $m, undef;
+is_deeply $m->[0]->params => {controller => 'magazines', action => 'update', id => 1};
 
 $m = $r->match(delete => 'magazines/1');
-is $m, undef;
+is_deeply $m->[0]->params => {controller => 'magazines', action => 'delete', id => 1};
 
 
 # build path
@@ -111,60 +111,3 @@ $e = eval {$r->build_path('magazines_ads_delete_form', magazine_id => 3)->{path}
 like $@ => qr/Required param 'id' was not passed when building a path/;
 undef $e;
 
-
-
-### now add magazines as a separate resource
-
-$r->add_resources('magazines');
-
-$m = $r->match(get => 'magazines');
-is_deeply $m->[0]->params => {controller => 'magazines', action => 'index'};
-
-$m = $r->match(get => 'magazines/new');
-is_deeply $m->[0]->params => {controller => 'magazines', action => 'create_form'};
-
-$m = $r->match(post => 'magazines');
-is_deeply $m->[0]->params => {controller => 'magazines', action => 'create'};
-
-$m = $r->match(get => 'magazines/1');
-is_deeply $m->[0]->params => {controller => 'magazines', action => 'show', id => 1};
-
-$m = $r->match(get => 'magazines/1/edit');
-is_deeply $m->[0]->params => {controller => 'magazines', action => 'update_form', id => 1};
-
-$m = $r->match(get => 'magazines/1/delete');
-is_deeply $m->[0]->params => {controller => 'magazines', action => 'delete_form', id => 1};
-
-$m = $r->match(put => 'magazines/1');
-is_deeply $m->[0]->params => {controller => 'magazines', action => 'update', id => 1};
-
-$m = $r->match(delete => 'magazines/1');
-is_deeply $m->[0]->params => {controller => 'magazines', action => 'delete', id => 1};
-
-
-
-# ... and nested resource still works
-
-$m = $r->match(get => 'magazines/1/ads');
-is_deeply $m->[0]->params => {controller => 'ads', action => 'index', magazine_id => 1};
-
-$m = $r->match(get => 'magazines/1/ads/new');
-is_deeply $m->[0]->params => {controller => 'ads', action => 'create_form', magazine_id => 1};
-
-$m = $r->match(post => 'magazines/1/ads');
-is_deeply $m->[0]->params => {controller => 'ads', action => 'create', magazine_id => 1};
-
-$m = $r->match(get => 'magazines/1/ads/4');
-is_deeply $m->[0]->params => {controller => 'ads', action => 'show', magazine_id => 1, id => 4};
-
-$m = $r->match(get => 'magazines/1/ads/5/edit');
-is_deeply $m->[0]->params => {controller => 'ads', action => 'update_form', magazine_id => 1, id => 5};
-
-$m = $r->match(put => 'magazines/1/ads/2');
-is_deeply $m->[0]->params => {controller => 'ads', action => 'update', magazine_id => 1, id => 2};
-
-$m = $r->match(delete => 'magazines/0/ads/1');
-is_deeply $m->[0]->params => {controller => 'ads', action => 'delete', magazine_id => 0, id => 1};
-
-$m = $r->match(get => 'magazines/11/ads/12/delete');
-is_deeply $m->[0]->params => {controller => 'ads', action => 'delete_form', magazine_id => 11, id => 12};

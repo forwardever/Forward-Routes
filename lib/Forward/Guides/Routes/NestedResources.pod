@@ -15,7 +15,8 @@ documentation on resource routing.
     # Create a nested resource
     $ads = $r->add_resources('magazines')->add_resources('ads');
 
-    # The following routes are generated:
+    # IN ADDITION TO ! to the magazine resource routes, the following routes
+    # are generated:
 
     HTTP     Path                                 Controller Action        Route name
     request                                       parameter  parameter
@@ -29,16 +30,6 @@ documentation on resource routing.
     POST     magazines/:magazine_id/ads            ads       create        magazines_ads_create
     PUT      magazines/:magazine_id/ads/:id        ads       update        magazines_ads_update
     DELETE   magazines/:magazine_id/ads/:id        ads       delete        magazines_ads_delete
-
-The creation of routes for a nested resource does not lead to an automatic
-generation of routes for the parent resource. In order to get routes for both,
-magazines and ads, two step are required:
-
-    # Create routes for "magazines" resource
-    $ads = $r->add_resources('magazines');
-
-    # Create routes for nested "ads" resource
-    $ads = $r->add_resources('magazines')->add_resources('ads');
 
 The placeholder name for the parent resource id is singularized. That way, it
 can easily be used to search the "ads" database table with "id" and
