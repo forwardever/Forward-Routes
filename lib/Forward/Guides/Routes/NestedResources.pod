@@ -1,13 +1,13 @@
 =head1 Name
 
-Forward::Guides::Routes::NestedResources - Nested Resources for Plack web
-framework developers (Perl)
+Forward::Guides::Routes::NestedResources - Routes for Nested Resources for
+Plack web framework developers (Perl)
 
 =head1 Description
 
-L<Forward::Routes> allows the creation of nested resources.
-Take a look at L<Forward::Guides::Routes::Resources> for more in depth
-documentation on resources.
+L<Forward::Routes> provides support for nested resources. Take a look at
+L<Forward::Guides::Routes::Resources> for more in depth
+documentation on resource routing.
 
     # Routes root object
     $r = Forward::Routes->new;

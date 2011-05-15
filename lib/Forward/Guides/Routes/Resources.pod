@@ -1,14 +1,18 @@
 =head1 Name
 
-Forward::Guides::Routes::Resources - Rails like resources for Plack web
+Forward::Guides::Routes::Resources - Rails like resource routing for Plack web
 framework developers (Perl)
 
 =head1 Description
 
-L<Forward::Routes> enables web framework developers to build Rails like
-resources with a single command. The C<add_resources> command generates a
-bunch of routes that can be used to dispatch to a controller's read, create,
-update and delete actions and to display CRUD related forms:
+L<Forward::Routes> provides support for Rails like resource routing.
+The C<add_resources> command generates a bunch of routes that can be used to
+dispatch to a controller's read, create, update and delete actions and to
+display CRUD related forms. Framework builders are responsible to load the
+respective controller classes and to execute the desired controller method.
+L<Forward::Routes> just generates the routes and in case
+of a match, provides a match object with the needed controller and action
+parameters.
 
     # Routes root object
     my $routes = Forward::Routes->new;
@@ -31,8 +35,7 @@ update and delete actions and to display CRUD related forms:
     PUT      /cities/:id          cities      update        cities_update
     DELETE   /cities/:id          cities      delete        cities_delete
 
-Framework builders are responsible for the dispatching process,
-L<Forward::Routes> just provides a match object with the needed parameters.
+
 Each generated route will usually dispatch to a specific method (see action
 parameter above) which is used to:
 
