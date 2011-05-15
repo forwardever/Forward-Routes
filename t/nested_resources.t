@@ -7,7 +7,7 @@ use Test::More;
 
 use Forward::Routes;
 
-use Test::More tests => 36;
+use Test::More tests => 37;
 
 
 #############################################################################
@@ -40,6 +40,9 @@ is_deeply $m->[0]->params => {controller => 'ads', action => 'delete', magazine_
 
 $m = $r->match(get => 'magazines/11/ads/12/delete');
 is_deeply $m->[0]->params => {controller => 'ads', action => 'delete_form', magazine_id => 11, id => 12};
+
+$m = $r->match(post => 'magazines/1.2/ads');
+is $m, undef;
 
 
 # magazine routes also work
