@@ -7,7 +7,7 @@ use Test::More;
 
 use Forward::Routes;
 
-use Test::More tests => 37;
+use Test::More tests => 38;
 
 
 #############################################################################
@@ -114,3 +114,11 @@ $e = eval {$r->build_path('magazines_ads_delete_form', magazine_id => 3)->{path}
 like $@ => qr/Required param 'id' was not passed when building a path/;
 undef $e;
 
+
+### deeper nesting
+$r = Forward::Routes->new;
+
+my $stats = $r->add_resources('magazines')->add_resources('ads')->add_resources('stats');
+
+$m = $r->match(get => 'magazines/1/ads/4/stats/7');
+is_deeply $m->[0]->params => {controller => 'stats', action => 'show', magazine_id => 1, ad_id => 4, id => 7};

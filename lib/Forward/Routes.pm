@@ -159,7 +159,7 @@ sub add_resources {
     
             my $parent_id_placeholder = $parent_name_singular.'_id';
 
-            $resource = $self->add_route(':'.$parent_id_placeholder.'/'.$name)
+            $resource = $self->add_route(':'.$parent_id_placeholder.'/'.$name, _is_plural_resource => $name)
               ->constraints($parent_id_placeholder => qr/[^.\/]+/);
         }
         else {
