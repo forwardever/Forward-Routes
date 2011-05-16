@@ -151,19 +151,23 @@ sub add_resources {
         my $parent_name_prefix = '';
 
         # Nestes resources
-        if (my $parent_name = $self->_is_plural_resource) {
+        if ($self->_is_plural_resource) {
     
-            $parent_name_prefix = $parent_name.'_';
+            my @parent_names = $self->_parent_resource_names;
 
-            my $parent_id_placeholder = $self->singularize->($parent_name).'_id';
+            $parent_name_prefix = join('_', @parent_names).'_';
+  
+            my $parent_id_name = $self->singularize->($parent_names[-1]).'_id';
 
-            $resource = $self->add_route(':'.$parent_id_placeholder.'/'.$name)
-              ->_is_plural_resource($name)
-              ->constraints($parent_id_placeholder => qr/[^.\/]+/);
+            $resource = $self->add_route(':'.$parent_id_name.'/'.$name)
+              ->_is_plural_resource(1)
+              ->_parent_resource_names($self->_parent_resource_names, $name)
+              ->constraints($parent_id_name => qr/[^.\/]+/);
         }
         else {
             $resource = $self->add_route($name)
-              ->_is_plural_resource($name);
+              ->_is_plural_resource(1)
+              ->_parent_resource_names($name);
         }
 
         # resource
@@ -727,6 +731,23 @@ sub pattern {
 
     return $self->{pattern};
 
+}
+
+
+sub _parent_resource_names {
+    my $self = shift;
+    my (@names) = @_;
+
+    # Initialize
+    $self->{_parent_resource_names} ||=[];
+
+
+    if (@names) {
+        $self->{_parent_resource_names} = \@names;
+        return $self;
+    }
+
+    return @{$self->{_parent_resource_names}};
 }
 
 

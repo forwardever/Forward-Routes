@@ -7,7 +7,7 @@ use Test::More;
 
 use Forward::Routes;
 
-use Test::More tests => 38;
+use Test::More tests => 41;
 
 
 #############################################################################
@@ -122,3 +122,8 @@ my $stats = $r->add_resources('magazines')->add_resources('ads')->add_resources(
 
 $m = $r->match(get => 'magazines/1/ads/4/stats/7');
 is_deeply $m->[0]->params => {controller => 'stats', action => 'show', magazine_id => 1, ad_id => 4, id => 7};
+is $m->[0]->name, 'magazines_ads_stats_show';
+
+
+is $r->build_path('magazines_ads_stats_show', magazine_id => 3, ad_id => 4, id => 5)->{path} => 'magazines/3/ads/4/stats/5';
+is $r->build_path('magazines_ads_stats_show', magazine_id => 3, ad_id => 4, id => 5)->{method} => 'get';
