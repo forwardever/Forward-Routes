@@ -1,5 +1,11 @@
 Changes for Forward::Routes
 
+0.18    2011-05-16 00:00:00
+        - Empty paths can be passed via "match" method (default to "/")
+        - Give bridges access to all captures of a URL
+        - Creation of a nested resource automatically generates the parent
+          resource (API CHANGE)
+
 0.17    2011-05-12 00:00:00
         - Fixed id prefix in case of nested resources (singularize)
         - Allow customization of singularize method
