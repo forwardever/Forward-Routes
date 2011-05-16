@@ -153,19 +153,18 @@ sub add_resources {
         # Nestes resources
         if (my $parent_name = $self->_is_plural_resource) {
     
-            my $parent_name_singular = $self->singularize->($parent_name);
-        
             $parent_name_prefix = $parent_name.'_';
-    
-            my $parent_id_placeholder = $parent_name_singular.'_id';
 
-            $resource = $self->add_route(':'.$parent_id_placeholder.'/'.$name, _is_plural_resource => $name)
+            my $parent_id_placeholder = $self->singularize->($parent_name).'_id';
+
+            $resource = $self->add_route(':'.$parent_id_placeholder.'/'.$name)
+              ->_is_plural_resource($name)
               ->constraints($parent_id_placeholder => qr/[^.\/]+/);
         }
         else {
-            $resource = $self->add_route($name, _is_plural_resource => $name);
+            $resource = $self->add_route($name)
+              ->_is_plural_resource($name);
         }
-
 
         # resource
         $resource->add_route
