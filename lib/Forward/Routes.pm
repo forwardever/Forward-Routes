@@ -158,7 +158,7 @@ sub add_resources {
         }
 
         if ($is_namespace_value) {
-            $namespace_prefix   = $name.'::';
+            $namespace_prefix   = $self->format_controller->($name).'::';
             $name_prefix        = $name.'_';
             $is_namespace_value = undef;
             next;
@@ -166,11 +166,11 @@ sub add_resources {
 
         # Nestes resources
         if ($self->_is_plural_resource) {
-    
+
             my @parent_names = $self->_parent_resource_names;
 
             $parent_name_prefix = join('_', @parent_names).'_';
-  
+
             my $parent_id_name = $self->singularize->($parent_names[-1]).'_id';
 
             $resource = $self->add_route(':'.$parent_id_name.'/'.$name)
@@ -184,21 +184,25 @@ sub add_resources {
               ->_parent_resource_names($name);
         }
 
+        #
+        my $ctrl = $self->format_controller->($name);
+
+
         # resource
         $resource->add_route
           ->via('get')
-          ->to($namespace_prefix.$name."#index")
+          ->to($namespace_prefix.$ctrl."#index")
           ->name($name_prefix.$parent_name_prefix.$name.'_index');
 
         $resource->add_route
           ->via('post')
-          ->to($namespace_prefix.$name."#create")
+          ->to($namespace_prefix.$ctrl."#create")
           ->name($name_prefix.$parent_name_prefix.$name.'_create');
 
         # new resource item
         $resource->add_route('/new')
           ->via('get')
-          ->to($namespace_prefix.$name."#create_form")
+          ->to($namespace_prefix.$ctrl."#create_form")
           ->name($name_prefix.$parent_name_prefix.$name.'_create_form');
 
         # modify resource item
@@ -207,27 +211,27 @@ sub add_resources {
 
         $nested->add_route
           ->via('get')
-          ->to($namespace_prefix.$name."#show")
+          ->to($namespace_prefix.$ctrl."#show")
           ->name($name_prefix.$parent_name_prefix.$name.'_show');
 
         $nested->add_route
           ->via('put')
-          ->to($namespace_prefix.$name."#update")
+          ->to($namespace_prefix.$ctrl."#update")
           ->name($name_prefix.$parent_name_prefix.$name.'_update');
 
         $nested->add_route
           ->via('delete')
-          ->to($namespace_prefix.$name."#delete")
+          ->to($namespace_prefix.$ctrl."#delete")
           ->name($name_prefix.$parent_name_prefix.$name.'_delete');
 
         $nested->add_route('edit')
           ->via('get')
-          ->to($namespace_prefix.$name."#update_form")
+          ->to($namespace_prefix.$ctrl."#update_form")
           ->name($name_prefix.$parent_name_prefix.$name.'_update_form');
 
         $nested->add_route('delete')
           ->via('get')
-          ->to($namespace_prefix.$name."#delete_form")
+          ->to($namespace_prefix.$ctrl."#delete_form")
           ->name($name_prefix.$parent_name_prefix.$name.'_delete_form');
 
         $last_resource = $resource;
@@ -249,7 +253,7 @@ sub singularize {
     # Initialize very basic singularize code ref
     $Forward::Routes::singularize ||= sub {
         my $value = shift;
-    
+
         if ($value =~ s/ies$//) {
             $value .= 'y';
         }
@@ -266,6 +270,28 @@ sub singularize {
 
     return $self;
 
+}
+
+
+sub format_controller {
+    my $self = shift;
+    my ($code_ref) = @_;
+
+    $Forward::Routes::format_controller ||= sub {
+        my $value = shift;
+
+        my @parts = split /-/, $value;
+        for my $part (@parts) {
+            $part = join '', map {ucfirst} split /_/, $part;
+        }
+        return join '::', @parts;
+    };
+
+    return $Forward::Routes::format_controller unless $code_ref;
+
+    $Forward::Routes::format_controller = $code_ref;
+
+    return $self;
 }
 
 
@@ -981,10 +1007,10 @@ Perl regular expression.
 
     # placeholder only matches integers
     $r->add_route('articles/:id')->constraints(id => qr/\d+/);
-    
+
     $m = $r->match(get => 'articles/abc');
     # $m is undef
-    
+
     $m = $r->match(get => 'articles/123');
     # $m->[0]->params is {id => 123}
 
@@ -1049,7 +1075,7 @@ matching route.
 
     my $m = $r->match(get => 'logout');
     # $m is undef
-    
+
     my $m = $r->match(post => 'logout');
     # $m->[0] is {}
 
@@ -1076,14 +1102,14 @@ Once a format constraint has been defined, all child routes inherit the
 behaviour of their parents, unless they get format constraints themselves.
 For example, adding a format constraint to the route root object affects all
 child routes added via C<add_route>.
-    
+
     my $root = Forward::Routes->new->format('html');
     $root->add_route('foo')->format('xml');
     $root->add_route('baz');
 
     $m = $root->match(get => 'foo.html');
     # $m is undef;
-    
+
     $m = $root->match(get => 'foo.xml');
     # $m->[0]->params is {format => 'xml'};
 

@@ -20,55 +20,55 @@ my $ads = $r->add_resources('magazines')->add_resources('ads');
 
 # magazine routes work
 my $m = $r->match(get => 'magazines');
-is_deeply $m->[0]->params => {controller => 'magazines', action => 'index'};
+is_deeply $m->[0]->params => {controller => 'Magazines', action => 'index'};
 
 $m = $r->match(get => 'magazines/new');
-is_deeply $m->[0]->params => {controller => 'magazines', action => 'create_form'};
+is_deeply $m->[0]->params => {controller => 'Magazines', action => 'create_form'};
 
 $m = $r->match(post => 'magazines');
-is_deeply $m->[0]->params => {controller => 'magazines', action => 'create'};
+is_deeply $m->[0]->params => {controller => 'Magazines', action => 'create'};
 
 $m = $r->match(get => 'magazines/1');
-is_deeply $m->[0]->params => {controller => 'magazines', action => 'show', id => 1};
+is_deeply $m->[0]->params => {controller => 'Magazines', action => 'show', id => 1};
 
 $m = $r->match(get => 'magazines/1/edit');
-is_deeply $m->[0]->params => {controller => 'magazines', action => 'update_form', id => 1};
+is_deeply $m->[0]->params => {controller => 'Magazines', action => 'update_form', id => 1};
 
 $m = $r->match(get => 'magazines/1/delete');
-is_deeply $m->[0]->params => {controller => 'magazines', action => 'delete_form', id => 1};
+is_deeply $m->[0]->params => {controller => 'Magazines', action => 'delete_form', id => 1};
 
 $m = $r->match(put => 'magazines/1');
-is_deeply $m->[0]->params => {controller => 'magazines', action => 'update', id => 1};
+is_deeply $m->[0]->params => {controller => 'Magazines', action => 'update', id => 1};
 
 $m = $r->match(delete => 'magazines/1');
-is_deeply $m->[0]->params => {controller => 'magazines', action => 'delete', id => 1};
+is_deeply $m->[0]->params => {controller => 'Magazines', action => 'delete', id => 1};
 
 
 
 # nested ads routes work
 $m = $r->match(get => 'magazines/1/ads');
-is_deeply $m->[0]->params => {controller => 'ads', action => 'index', magazine_id => 1};
+is_deeply $m->[0]->params => {controller => 'Ads', action => 'index', magazine_id => 1};
 
 $m = $r->match(get => 'magazines/1/ads/new');
-is_deeply $m->[0]->params => {controller => 'ads', action => 'create_form', magazine_id => 1};
+is_deeply $m->[0]->params => {controller => 'Ads', action => 'create_form', magazine_id => 1};
 
 $m = $r->match(post => 'magazines/1/ads');
-is_deeply $m->[0]->params => {controller => 'ads', action => 'create', magazine_id => 1};
+is_deeply $m->[0]->params => {controller => 'Ads', action => 'create', magazine_id => 1};
 
 $m = $r->match(get => 'magazines/1/ads/4');
-is_deeply $m->[0]->params => {controller => 'ads', action => 'show', magazine_id => 1, id => 4};
+is_deeply $m->[0]->params => {controller => 'Ads', action => 'show', magazine_id => 1, id => 4};
 
 $m = $r->match(get => 'magazines/1/ads/5/edit');
-is_deeply $m->[0]->params => {controller => 'ads', action => 'update_form', magazine_id => 1, id => 5};
+is_deeply $m->[0]->params => {controller => 'Ads', action => 'update_form', magazine_id => 1, id => 5};
 
 $m = $r->match(put => 'magazines/1/ads/2');
-is_deeply $m->[0]->params => {controller => 'ads', action => 'update', magazine_id => 1, id => 2};
+is_deeply $m->[0]->params => {controller => 'Ads', action => 'update', magazine_id => 1, id => 2};
 
 $m = $r->match(delete => 'magazines/0/ads/1');
-is_deeply $m->[0]->params => {controller => 'ads', action => 'delete', magazine_id => 0, id => 1};
+is_deeply $m->[0]->params => {controller => 'Ads', action => 'delete', magazine_id => 0, id => 1};
 
 $m = $r->match(get => 'magazines/11/ads/12/delete');
-is_deeply $m->[0]->params => {controller => 'ads', action => 'delete_form', magazine_id => 11, id => 12};
+is_deeply $m->[0]->params => {controller => 'Ads', action => 'delete_form', magazine_id => 11, id => 12};
 
 $m = $r->match(post => 'magazines/1.2/ads');
 is $m, undef;
@@ -125,7 +125,7 @@ $r = Forward::Routes->new;
 my $stats = $r->add_resources('magazines')->add_resources('ads')->add_resources('stats');
 
 $m = $r->match(get => 'magazines/1/ads/4/stats/7');
-is_deeply $m->[0]->params => {controller => 'stats', action => 'show', magazine_id => 1, ad_id => 4, id => 7};
+is_deeply $m->[0]->params => {controller => 'Stats', action => 'show', magazine_id => 1, ad_id => 4, id => 7};
 is $m->[0]->name, 'magazines_ads_stats_show';
 
 
@@ -135,55 +135,55 @@ is $r->build_path('magazines_ads_stats_show', magazine_id => 3, ad_id => 4, id =
 
 # magazines resource still works
 $m = $r->match(get => 'magazines');
-is_deeply $m->[0]->params => {controller => 'magazines', action => 'index'};
+is_deeply $m->[0]->params => {controller => 'Magazines', action => 'index'};
 
 $m = $r->match(get => 'magazines/new');
-is_deeply $m->[0]->params => {controller => 'magazines', action => 'create_form'};
+is_deeply $m->[0]->params => {controller => 'Magazines', action => 'create_form'};
 
 $m = $r->match(post => 'magazines');
-is_deeply $m->[0]->params => {controller => 'magazines', action => 'create'};
+is_deeply $m->[0]->params => {controller => 'Magazines', action => 'create'};
 
 $m = $r->match(get => 'magazines/1');
-is_deeply $m->[0]->params => {controller => 'magazines', action => 'show', id => 1};
+is_deeply $m->[0]->params => {controller => 'Magazines', action => 'show', id => 1};
 
 $m = $r->match(get => 'magazines/1/edit');
-is_deeply $m->[0]->params => {controller => 'magazines', action => 'update_form', id => 1};
+is_deeply $m->[0]->params => {controller => 'Magazines', action => 'update_form', id => 1};
 
 $m = $r->match(get => 'magazines/1/delete');
-is_deeply $m->[0]->params => {controller => 'magazines', action => 'delete_form', id => 1};
+is_deeply $m->[0]->params => {controller => 'Magazines', action => 'delete_form', id => 1};
 
 $m = $r->match(put => 'magazines/1');
-is_deeply $m->[0]->params => {controller => 'magazines', action => 'update', id => 1};
+is_deeply $m->[0]->params => {controller => 'Magazines', action => 'update', id => 1};
 
 $m = $r->match(delete => 'magazines/1');
-is_deeply $m->[0]->params => {controller => 'magazines', action => 'delete', id => 1};
+is_deeply $m->[0]->params => {controller => 'Magazines', action => 'delete', id => 1};
 
 
 
 # ads resource still works
 $m = $r->match(get => 'magazines/1/ads');
-is_deeply $m->[0]->params => {controller => 'ads', action => 'index', magazine_id => 1};
+is_deeply $m->[0]->params => {controller => 'Ads', action => 'index', magazine_id => 1};
 
 $m = $r->match(get => 'magazines/1/ads/new');
-is_deeply $m->[0]->params => {controller => 'ads', action => 'create_form', magazine_id => 1};
+is_deeply $m->[0]->params => {controller => 'Ads', action => 'create_form', magazine_id => 1};
 
 $m = $r->match(post => 'magazines/1/ads');
-is_deeply $m->[0]->params => {controller => 'ads', action => 'create', magazine_id => 1};
+is_deeply $m->[0]->params => {controller => 'Ads', action => 'create', magazine_id => 1};
 
 $m = $r->match(get => 'magazines/1/ads/4');
-is_deeply $m->[0]->params => {controller => 'ads', action => 'show', magazine_id => 1, id => 4};
+is_deeply $m->[0]->params => {controller => 'Ads', action => 'show', magazine_id => 1, id => 4};
 
 $m = $r->match(get => 'magazines/1/ads/5/edit');
-is_deeply $m->[0]->params => {controller => 'ads', action => 'update_form', magazine_id => 1, id => 5};
+is_deeply $m->[0]->params => {controller => 'Ads', action => 'update_form', magazine_id => 1, id => 5};
 
 $m = $r->match(put => 'magazines/1/ads/2');
-is_deeply $m->[0]->params => {controller => 'ads', action => 'update', magazine_id => 1, id => 2};
+is_deeply $m->[0]->params => {controller => 'Ads', action => 'update', magazine_id => 1, id => 2};
 
 $m = $r->match(delete => 'magazines/0/ads/1');
-is_deeply $m->[0]->params => {controller => 'ads', action => 'delete', magazine_id => 0, id => 1};
+is_deeply $m->[0]->params => {controller => 'Ads', action => 'delete', magazine_id => 0, id => 1};
 
 $m = $r->match(get => 'magazines/11/ads/12/delete');
-is_deeply $m->[0]->params => {controller => 'ads', action => 'delete_form', magazine_id => 11, id => 12};
+is_deeply $m->[0]->params => {controller => 'Ads', action => 'delete_form', magazine_id => 11, id => 12};
 
 $m = $r->match(post => 'magazines/1.2/ads');
 is $m, undef;

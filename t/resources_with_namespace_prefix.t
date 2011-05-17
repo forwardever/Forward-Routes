@@ -20,11 +20,11 @@ $r->add_resources('photos', -namespace => 'admin', 'users', 'prices');
 
 # test routes withOUT namespace prefix
 my $m = $r->match(get => 'photos');
-is_deeply $m->[0]->params => {controller => 'photos', action => 'index'};
+is_deeply $m->[0]->params => {controller => 'Photos', action => 'index'};
 $m = $r->match(get => 'photos/new');
-is_deeply $m->[0]->params => {controller => 'photos', action => 'create_form'};
+is_deeply $m->[0]->params => {controller => 'Photos', action => 'create_form'};
 $m = $r->match(post => 'photos');
-is_deeply $m->[0]->params => {controller => 'photos', action => 'create'};
+is_deeply $m->[0]->params => {controller => 'Photos', action => 'create'};
 
 
 is $r->build_path('photos_index')->{path} => 'photos';
@@ -40,28 +40,28 @@ is $r->build_path('photos_create')->{method} => 'post';
 
 # adjusted controller
 $m = $r->match(get => 'users');
-is_deeply $m->[0]->params => {controller => 'admin::users', action => 'index'};
+is_deeply $m->[0]->params => {controller => 'Admin::Users', action => 'index'};
 
 $m = $r->match(get => 'users/new');
-is_deeply $m->[0]->params => {controller => 'admin::users', action => 'create_form'};
+is_deeply $m->[0]->params => {controller => 'Admin::Users', action => 'create_form'};
 
 $m = $r->match(post => 'users');
-is_deeply $m->[0]->params => {controller => 'admin::users', action => 'create'};
+is_deeply $m->[0]->params => {controller => 'Admin::Users', action => 'create'};
 
 $m = $r->match(get => 'users/1');
-is_deeply $m->[0]->params => {controller => 'admin::users', action => 'show', id => 1};
+is_deeply $m->[0]->params => {controller => 'Admin::Users', action => 'show', id => 1};
 
 $m = $r->match(get => 'users/1/edit');
-is_deeply $m->[0]->params => {controller => 'admin::users', action => 'update_form', id => 1};
+is_deeply $m->[0]->params => {controller => 'Admin::Users', action => 'update_form', id => 1};
 
 $m = $r->match(get => 'users/1/delete');
-is_deeply $m->[0]->params => {controller => 'admin::users', action => 'delete_form', id => 1};
+is_deeply $m->[0]->params => {controller => 'Admin::Users', action => 'delete_form', id => 1};
 
 $m = $r->match(put => 'users/1');
-is_deeply $m->[0]->params => {controller => 'admin::users', action => 'update', id => 1};
+is_deeply $m->[0]->params => {controller => 'Admin::Users', action => 'update', id => 1};
 
 $m = $r->match(delete => 'users/1');
-is_deeply $m->[0]->params => {controller => 'admin::users', action => 'delete', id => 1};
+is_deeply $m->[0]->params => {controller => 'Admin::Users', action => 'delete', id => 1};
 
 
 # path building with name prefix
@@ -77,7 +77,7 @@ is $r->build_path('admin_users_delete_form', id => 222)->{path} => 'users/222/de
 
 # also works for prices
 $m = $r->match(get => 'prices');
-is_deeply $m->[0]->params => {controller => 'admin::prices', action => 'index'};
+is_deeply $m->[0]->params => {controller => 'Admin::Prices', action => 'index'};
 
 is $r->build_path('admin_prices_index')->{path} => 'prices';
 
