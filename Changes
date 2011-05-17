@@ -1,5 +1,12 @@
 Changes for Forward::Routes
 
+0.19    2011-05-17 00:00:00
+        - Added namespace prefix for resources 
+        - Updated docs (use camelized controller names in examples)
+        - Camelize controller param of resources by default
+        - Added format_resource_controller method to allow customization
+          of controller param values for resources
+
 0.18    2011-05-16 00:00:00
         - Empty paths can be passed via "match" method (default to "/")
         - Give bridges access to all captures of a URL
