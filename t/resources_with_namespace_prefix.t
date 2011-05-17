@@ -7,7 +7,7 @@ use Test::More;
 
 use Forward::Routes;
 
-use Test::More tests => 27;
+use Test::More tests => 29;
 
 
 
@@ -81,3 +81,22 @@ is_deeply $m->[0]->params => {controller => 'Admin::Prices', action => 'index'};
 
 is $r->build_path('admin_prices_index')->{path} => 'prices';
 
+
+#############################################################################
+### customized format_resource_controller method
+
+$r = Forward::Routes->new;
+
+$r->format_resource_controller(
+    sub {
+        return $_[0];
+    }
+);
+
+$r->add_resources('photos', -namespace => 'admin', 'users', 'prices');
+
+$m = $r->match(get => 'photos');
+is_deeply $m->[0]->params => {controller => 'photos', action => 'index'};
+
+$m = $r->match(get => 'users');
+is_deeply $m->[0]->params => {controller => 'admin::users', action => 'index'};
