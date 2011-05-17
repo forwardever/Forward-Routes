@@ -158,7 +158,7 @@ sub add_resources {
         }
 
         if ($is_namespace_value) {
-            $namespace_prefix   = $self->format_controller->($name).'::';
+            $namespace_prefix   = $self->format_resource_controller->($name).'::';
             $name_prefix        = $name.'_';
             $is_namespace_value = undef;
             next;
@@ -185,7 +185,7 @@ sub add_resources {
         }
 
         #
-        my $ctrl = $self->format_controller->($name);
+        my $ctrl = $self->format_resource_controller->($name);
 
 
         # resource
@@ -273,7 +273,7 @@ sub singularize {
 }
 
 
-sub format_controller {
+sub format_resource_controller {
     my $self = shift;
     my ($code_ref) = @_;
 
