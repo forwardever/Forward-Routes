@@ -144,11 +144,25 @@ sub add_resources {
     my $names = $_[0] && ref $_[0] eq 'ARRAY' ? [@{$_[0]}] : [@_];
 
     my $last_resource;
-
+    my $name_prefix = '';
+    my $namespace_prefix = '';
+    my $is_namespace_value;
 
     foreach my $name (@$names) {
         my $resource;
         my $parent_name_prefix = '';
+
+        if ($name eq '-namespace') {
+            $is_namespace_value = 1;
+            next;
+        }
+
+        if ($is_namespace_value) {
+            $namespace_prefix   = $name.'::';
+            $name_prefix        = $name.'_';
+            $is_namespace_value = undef;
+            next;
+        }
 
         # Nestes resources
         if ($self->_is_plural_resource) {
@@ -173,19 +187,19 @@ sub add_resources {
         # resource
         $resource->add_route
           ->via('get')
-          ->to("$name#index")
-          ->name($parent_name_prefix.$name.'_index');
+          ->to($namespace_prefix.$name."#index")
+          ->name($name_prefix.$parent_name_prefix.$name.'_index');
 
         $resource->add_route
           ->via('post')
-          ->to("$name#create")
-          ->name($parent_name_prefix.$name.'_create');
+          ->to($namespace_prefix.$name."#create")
+          ->name($name_prefix.$parent_name_prefix.$name.'_create');
 
         # new resource item
         $resource->add_route('/new')
           ->via('get')
-          ->to("$name#create_form")
-          ->name($parent_name_prefix.$name.'_create_form');
+          ->to($namespace_prefix.$name."#create_form")
+          ->name($name_prefix.$parent_name_prefix.$name.'_create_form');
 
         # modify resource item
         my $nested = $resource->add_route(':id')
@@ -193,28 +207,28 @@ sub add_resources {
 
         $nested->add_route
           ->via('get')
-          ->to("$name#show")
-          ->name($parent_name_prefix.$name.'_show');
+          ->to($namespace_prefix.$name."#show")
+          ->name($name_prefix.$parent_name_prefix.$name.'_show');
 
         $nested->add_route
           ->via('put')
-          ->to("$name#update")
-          ->name($parent_name_prefix.$name.'_update');
+          ->to($namespace_prefix.$name."#update")
+          ->name($name_prefix.$parent_name_prefix.$name.'_update');
 
         $nested->add_route
           ->via('delete')
-          ->to("$name#delete")
-          ->name($parent_name_prefix.$name.'_delete');
+          ->to($namespace_prefix.$name."#delete")
+          ->name($name_prefix.$parent_name_prefix.$name.'_delete');
 
         $nested->add_route('edit')
           ->via('get')
-          ->to("$name#update_form")
-          ->name($parent_name_prefix.$name.'_update_form');
+          ->to($namespace_prefix.$name."#update_form")
+          ->name($name_prefix.$parent_name_prefix.$name.'_update_form');
 
         $nested->add_route('delete')
           ->via('get')
-          ->to("$name#delete_form")
-          ->name($parent_name_prefix.$name.'_delete_form');
+          ->to($namespace_prefix.$name."#delete_form")
+          ->name($name_prefix.$parent_name_prefix.$name.'_delete_form');
 
         $last_resource = $resource;
     }
