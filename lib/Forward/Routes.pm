@@ -1182,7 +1182,7 @@ All methods can be chained.
       ->format('html')
       ->constraints(id => qr/\d+/)
       ->name('hot')
-      ->to('hello#world')
+      ->to('Hello#world')
       ->via('get','post');
 
 
