@@ -22,14 +22,14 @@ documentation on resource routing.
     request                                       parameter  parameter
     method          
 
-    GET      magazines/:magazine_id/ads/new        ads       create_form   magazines_ads_create_form
-    GET      magazines/:magazine_id/ads/:id        ads       show          magazines_ads_show
-    GET      magazines/:magazine_id/ads/:id/edit   ads       update_form   magazines_ads_update_form
-    GET      magazines/:magazine_id/ads/:id/delete ads       delete_form   magazines_ads_delete_form
-    GET      magazines/:magazine_id/ads            ads       index         magazines_ads_index
-    POST     magazines/:magazine_id/ads            ads       create        magazines_ads_create
-    PUT      magazines/:magazine_id/ads/:id        ads       update        magazines_ads_update
-    DELETE   magazines/:magazine_id/ads/:id        ads       delete        magazines_ads_delete
+    GET      magazines/:magazine_id/ads/new        Ads       create_form   magazines_ads_create_form
+    GET      magazines/:magazine_id/ads/:id        Ads       show          magazines_ads_show
+    GET      magazines/:magazine_id/ads/:id/edit   Ads       update_form   magazines_ads_update_form
+    GET      magazines/:magazine_id/ads/:id/delete Ads       delete_form   magazines_ads_delete_form
+    GET      magazines/:magazine_id/ads            Ads       index         magazines_ads_index
+    POST     magazines/:magazine_id/ads            Ads       create        magazines_ads_create
+    PUT      magazines/:magazine_id/ads/:id        Ads       update        magazines_ads_update
+    DELETE   magazines/:magazine_id/ads/:id        Ads       delete        magazines_ads_delete
 
 The placeholder name for the parent resource id is singularized. That way, it
 can easily be used to search the "ads" database table with "id" and

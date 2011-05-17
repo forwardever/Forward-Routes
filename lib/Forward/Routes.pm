@@ -852,7 +852,7 @@ Each route represents a URL path pattern and holds a set of default values.
     my $routes = Forward::Routes->new;
 
     # add a new route with a :city placeholder and controller and action defaults
-    $routes->add_route('/towns/:city')->defaults(controller => 'world', action => 'cities');
+    $routes->add_route('/towns/:city')->defaults(controller => 'World', action => 'cities');
 
 =head2 2. Search for a matching route
 
@@ -913,7 +913,7 @@ matching route available to that method for further use.
     # $match is a Forward::Routes::Match object
     my $match = $matches->[0]
 
-    # $match->params->{controller} is "world"
+    # $match->params->{controller} is "World"
     # $match->params->{action}     is "cities"
     # $match->params->{city}       is "paris"
 
@@ -1007,10 +1007,10 @@ Perl regular expression.
 
     # placeholder only matches integers
     $r->add_route('articles/:id')->constraints(id => qr/\d+/);
-
+    
     $m = $r->match(get => 'articles/abc');
     # $m is undef
-
+    
     $m = $r->match(get => 'articles/123');
     # $m->[0]->params is {id => 123}
 
@@ -1054,14 +1054,14 @@ The C<to> method provides a shortcut for action and controller defaults.
     $r = Forward::Routes->new;
 
     $r->add_route('articles')
-      ->to('foo#bar');
+      ->to('Foo#bar');
 
     # is a shortcut for
     $r->add_route('articles')
-      ->defaults(controller => 'foo', action => 'bar');
+      ->defaults(controller => 'Foo', action => 'bar');
 
     $m = $r->match(get => 'articles');
-    # $m->[0]->params is {controller => 'foo', action => 'bar'}
+    # $m->[0]->params is {controller => 'Foo', action => 'bar'}
 
 
 =head2 Request Method Constraints
@@ -1075,7 +1075,7 @@ matching route.
 
     my $m = $r->match(get => 'logout');
     # $m is undef
-
+    
     my $m = $r->match(post => 'logout');
     # $m->[0] is {}
 
@@ -1102,14 +1102,14 @@ Once a format constraint has been defined, all child routes inherit the
 behaviour of their parents, unless they get format constraints themselves.
 For example, adding a format constraint to the route root object affects all
 child routes added via C<add_route>.
-
+    
     my $root = Forward::Routes->new->format('html');
     $root->add_route('foo')->format('xml');
     $root->add_route('baz');
 
     $m = $root->match(get => 'foo.html');
     # $m is undef;
-
+    
     $m = $root->match(get => 'foo.xml');
     # $m->[0]->params is {format => 'xml'};
 
@@ -1230,13 +1230,13 @@ documentation on restful resources.
     $r->add_resources('users', 'photos', 'tags');
 
     $m = $r->match(get => 'photos');
-    # $m->[0]->params is {controller => 'photos', action => 'index'}
+    # $m->[0]->params is {controller => 'Photos', action => 'index'}
 
     $m = $r->match(get => 'photos/1');
-    # $m->[0]->params is {controller => 'photos', action => 'show', id => 1}
+    # $m->[0]->params is {controller => 'Photos', action => 'show', id => 1}
 
     $m = $r->match(put => 'photos/1');
-    # $m->[0]->params is {controller => 'photos', action => 'update', id => 1}
+    # $m->[0]->params is {controller => 'Photos', action => 'update', id => 1}
 
 
 =head2 Path Building and Resources
@@ -1258,18 +1258,18 @@ documentation on nested resources.
 
     $m = $r->match(get => 'magazines/1/ads/4');
     # $m->[0]->params is
-    # {controller => 'ads', action => 'show', magazines_id => 1, ads_id => 4}
+    # {controller => 'Ads', action => 'show', magazines_id => 1, ads_id => 4}
 
 
 =head2 Bridges
 
     $r = Forward::Routes->new;
-    my $bridge = $r->bridge('admin')->to('check#authentication');
-    $bridge->add_route('foo')->to('my#stuff');
+    my $bridge = $r->bridge('admin')->to('Check#authentication');
+    $bridge->add_route('foo')->to('My#stuff');
 
     $m = $r->match(get => 'admin/foo');
-    # $m->[0]->params is {controller => 'check', action => 'authentication'}
-    # $m->[1]->params is {controller => 'my', action => 'stuff'}
+    # $m->[0]->params is {controller => 'Check', action => 'authentication'}
+    # $m->[1]->params is {controller => 'My', action => 'stuff'}
 
 
 =head1 Author

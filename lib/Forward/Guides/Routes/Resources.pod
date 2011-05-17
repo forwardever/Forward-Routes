@@ -26,14 +26,14 @@ parameters.
     request                       parameter   parameter
     method          
 
-    GET      /cities/new          cities      create_form   cities_create_form
-    GET      /cities/:id          cities      show          cities_show
-    GET      /cities/:id/edit     cities      update_form   cities_update_form
-    GET      /cities/:id/delete   cities      delete_form   cities_delete_form
-    GET      /cities              cities      index         cities_index
-    POST     /cities              cities      create        cities_create
-    PUT      /cities/:id          cities      update        cities_update
-    DELETE   /cities/:id          cities      delete        cities_delete
+    GET      /cities/new          Cities      create_form   cities_create_form
+    GET      /cities/:id          Cities      show          cities_show
+    GET      /cities/:id/edit     Cities      update_form   cities_update_form
+    GET      /cities/:id/delete   Cities      delete_form   cities_delete_form
+    GET      /cities              Cities      index         cities_index
+    POST     /cities              Cities      create        cities_create
+    PUT      /cities/:id          Cities      update        cities_update
+    DELETE   /cities/:id          Cities      delete        cities_delete
 
 
 Each generated route will usually dispatch to a specific method (see action
@@ -58,19 +58,19 @@ The internal code to generate a resource makes use of nested routes:
     # get => /cities
     $resource->add_route
       ->via('get')
-      ->to("cities#index")
+      ->to("Cities#index")
       ->name('cities_index');
 
     # post => /cities
     $resource->add_route
       ->via('post')
-      ->to("cities#create")
+      ->to("Cities#create")
       ->name('cities_create');
 
     # get => /cities/new
     $resource->add_route('/new')
       ->via('get')
-      ->to("cities#create_form")
+      ->to("Cities#create_form")
       ->name('cities_create_form');
 
     # nested route with id placeholder, placeholder can contain everything
@@ -81,31 +81,31 @@ The internal code to generate a resource makes use of nested routes:
     # get => /cities/paris
     $nested->add_route
       ->via('get')
-      ->to("cities#show")
+      ->to("Cities#show")
       ->name('cities_show');
 
     # put => /cities/paris
     $nested->add_route
       ->via('put')
-      ->to("cities#update")
+      ->to("Cities#update")
       ->name('cities_update');
 
     # delete => /cities/paris
     $nested->add_route
       ->via('delete')
-      ->to("cities#delete")
+      ->to("Cities#delete")
       ->name('cities_delete');
 
     # get => /cities/paris/edit
     $nested->add_route('edit')
       ->via('get')
-      ->to("cities#update_form")
+      ->to("Cities#update_form")
       ->name('cities_update_form');
 
     # get => /cities/paris/delete
     $nested->add_route('delete')
       ->via('get')
-      ->to("cities#delete_form")
+      ->to("Cities#delete_form")
       ->name('cities_delete_form');
 
 Multiple resources can be created with a single C<add_resources> call:
@@ -133,7 +133,7 @@ Resources inherit the file extension of their parent:
     
     $m = $root->match(get => '/cities/paris/edit.html');
     # $m->[0]->params is
-    #   {controller => 'cities', action => 'cities_update_form',
+    #   {controller => 'Cities', action => 'cities_update_form',
     #    format => 'html'};
 
 =cut
