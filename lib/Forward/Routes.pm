@@ -175,7 +175,7 @@ sub add_resources {
         # custom resource params
         if ($names->[$i+1] && ref $names->[$i+1] eq 'HASH'){
             my $params = $names->[$i+1];
-            $as = $params->{as};
+            $as = $params->{as} if $params->{as};
         }
 
 

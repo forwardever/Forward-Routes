@@ -7,7 +7,7 @@ use Test::More;
 
 use Forward::Routes;
 
-use Test::More tests => 34;
+use Test::More tests => 35;
 
 
 
@@ -93,3 +93,12 @@ is $r->build_path('prices_index')->{method} => 'get';
 is $r->build_path('prices_create_form')->{method} => 'get';
 is $r->build_path('prices_create')->{method} => 'post';
 
+
+
+#############################################################################
+### empty options
+$r = Forward::Routes->new;
+$r->add_resources('photos', 'users' => {}, 'prices');
+
+$m = $r->match(get => 'users');
+is_deeply $m->[0]->params => {controller => 'Users', action => 'index'};
