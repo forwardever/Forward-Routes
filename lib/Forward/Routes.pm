@@ -152,6 +152,9 @@ sub add_resources {
 
         my $name = $names->[$i];
 
+        # options
+        next if ref $name;
+
         my $resource;
         my $parent_name_prefix = '';
 
@@ -165,6 +168,17 @@ sub add_resources {
         }
 
 
+        # path name
+        my $as = $name;
+
+
+        # custom resource params
+        if ($names->[$i+1] && ref $names->[$i+1] eq 'HASH'){
+            my $params = $names->[$i+1];
+            $as = $params->{as};
+        }
+
+
         # Nested resources
         if ($self->_is_plural_resource) {
 
@@ -174,13 +188,13 @@ sub add_resources {
 
             my $parent_id_name = $self->singularize->($parent_names[-1]).'_id';
 
-            $resource = $self->add_route(':'.$parent_id_name.'/'.$name)
+            $resource = $self->add_route(':'.$parent_id_name.'/'.$as)
               ->_is_plural_resource(1)
               ->_parent_resource_names($self->_parent_resource_names, $name)
               ->constraints($parent_id_name => qr/[^.\/]+/);
         }
         else {
-            $resource = $self->add_route($name)
+            $resource = $self->add_route($as)
               ->_is_plural_resource(1)
               ->_parent_resource_names($name);
         }
