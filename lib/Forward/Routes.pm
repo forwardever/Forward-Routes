@@ -98,40 +98,40 @@ sub _is_bridge {
 sub add_singular_resources {
     my ($self, $name) = @_;
 
-    my $controller = $name;
+     my $ctrl = $self->format_resource_controller->($name);
 
     my $resource = $self->add_route($name);
 
     $resource->add_route('/new')
       ->via('get')
-      ->to("$controller#create_form")
+      ->to("$ctrl#create_form")
       ->name($name.'_create_form');
 
     $resource->add_route('/edit')
       ->via('get')
-      ->to("$controller#update_form")
+      ->to("$ctrl#update_form")
       ->name($name.'_update_form');
 
 
     my $nested = $resource->add_route;
     $nested->add_route
       ->via('post')
-      ->to("$controller#create")
+      ->to("$ctrl#create")
       ->name($name.'_create');
 
     $nested->add_route
       ->via('get')
-      ->to("$controller#show")
+      ->to("$ctrl#show")
       ->name($name.'_show');
 
     $nested->add_route
       ->via('put')
-      ->to("$controller#update")
+      ->to("$ctrl#update")
       ->name($name.'_update');
 
     $nested->add_route
       ->via('delete')
-      ->to("$name#delete")
+      ->to("$ctrl#delete")
       ->name($name.'_delete');
 
     return $self;
@@ -766,10 +766,15 @@ sub prefix {
 
 sub pattern {
     my $self = shift;
+    my (@params) = @_;
 
     $self->{pattern} ||= Forward::Routes::Pattern->new;
 
-    return $self->{pattern};
+    return $self->{pattern} unless @params;
+
+    $self->{pattern}->pattern(@params);
+
+    return $self;
 
 }
 

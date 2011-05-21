@@ -18,22 +18,22 @@ my $r = Forward::Routes->new;
 $r->add_singular_resources('geocoder');
 
 my $m = $r->match(get => 'geocoder/new');
-is_deeply $m->[0]->params => {controller => 'geocoder', action => 'create_form'};
+is_deeply $m->[0]->params => {controller => 'Geocoder', action => 'create_form'};
 
 $m = $r->match(post => 'geocoder');
-is_deeply $m->[0]->params => {controller => 'geocoder', action => 'create'};
+is_deeply $m->[0]->params => {controller => 'Geocoder', action => 'create'};
 
 $m = $r->match(get => 'geocoder');
-is_deeply $m->[0]->params => {controller => 'geocoder', action => 'show'};
+is_deeply $m->[0]->params => {controller => 'Geocoder', action => 'show'};
 
 $m = $r->match(get => 'geocoder/edit');
-is_deeply $m->[0]->params => {controller => 'geocoder', action => 'update_form'};
+is_deeply $m->[0]->params => {controller => 'Geocoder', action => 'update_form'};
 
 $m = $r->match(put => 'geocoder');
-is_deeply $m->[0]->params => {controller => 'geocoder', action => 'update'};
+is_deeply $m->[0]->params => {controller => 'Geocoder', action => 'update'};
 
 $m = $r->match(delete => 'geocoder');
-is_deeply $m->[0]->params => {controller => 'geocoder', action => 'delete'};
+is_deeply $m->[0]->params => {controller => 'Geocoder', action => 'delete'};
 
 
 is ref $r->find_route('geocoder_create_form'), 'Forward::Routes';
