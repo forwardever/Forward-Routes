@@ -7,7 +7,7 @@ use Test::More;
 
 use Forward::Routes;
 
-use Test::More tests => 36;
+use Test::More tests => 37;
 
 
 #############################################################################
@@ -72,6 +72,10 @@ is $r->build_path('admin_contact_update_form', id => 789)->{path} => 'contact/ed
 is $r->build_path('admin_contact_update', id => 987)->{path} => 'contact';
 is $r->build_path('admin_contact_delete', id => 654)->{path} => 'contact';
 
+
+# make sure that admin does not match (it is just the namespace value):
+$m = $r->match(get => 'admin');
+is $m, undef;
 
 
 ### now "test"
