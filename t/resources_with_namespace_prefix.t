@@ -7,7 +7,7 @@ use Test::More;
 
 use Forward::Routes;
 
-use Test::More tests => 29;
+use Test::More tests => 30;
 
 
 
@@ -80,6 +80,11 @@ $m = $r->match(get => 'prices');
 is_deeply $m->[0]->params => {controller => 'Admin::Prices', action => 'index'};
 
 is $r->build_path('admin_prices_index')->{path} => 'prices';
+
+
+# just make sure:
+$m = $r->match(get => 'admin');
+is $m, undef;
 
 
 #############################################################################

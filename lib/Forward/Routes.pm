@@ -146,24 +146,24 @@ sub add_resources {
     my $last_resource;
     my $ns_name_prefix = '';
     my $ns_ctrl_prefix = '';
-    my $is_namespace_value;
 
-    foreach my $name (@$names) {
+
+    for (my $i=0; $i<@$names; $i++) {
+
+        my $name = $names->[$i];
+
         my $resource;
         my $parent_name_prefix = '';
 
         # Namespace for upcoming resources
         if ($name eq '-namespace') {
-            $is_namespace_value = 1;
+            $name = $names->[$i+1];
+            $ns_ctrl_prefix   = $self->format_resource_controller->($name).'::';
+            $ns_name_prefix   = $name.'_';
+            $i++;
             next;
         }
 
-        if ($is_namespace_value) {
-            $ns_ctrl_prefix   = $self->format_resource_controller->($name).'::';
-            $ns_name_prefix   = $name.'_';
-            $is_namespace_value = undef;
-            next;
-        }
 
         # Nested resources
         if ($self->_is_plural_resource) {
@@ -184,6 +184,7 @@ sub add_resources {
               ->_is_plural_resource(1)
               ->_parent_resource_names($name);
         }
+
 
         #
         my $ctrl = $self->format_resource_controller->($name);
