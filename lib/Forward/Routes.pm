@@ -101,6 +101,8 @@ sub add_singular_resources {
     my $names = $_[0] && ref $_[0] eq 'ARRAY' ? [@{$_[0]}] : [@_];
 
     my $last_resource;
+    my $ns_name_prefix = '';
+    my $ns_ctrl_prefix = '';
 
     for (my $i=0; $i<@$names; $i++) {
 
@@ -108,6 +110,17 @@ sub add_singular_resources {
 
         # options
         next if ref $name;
+
+
+        # Namespace for upcoming resources
+        if ($name eq '-namespace') {
+            $name = $names->[$i+1];
+            $ns_ctrl_prefix   = $self->format_resource_controller->($name).'::';
+            $ns_name_prefix   = $name.'_';
+            $i++;
+            next;
+        }
+
 
         # path name
         my $as = $name;
@@ -128,35 +141,35 @@ sub add_singular_resources {
     
         $resource->add_route('/new')
           ->via('get')
-          ->to("$ctrl#create_form")
-          ->name($name.'_create_form');
+          ->to($ns_ctrl_prefix."$ctrl#create_form")
+          ->name($ns_name_prefix.$name.'_create_form');
     
         $resource->add_route('/edit')
           ->via('get')
-          ->to("$ctrl#update_form")
-          ->name($name.'_update_form');
+          ->to($ns_ctrl_prefix."$ctrl#update_form")
+          ->name($ns_name_prefix.$name.'_update_form');
     
     
         my $nested = $resource->add_route;
         $nested->add_route
           ->via('post')
-          ->to("$ctrl#create")
-          ->name($name.'_create');
+          ->to($ns_ctrl_prefix."$ctrl#create")
+          ->name($ns_name_prefix.$name.'_create');
     
         $nested->add_route
           ->via('get')
-          ->to("$ctrl#show")
-          ->name($name.'_show');
+          ->to($ns_ctrl_prefix."$ctrl#show")
+          ->name($ns_name_prefix.$name.'_show');
     
         $nested->add_route
           ->via('put')
-          ->to("$ctrl#update")
-          ->name($name.'_update');
+          ->to($ns_ctrl_prefix."$ctrl#update")
+          ->name($ns_name_prefix.$name.'_update');
     
         $nested->add_route
           ->via('delete')
-          ->to("$ctrl#delete")
-          ->name($name.'_delete');
+          ->to($ns_ctrl_prefix."$ctrl#delete")
+          ->name($ns_name_prefix.$name.'_delete');
 
         $last_resource = $resource;
     }
