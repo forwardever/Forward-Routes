@@ -96,45 +96,72 @@ sub _is_bridge {
 
 
 sub add_singular_resources {
-    my ($self, $name) = @_;
+    my $self = shift;
 
-     my $ctrl = $self->format_resource_controller->($name);
+    my $names = $_[0] && ref $_[0] eq 'ARRAY' ? [@{$_[0]}] : [@_];
 
-    my $resource = $self->add_route($name);
+    my $last_resource;
 
-    $resource->add_route('/new')
-      ->via('get')
-      ->to("$ctrl#create_form")
-      ->name($name.'_create_form');
+    for (my $i=0; $i<@$names; $i++) {
 
-    $resource->add_route('/edit')
-      ->via('get')
-      ->to("$ctrl#update_form")
-      ->name($name.'_update_form');
+        my $name = $names->[$i];
+
+        # options
+        next if ref $name;
+
+        # path name
+        my $as = $name;
 
 
-    my $nested = $resource->add_route;
-    $nested->add_route
-      ->via('post')
-      ->to("$ctrl#create")
-      ->name($name.'_create');
+        # custom resource params
+        if ($names->[$i+1] && ref $names->[$i+1] eq 'HASH') {
+            my $params = $names->[$i+1];
+            $as = $params->{as} if $params->{as};
+        }
 
-    $nested->add_route
-      ->via('get')
-      ->to("$ctrl#show")
-      ->name($name.'_show');
 
-    $nested->add_route
-      ->via('put')
-      ->to("$ctrl#update")
-      ->name($name.'_update');
+        # camelize controller name (default)
+        my $ctrl = $self->format_resource_controller->($name);
+    
 
-    $nested->add_route
-      ->via('delete')
-      ->to("$ctrl#delete")
-      ->name($name.'_delete');
+        my $resource = $self->add_route($as);
+    
+        $resource->add_route('/new')
+          ->via('get')
+          ->to("$ctrl#create_form")
+          ->name($name.'_create_form');
+    
+        $resource->add_route('/edit')
+          ->via('get')
+          ->to("$ctrl#update_form")
+          ->name($name.'_update_form');
+    
+    
+        my $nested = $resource->add_route;
+        $nested->add_route
+          ->via('post')
+          ->to("$ctrl#create")
+          ->name($name.'_create');
+    
+        $nested->add_route
+          ->via('get')
+          ->to("$ctrl#show")
+          ->name($name.'_show');
+    
+        $nested->add_route
+          ->via('put')
+          ->to("$ctrl#update")
+          ->name($name.'_update');
+    
+        $nested->add_route
+          ->via('delete')
+          ->to("$ctrl#delete")
+          ->name($name.'_delete');
 
-    return $self;
+        $last_resource = $resource;
+    }
+
+    return $last_resource;
 }
 
 
@@ -155,8 +182,6 @@ sub add_resources {
         # options
         next if ref $name;
 
-        my $resource;
-        my $parent_name_prefix = '';
 
         # Namespace for upcoming resources
         if ($name eq '-namespace') {
@@ -173,13 +198,19 @@ sub add_resources {
 
 
         # custom resource params
-        if ($names->[$i+1] && ref $names->[$i+1] eq 'HASH'){
+        if ($names->[$i+1] && ref $names->[$i+1] eq 'HASH') {
             my $params = $names->[$i+1];
             $as = $params->{as} if $params->{as};
         }
 
 
+        # camelize controller name (default)
+        my $ctrl = $self->format_resource_controller->($name);
+
+
         # Nested resources
+        my $resource;
+        my $parent_name_prefix = '';
         if ($self->_is_plural_resource) {
 
             my @parent_names = $self->_parent_resource_names;
@@ -198,10 +229,6 @@ sub add_resources {
               ->_is_plural_resource(1)
               ->_parent_resource_names($name);
         }
-
-
-        #
-        my $ctrl = $self->format_resource_controller->($name);
 
 
         # resource
