@@ -7,7 +7,7 @@ use Test::More;
 
 use Forward::Routes;
 
-use Test::More tests => 37;
+use Test::More tests => 21;
 
 
 #############################################################################
@@ -26,22 +26,11 @@ is_deeply $m->[0]->params => {controller => 'Geocoder', action => 'create'};
 $m = $r->match(get => 'geocoder');
 is_deeply $m->[0]->params => {controller => 'Geocoder', action => 'show'};
 
-$m = $r->match(get => 'geocoder/edit');
-is_deeply $m->[0]->params => {controller => 'Geocoder', action => 'update_form'};
-
-$m = $r->match(put => 'geocoder');
-is_deeply $m->[0]->params => {controller => 'Geocoder', action => 'update'};
-
-$m = $r->match(delete => 'geocoder');
-is_deeply $m->[0]->params => {controller => 'Geocoder', action => 'delete'};
-
 
 is $r->build_path('geocoder_create_form')->{path} => 'geocoder/new';
 is $r->build_path('geocoder_create')->{path} => 'geocoder';
 is $r->build_path('geocoder_show', id => 456)->{path} => 'geocoder';
-is $r->build_path('geocoder_update_form', id => 789)->{path} => 'geocoder/edit';
-is $r->build_path('geocoder_update', id => 987)->{path} => 'geocoder';
-is $r->build_path('geocoder_delete', id => 654)->{path} => 'geocoder';
+
 
 
 ### now contact
@@ -82,26 +71,6 @@ is $m, undef;
 $m = $r->match(get => 'test/new');
 is_deeply $m->[0]->params => {controller => 'Admin::Test', action => 'create_form'};
 
-$m = $r->match(post => 'test');
-is_deeply $m->[0]->params => {controller => 'Admin::Test', action => 'create'};
-
-$m = $r->match(get => 'test');
-is_deeply $m->[0]->params => {controller => 'Admin::Test', action => 'show'};
-
-$m = $r->match(get => 'test/edit');
-is_deeply $m->[0]->params => {controller => 'Admin::Test', action => 'update_form'};
-
-$m = $r->match(put => 'test');
-is_deeply $m->[0]->params => {controller => 'Admin::Test', action => 'update'};
-
-$m = $r->match(delete => 'test');
-is_deeply $m->[0]->params => {controller => 'Admin::Test', action => 'delete'};
-
-
 is $r->build_path('admin_test_create_form')->{path} => 'test/new';
-is $r->build_path('admin_test_create')->{path} => 'test';
-is $r->build_path('admin_test_show', id => 456)->{path} => 'test';
-is $r->build_path('admin_test_update_form', id => 789)->{path} => 'test/edit';
-is $r->build_path('admin_test_update', id => 987)->{path} => 'test';
-is $r->build_path('admin_test_delete', id => 654)->{path} => 'test';
+
 
