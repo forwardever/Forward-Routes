@@ -18,7 +18,7 @@ my $r = Forward::Routes->new;
 $r->add_resources('photos', 'users' => {as => 'customers'}, 'prices');
 
 
-# test routes withOUT namespace prefix
+# NO adjusted path name
 my $m = $r->match(get => 'photos');
 is_deeply $m->[0]->params => {controller => 'Photos', action => 'index'};
 $m = $r->match(get => 'photos/new');
@@ -75,7 +75,7 @@ is $r->build_path('users_delete', id => 654)->{path} => 'customers/654';
 is $r->build_path('users_delete_form', id => 222)->{path} => 'customers/222/delete';
 
 
-# no adjusted path name for for prices
+# NO adjusted path name for prices
 $m = $r->match(get => 'prices');
 is_deeply $m->[0]->params => {controller => 'Prices', action => 'index'};
 $m = $r->match(get => 'prices/new');
