@@ -396,7 +396,7 @@ be reduced this way.
 The C<resources> method allows to generate Rails like resources.
 
 Please look at L<Forward::Guides::Routes::Resources> for more in depth
-documentation on restful resources.
+documentation on resourceful routes.
 
     $r = Forward::Routes->new;
     $r->add_resources('users', 'photos', 'tags');
@@ -410,28 +410,16 @@ documentation on restful resources.
     $m = $r->match(put => 'photos/1');
     # $m->[0]->params is {controller => 'Photos', action => 'update', id => 1}
 
+    my $path = $r->build_path('photos_update', id => 987)
+    # $path->{path} is 'photos/987'
+    # $path->{method} is 'put'
 
-=head2 Path Building and Resources
+Resource routing is quite flexible and offers many customization options:
 
-    $r = Forward::Routes->new;
-    $r->add_resources('users', 'photos', 'tags');
-
-    # $r->build_path('photos_update', id => 987)->{path} is 'photos/987'
-
-
-=head2 Nested Resources
+    L<Forward::Guides::Routes::ResourceCustomization>
 
 Please look at L<Forward::Guides::Routes::NestedResources> for more in depth
 documentation on nested resources.
-
-    $r = Forward::Routes->new;
-    my $magazines = $r->add_resources('magazines');
-    $magazines->add_resources('ads');
-
-    $m = $r->match(get => 'magazines/1/ads/4');
-    # $m->[0]->params is
-    # {controller => 'Ads', action => 'show', magazines_id => 1, ads_id => 4}
-
 
 =head2 Bridges
 

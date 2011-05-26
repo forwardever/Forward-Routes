@@ -108,6 +108,12 @@ case of nested routes) or could be derived from a cookie.
     DELETE   /contact        Contact     delete        contact_delete
 
 
+=head1 Customization
+
+Resource routing is quite flexible and offers many customization options:
+
+L<Forward::Guides::Routes::ResourceCustomization>
+
 =head1 Taking a look at the source
 
 The internal code to generate a resource makes use of nested routes:
