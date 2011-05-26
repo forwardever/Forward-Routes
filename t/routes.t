@@ -137,22 +137,6 @@ $m = $r->match(get => 'author/articles');
 is_deeply $m->[0]->params => {comments => 'foo'};
 
 
-#############################################################################
-### match_with_constraints
-
-$r = Forward::Routes->new;
-
-$r->add_route('articles/:id')->constraints(id => qr/\d+/);
-
-$m = $r->match(get => 'articles/abc');
-ok not defined $m;
-
-$m = $r->match(get => 'articles/123');
-is_deeply $m->[0]->params => {id => 123};
-
-
-
-
 
 #############################################################################
 ### match_with_grouping
