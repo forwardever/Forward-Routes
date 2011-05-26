@@ -39,7 +39,6 @@ sub initialize {
     $self->method(delete $params->{method});
     $self->method(delete $params->{via});
     $self->defaults(delete $params->{defaults});
-    $self->prefix(delete $params->{prefix});
     $self->name(delete $params->{name});
     $self->to(delete $params->{to});
     $self->_is_plural_resource(delete $params->{_is_plural_resource});
@@ -47,16 +46,6 @@ sub initialize {
 
     return $self;
 
-}
-
-
-sub prefixed_with {
-    my ($self, $prefix) = @_;
-
-    my $router = Forward::Routes->new(prefix => $prefix);
-    $router->{patterns} = $self->{patterns};
-
-    return $router;
 }
 
 
@@ -813,17 +802,6 @@ sub parent {
 
     return $self;
 
-}
-
-
-sub prefix {
-    my $self = shift;
-
-    return $self->{prefix} unless defined $_[0];
-
-    $self->{prefix} = $_[0];
-
-    return $self;
 }
 
 

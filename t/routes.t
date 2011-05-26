@@ -7,7 +7,7 @@ use Test::More;
 
 use Forward::Routes;
 
-use Test::More tests => 203;
+use Test::More tests => 201;
 
 #############################################################################
 ### empty
@@ -32,7 +32,6 @@ $r = Forward::Routes->new;
 
 is $r->{method}, undef;
 is $r->{defaults}, undef;
-is $r->{prefix}, undef;
 is $r->{name}, undef;
 is $r->{to}, undef;
 is $r->{pattern}, undef;
@@ -747,26 +746,6 @@ is $r->{routes_by_name}->{photos_index}, undef;
 is $r->find_route('photos_index')->name, 'photos_index';
 is $r->{routes_by_name}->{photos_index}->name, 'photos_index';
 
-
-
-#############################################################################
-### prefix
-
-$r = Forward::Routes->new;
-$r->add_route('prefixed', to => 'foo#bar', prefix => 'hello');
-
-my $admin = $r->prefixed_with('admin');
-$admin->add_route('foo', to => 'foo#bar');
-
-ok !$r->match(get => 'foo');
-
-$m = $r->match(get => 'admin/foo');
-
-#is_deeply $m->[0]->params => {controller => 'admin-foo', action => 'bar'};
-
-$m = $r->match(get => 'hello/prefixed');
-
-#is_deeply $m->[0]->params => {controller => 'hello-foo', action => 'bar'};
 
 
 #############################################################################
