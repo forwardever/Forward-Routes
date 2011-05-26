@@ -17,7 +17,7 @@ my $r = Forward::Routes->new;
 
 $r->add_route('articles/:id')->constraints(id => qr/\d+/);
 
-$m = $r->match(get => 'articles/abc');
+my $m = $r->match(get => 'articles/abc');
 ok not defined $m;
 
 $m = $r->match(get => 'articles/123');

@@ -7,7 +7,7 @@ use Test::More;
 
 use Forward::Routes;
 
-use Test::More tests => 208;
+use Test::More tests => 206;
 
 #############################################################################
 ### empty
