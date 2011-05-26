@@ -1,6 +1,6 @@
 =head1 Name
 
-Forward::Guides::Routes::ResourceCustomization - Customizing restful resources
+Forward::Guides::Routes::ResourceCustomization - Customizing resourceful routes
 
 =head1 namespace
 
