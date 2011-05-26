@@ -1,0 +1,76 @@
+=head1 Name
+
+Forward::Guides::Routes::Customization - Customizing restful resources
+
+=head1 namespace
+
+The controller parameter and the route name can be changed with the help of
+the C<-namespace> option:
+
+    my $r = Forward::Routes->new;
+    $r->add_resources(
+        'photos',
+        'users' => -namespace => 'admin',
+        'prices'
+    );
+
+    $m = $r->match(get => 'users');
+    # $m->[0]->params is {controller => 'Admin::Users', action => 'index'};
+
+    my $path = $r->build_path('admin_users_index');
+    # $path->{path} is 'users'
+    # $path->{method} is 'get'
+
+The C<-namespace> option has no effect on the URL pattern.
+
+    # in order to match /admin/users instead of /users,
+    $r->add_route('admin')->add_resources('users' => -namespace => 'admin');
+
+    # that way, a lot of flexibility is kept:
+    $r->bridge('admin')->to('Authorization#admin')
+      ->add_resources('users' => -namespace => 'admin');
+    # allows to check whether the current user is really the admin (using
+    # bridges) and break the dispatching cycle if authorization fails
+
+
+=head1 as
+
+    The first part of the URL pattern can be changed with the help of the
+    C<-as> option.
+
+    my $r = Forward::Routes->new;
+    $r->add_resources(
+        'photos',
+        'users' => -as => 'customers',
+        'prices'
+    );
+
+    $m = $r->match(get => 'customers');
+    # $m->[0]->params is {controller => 'Users', action => 'index'};
+
+    $m = $r->match(get => 'users');
+    # $m is undef
+
+    my $path = $r->build_path('users_index');
+    # $path->{path} is 'customers'
+    # $path->{method} is 'get'
+
+=head1 constraints
+
+The resource id placeholder can get a custom constraint using the
+C<-constraint> option:
+
+    my $r = Forward::Routes->new;
+    $r->add_resources(
+        'users',
+        'photos' => -constraints => {id => qr/\d{6}/},
+        'tags'
+    );
+    
+    my $m = $r->match(get => 'photos/123456');
+    # $m->[0]->params is {controller => 'Photos', action => 'show', id => 123456};
+    
+    $m = $r->match(get => 'photos/abc');
+    # $m is undef;
+
+=cut
