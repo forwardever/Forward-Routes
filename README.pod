@@ -273,8 +273,7 @@ retrieved from the returned match object.
 All child routes inherit the format constraint of their parent, unless the
 format constraint of the child is overwritten. For example, adding a format
 constraint to the route root object affects all child routes added
-via add_route. For example, adding a format constraint to the route root
-object affects all child routes added via C<add_route>.
+via add_route.
     
     my $root = Forward::Routes->new->format('html');
     $root->add_route('foo')->format('xml');
