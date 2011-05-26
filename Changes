@@ -1,5 +1,17 @@
 Changes for Forward::Routes
 
+0.20    2011-05-26 00:00:00
+        - Fixed singular resources (camelized controller name)
+        - Added custom path naming for resources
+        - Added support to define multiple singular resources at once
+        - Test cleanup for constraint related tests
+        - Added custom id constraints to resources
+        - Added docs for singular resources
+        - Removed prefix methods (no tests, no docs, no use cases)
+        - API Change: namespace can only be customized for individual resources
+        - Improved API for resource customization 
+        - Added docs for resource customization 
+
 0.19    2011-05-17 00:00:00
         - Added namespace prefix for resources 
         - Updated docs (use camelized controller names in examples)
