@@ -247,6 +247,9 @@ matching route.
     my $m = $r->match(post => 'logout');
     # $m->[0] is {}
 
+All child routes inherit the method constraint of their parent, unless the
+method constraint of the child is overwritten.
+
 
 =head2 Format Constraints
 
@@ -266,10 +269,12 @@ retrieved from the returned match object.
     $m = $r->match(get => 'hello/there.jpeg');
     # $m is undef
 
-Once a format constraint has been defined, all child routes inherit the
-behaviour of their parents, unless they get format constraints themselves.
-For example, adding a format constraint to the route root object affects all
-child routes added via C<add_route>.
+
+All child routes inherit the format constraint of their parent, unless the
+format constraint of the child is overwritten. For example, adding a format
+constraint to the route root object affects all child routes added
+via add_route. For example, adding a format constraint to the route root
+object affects all child routes added via C<add_route>.
     
     my $root = Forward::Routes->new->format('html');
     $root->add_route('foo')->format('xml');
@@ -336,7 +341,7 @@ The C<build_path> method returns a hash ref with the keys "method" and "path".
 Path building is useful to build tag helpers that can be used in templates.
 For example, a link_to helper might generate a link with the help of a route
 name: link_to('route_name', placeholder => 'value'). In contrast to hard
-coding the URL in templates, routes could be changed an all links in your
+coding the URL in templates, routes could be changed and all links in your
 templates would get adjusted automatically.
 
 
