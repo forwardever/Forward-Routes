@@ -1290,9 +1290,9 @@ be reduced this way.
     # 6 regular expression searches performed
 
 
-=head2 Resources
+=head2 Resource Routing
 
-The C<resources> method allows to generate Rails like resources.
+The C<add_resources> method enables Rails like resource routing.
 
 Please look at L<Forward::Guides::Routes::Resources> for more in depth
 documentation on resourceful routes.
@@ -1313,9 +1313,8 @@ documentation on resourceful routes.
     # $path->{path} is 'photos/987'
     # $path->{method} is 'put'
 
-Resource routing is quite flexible and offers many customization options:
-
-    L<Forward::Guides::Routes::ResourceCustomization>
+Resource routing is quite flexible and offers many options for customization:
+L<Forward::Guides::Routes::ResourceCustomization>
 
 Please look at L<Forward::Guides::Routes::NestedResources> for more in depth
 documentation on nested resources.
