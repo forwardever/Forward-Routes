@@ -208,13 +208,20 @@ sub add_resources {
 
         # path name
         my $as = $name;
+        my $constraints;
 
 
         # custom resource params
         if ($names->[$i+1] && ref $names->[$i+1] eq 'HASH') {
             my $params = $names->[$i+1];
-            $as = $params->{as} if $params->{as};
+
+            $as          = $params->{as}          if $params->{as};
+            $constraints = $params->{constraints} if $params->{constraints};
         }
+
+
+        # custom constraint
+        my $id_constraint = $constraints->{id} || qr/[^.\/]+/;
 
 
         # camelize controller name (default)
@@ -263,7 +270,7 @@ sub add_resources {
 
         # modify resource item
         my $nested = $resource->add_route(':id')
-          ->constraints('id' => qr/[^.\/]+/);
+          ->constraints('id' => $id_constraint);
 
         $nested->add_route
           ->via('get')

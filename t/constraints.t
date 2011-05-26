@@ -7,7 +7,7 @@ use Test::More;
 
 use Forward::Routes;
 
-use Test::More tests => 5;
+use Test::More tests => 6;
 
 
 #############################################################################
@@ -18,6 +18,9 @@ my $r = Forward::Routes->new;
 $r->add_route('articles/:id')->constraints(id => qr/\d+/)->name('article');
 
 my $m = $r->match(get => 'articles/abc');
+ok not defined $m;
+
+$m = $r->match(get => 'articles/abc1');
 ok not defined $m;
 
 $m = $r->match(get => 'articles/123');
