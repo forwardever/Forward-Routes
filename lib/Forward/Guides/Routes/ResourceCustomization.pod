@@ -1,6 +1,6 @@
 =head1 Name
 
-Forward::Guides::Routes::Customization - Customizing restful resources
+Forward::Guides::Routes::ResourceCustomization - Customizing restful resources
 
 =head1 namespace
 
@@ -21,12 +21,13 @@ the C<-namespace> option:
     # $path->{path} is 'users'
     # $path->{method} is 'get'
 
-The C<-namespace> option has no effect on the URL pattern.
+The C<-namespace> option has no effect on the URL pattern,
 
     # in order to match /admin/users instead of /users,
     $r->add_route('admin')->add_resources('users' => -namespace => 'admin');
 
-    # that way, a lot of flexibility is kept:
+offering a lot more flexibility:
+
     $r->bridge('admin')->to('Authorization#admin')
       ->add_resources('users' => -namespace => 'admin');
     # allows to check whether the current user is really the admin (using
@@ -35,8 +36,8 @@ The C<-namespace> option has no effect on the URL pattern.
 
 =head1 as
 
-    The first part of the URL pattern can be changed with the help of the
-    C<-as> option.
+The first part of the URL pattern can be changed with the help of the C<-as>
+option.
 
     my $r = Forward::Routes->new;
     $r->add_resources(
@@ -57,7 +58,7 @@ The C<-namespace> option has no effect on the URL pattern.
 
 =head1 constraints
 
-The resource id placeholder can get a custom constraint using the
+The resource id placeholder can be assigned a custom constraint using the
 C<-constraint> option:
 
     my $r = Forward::Routes->new;
