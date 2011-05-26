@@ -84,14 +84,38 @@ sub _is_bridge {
 }
 
 
+sub _prepare_resource_options {
+    my $self    = shift;
+    my (@names) = @_;
+
+    my @final;
+    while (@names) {
+        my $name = shift(@names);
+
+        if ($name =~m/^-/){
+            $name =~s/^-//;
+            push @final, {} unless ref $final[-1] eq 'HASH';
+            $final[-1]->{$name} = shift(@names);
+        }
+        else {
+            push @final, $name;
+        }
+    }
+    return \@final;
+}
+
+
 sub add_singular_resources {
     my $self = shift;
 
     my $names = $_[0] && ref $_[0] eq 'ARRAY' ? [@{$_[0]}] : [@_];
 
+    $names = $self->_prepare_resource_options(@$names);
+
     my $last_resource;
     my $ns_name_prefix = '';
     my $ns_ctrl_prefix = '';
+
 
     for (my $i=0; $i<@$names; $i++) {
 
@@ -169,6 +193,8 @@ sub add_resources {
     my $self = shift;
 
     my $names = $_[0] && ref $_[0] eq 'ARRAY' ? [@{$_[0]}] : [@_];
+
+    $names = $self->_prepare_resource_options(@$names);
 
     my $last_resource;
     my $ns_name_prefix = '';

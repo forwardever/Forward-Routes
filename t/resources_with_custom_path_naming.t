@@ -15,7 +15,11 @@ use Test::More tests => 35;
 ### resources with custom path naming
 
 my $r = Forward::Routes->new;
-$r->add_resources('photos', 'users' => {as => 'customers'}, 'prices');
+$r->add_resources(
+    'photos',
+    'users' => -as => 'customers',
+    'prices'
+);
 
 
 # NO adjusted path name
@@ -98,7 +102,11 @@ is $r->build_path('prices_create')->{method} => 'post';
 #############################################################################
 ### empty options
 $r = Forward::Routes->new;
-$r->add_resources('photos', 'users' => {}, 'prices');
+$r->add_resources(
+    'photos',
+    'users' => {},
+    'prices'
+);
 
 $m = $r->match(get => 'users');
 is_deeply $m->[0]->params => {controller => 'Users', action => 'index'};

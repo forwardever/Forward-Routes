@@ -15,7 +15,11 @@ use Test::More tests => 30;
 ### plural resources with namespace prefix
 
 my $r = Forward::Routes->new;
-$r->add_resources('photos', 'users' => {namespace => 'admin'}, 'prices' => {namespace => 'admin'});
+$r->add_resources(
+    'photos',
+    'users' => -namespace => 'admin',
+    'prices' => -namespace => 'admin'
+);
 
 
 # test routes withOUT namespace prefix
@@ -98,7 +102,11 @@ $r->format_resource_controller(
     }
 );
 
-$r->add_resources('photos', 'users' => {namespace => 'admin'}, 'prices' => {namespace => 'admin'});
+$r->add_resources(
+    'photos',
+    'users' => -namespace => 'admin',
+    'prices' => -namespace => 'admin'
+);
 
 $m = $r->match(get => 'photos');
 is_deeply $m->[0]->params => {controller => 'photos', action => 'index'};

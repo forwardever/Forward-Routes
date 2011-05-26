@@ -15,7 +15,11 @@ use Test::More tests => 4;
 
 
 my $r = Forward::Routes->new;
-$r->add_resources('users', 'photos' => {constraints => {id => qr/\d{6}/ }}, 'tags');
+$r->add_resources(
+    'users',
+    'photos' => -constraints => {id => qr/\d{6}/},
+    'tags'
+);
 
 my $m = $r->match(get => 'photos/123456');
 is_deeply $m->[0]->params => {controller => 'Photos', action => 'show', id => 123456};
