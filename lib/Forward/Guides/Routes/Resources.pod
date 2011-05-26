@@ -3,7 +3,7 @@
 Forward::Guides::Routes::Resources - Rails like resource routing for Plack web
 framework developers (Perl)
 
-=head1 Description
+=head1 Plural Resources
 
 L<Forward::Routes> provides support for Rails like resource routing.
 The C<add_resources> command generates a bunch of routes that can be used to
@@ -50,6 +50,65 @@ parameter above) which is used to:
     update                update an existing item
     delete                delete an existing item
 
+
+Multiple resources can be created with a single C<add_resources> call:
+
+    # Add multiple resources
+    $routes->add_resources('cities', 'users', 'articles');
+
+    # equals
+    $routes->add_resources('cities'');
+    $routes->add_resources('users');
+    $routes->add_resources('articles');    
+
+Resources inherit the file extension of their parent:
+
+    # in order to match get => /cities/paris/edit.html
+
+    # Routes root object
+    my $root = Forward::Routes->new;
+
+    # Create a parent route with format "html"
+    $route_with_html_extension = $root->add_route->format('html');
+
+    # add a resource on top of parent
+    $route_with_html_extension->add_resources('cities');
+    
+    $m = $root->match(get => '/cities/paris/edit.html');
+    # $m->[0]->params is
+    #   {controller => 'Cities', action => 'cities_update_form',
+    #    format => 'html'};
+
+=head1 Singular Resources
+
+L<Forward::Routes> also supports singular resource routing. Singular resources
+are useful if the "id" is already known and has not to be part of the URL
+pattern. For example, the id might already be part of a higher level route (in
+case of nested routes) or could be derived from a cookie.
+
+    # Routes root object
+    my $routes = Forward::Routes->new;
+
+    my $author = $routes->add_route('author/:id');
+
+    # Add a singular resource to $author
+    $author->add_singular_resources('contact');
+
+    # The following routes are generated on top of author/:id:
+
+    HTTP     Path            Controller  Action        Route name
+    request                  parameter   parameter
+    method          
+
+    GET      /contact/new    Contact     create_form   contact_create_form
+    GET      /contact/edit   Contact     update_form   contact_update_form
+    GET      /contact        Contact     show          contact_show
+    PUT      /contact        Contact     update        contact_update
+    POST     /contact        Contact     create        contact_create
+    DELETE   /contact        Contact     delete        contact_delete
+
+
+=head1 Taking a look at the source
 
 The internal code to generate a resource makes use of nested routes:
 
@@ -107,62 +166,6 @@ The internal code to generate a resource makes use of nested routes:
       ->via('get')
       ->to("Cities#delete_form")
       ->name('cities_delete_form');
-
-Multiple resources can be created with a single C<add_resources> call:
-
-    # Add multiple resources
-    $routes->add_resources('cities', 'users', 'articles');
-
-    # equals
-    $routes->add_resources('cities'');
-    $routes->add_resources('users');
-    $routes->add_resources('articles');    
-
-Resources inherit the file extension of their parent:
-
-    # in order to match get => /cities/paris/edit.html
-
-    # Routes root object
-    my $root = Forward::Routes->new;
-
-    # Create a parent route with format "html"
-    $route_with_html_extension = $root->add_route->format('html');
-
-    # add a resource on top of parent
-    $route_with_html_extension->add_resources('cities');
-    
-    $m = $root->match(get => '/cities/paris/edit.html');
-    # $m->[0]->params is
-    #   {controller => 'Cities', action => 'cities_update_form',
-    #    format => 'html'};
-
-
-
-L<Forward::Routes> also supports singular resource routing. Singular resources
-are useful if the "id" is already known and has not to be part of the URL
-pattern. For example, the id might already be part of a higher level route (in
-case of nested routes) or could be derived from a cookie.
-
-    # Routes root object
-    my $routes = Forward::Routes->new;
-
-    my $author = $routes->add_route('author/:id');
-
-    # Add a singular resource to $author
-    $author->add_singular_resources('contact');
-
-    # The following routes are generated on top of author/:id:
-
-    HTTP     Path            Controller  Action        Route name
-    request                  parameter   parameter
-    method          
-
-    GET      /contact/new    Contact     create_form   contact_create_form
-    GET      /contact/edit   Contact     update_form   contact_update_form
-    GET      /contact        Contact     show          contact_show
-    PUT      /contact        Contact     update        contact_update
-    POST     /contact        Contact     create        contact_create
-    DELETE   /contact        Contact     delete        contact_delete
 
 
 =cut

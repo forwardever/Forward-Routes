@@ -5,7 +5,7 @@ Plack web framework developers (Perl)
 
 =head1 Description
 
-L<Forward::Routes> provides support for nested resources. Take a look at
+L<Forward::Routes> supports nested resource routing. Take a look at
 L<Forward::Guides::Routes::Resources> for more in depth
 documentation on resource routing.
 
