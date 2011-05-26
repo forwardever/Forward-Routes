@@ -7,7 +7,7 @@ use Test::More;
 
 use Forward::Routes;
 
-use Test::More tests => 206;
+use Test::More tests => 203;
 
 #############################################################################
 ### empty
@@ -775,11 +775,6 @@ $m = $r->match(get => 'hello/prefixed');
 $r = Forward::Routes->new;
 $r->add_route('foo',       name => 'one');
 $r->add_route(':foo/:bar', name => 'two');
-$r->add_route(
-    'articles/:id',
-    constraints => {id => qr/\d+/},
-    name        => 'article'
-);
 $r->add_route('photos/*other',                   name => 'glob1');
 $r->add_route('books/*section/:title',           name => 'glob2');
 $r->add_route('*a/foo/*b',                       name => 'glob3');
@@ -791,22 +786,13 @@ $e = eval {$r->build_path('unknown')->{path}; };
 like $@ => qr/Unknown name 'unknown' used to build a path/;
 undef $e;
 
-$e = eval {$r->build_path('article')->{path}; };
-like $@ => qr/Required param 'id' was not passed when building a path/;
-undef $e;
-
 $e = eval {$r->build_path('glob2')->{path}; };
 like $@ =>
   qr/Required glob param 'section' was not passed when building a path/;
 undef $e;
 
-$e = eval {$r->build_path('article', id => 'abc')->{path}; };
-like $@ => qr/Param 'id' fails a constraint/;
-undef $e;
-
 is $r->build_path('one')->{path} => 'foo';
 is $r->build_path('two', foo => 'foo', bar => 'bar')->{path} => 'foo/bar';
-is $r->build_path('article', id => 123)->{path} => 'articles/123';
 is $r->build_path('glob1', other => 'foo/bar/baz')->{path} =>
   'photos/foo/bar/baz';
 is $r->build_path(
