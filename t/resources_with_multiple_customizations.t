@@ -11,7 +11,7 @@ use Test::More tests => 3;
 
 
 #############################################################################
-### resources with custom id constraint
+### resources with multiple customizations
 
 
 my $r = Forward::Routes->new;
