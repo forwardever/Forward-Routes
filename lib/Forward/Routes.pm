@@ -101,25 +101,23 @@ sub add_singular_resources {
         next if ref $name;
 
 
-        # Namespace for upcoming resources
-        if ($name eq '-namespace') {
-            $name = $names->[$i+1];
-            $ns_ctrl_prefix   = $self->format_resource_controller->($name).'::';
-            $ns_name_prefix   = $name.'_';
-            $i++;
-            next;
-        }
-
-
         # path name
         my $as = $name;
+        my $namespace;
 
 
         # custom resource params
         if ($names->[$i+1] && ref $names->[$i+1] eq 'HASH') {
             my $params = $names->[$i+1];
-            $as = $params->{as} if $params->{as};
+
+            $as        = $params->{as}        if $params->{as};
+            $namespace = $params->{namespace} if $params->{namespace};
         }
+
+
+        # custom namespace
+        $ns_ctrl_prefix   = $self->format_resource_controller->($namespace).'::' if $namespace;
+        $ns_name_prefix   = $namespace.'_' if $namespace;
 
 
         # camelize controller name (default)
@@ -185,19 +183,10 @@ sub add_resources {
         next if ref $name;
 
 
-        # Namespace for upcoming resources
-        if ($name eq '-namespace') {
-            $name = $names->[$i+1];
-            $ns_ctrl_prefix   = $self->format_resource_controller->($name).'::';
-            $ns_name_prefix   = $name.'_';
-            $i++;
-            next;
-        }
-
-
         # path name
         my $as = $name;
         my $constraints;
+        my $namespace;
 
 
         # custom resource params
@@ -206,11 +195,17 @@ sub add_resources {
 
             $as          = $params->{as}          if $params->{as};
             $constraints = $params->{constraints} if $params->{constraints};
+            $namespace   = $params->{namespace}   if $params->{namespace};
         }
 
 
         # custom constraint
         my $id_constraint = $constraints->{id} || qr/[^.\/]+/;
+
+
+        # custom namespace
+        $ns_ctrl_prefix   = $self->format_resource_controller->($namespace).'::' if $namespace;
+        $ns_name_prefix   = $namespace.'_' if $namespace;
 
 
         # camelize controller name (default)
