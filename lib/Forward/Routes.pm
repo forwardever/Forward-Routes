@@ -523,6 +523,7 @@ sub _match {
         if (my $m = $matches->[0]) {
             $match->_add_params(\%{$m->captures});
             $match->_add_captures(\%{$m->captures});
+            $match->_add_name($m->name);
         }
 
         unshift @$matches, $match;

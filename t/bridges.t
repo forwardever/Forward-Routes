@@ -7,7 +7,7 @@ use Test::More;
 
 use Forward::Routes;
 
-use Test::More tests => 12;
+use Test::More tests => 14;
 
 
 #############################################################################
@@ -16,8 +16,8 @@ use Test::More tests => 12;
 my $r = Forward::Routes->new;
 my $bridge = $r->bridge('admin')->to('check#authentication');
 
-$bridge->add_route('foo')->to('no#placeholders');
-$bridge->add_route(':foo/:bar')->to('two#placeholders');
+$bridge->add_route('foo')->to('no#placeholders')->name('foo');
+$bridge->add_route(':foo/:bar')->to('two#placeholders')->name('foo_bar');
 
 my $m = $r->match(get => 'foo');
 is $m, undef;
@@ -50,3 +50,7 @@ is_deeply $m->[1]->params, {controller => 'two', action => 'placeholders',
 
 is_deeply $m->[0]->captures, {foo => 'hello', bar => 'there'};
 is_deeply $m->[1]->captures, {foo => 'hello', bar => 'there'};
+
+is $m->[0]->name, 'foo_bar';
+is $m->[1]->name, 'foo_bar';
+
