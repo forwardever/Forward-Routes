@@ -128,14 +128,18 @@ sub add_singular_resources {
         # path name
         my $as = $name;
         my $namespace;
+        my $format;
+        my $format_exists;
 
 
         # custom resource params
         if ($names->[$i+1] && ref $names->[$i+1] eq 'HASH') {
             my $params = $names->[$i+1];
 
-            $as        = $params->{as}        if $params->{as};
-            $namespace = $params->{namespace} if $params->{namespace};
+            $as            = $params->{as}        if $params->{as};
+            $namespace     = $params->{namespace} if $params->{namespace};
+            $format_exists = 1                    if exists $params->{format};
+            $format        = $params->{format}    if exists $params->{format};
         }
 
 
@@ -149,6 +153,9 @@ sub add_singular_resources {
     
 
         my $resource = $self->add_route($as);
+
+        # custom format
+        $resource->format($format) if $format_exists;
     
         $resource->add_route('/new')
           ->via('get')
@@ -213,15 +220,18 @@ sub add_resources {
         my $as = $name;
         my $constraints;
         my $namespace;
-
+        my $format;
+        my $format_exists;
 
         # custom resource params
         if ($names->[$i+1] && ref $names->[$i+1] eq 'HASH') {
             my $params = $names->[$i+1];
 
-            $as          = $params->{as}          if $params->{as};
-            $constraints = $params->{constraints} if $params->{constraints};
-            $namespace   = $params->{namespace}   if $params->{namespace};
+            $as            = $params->{as}          if $params->{as};
+            $constraints   = $params->{constraints} if $params->{constraints};
+            $namespace     = $params->{namespace}   if $params->{namespace};
+            $format_exists = 1                      if exists $params->{format};
+            $format        = $params->{format}      if exists $params->{format};
         }
 
 
@@ -259,6 +269,9 @@ sub add_resources {
               ->_is_plural_resource(1)
               ->_parent_resource_names($name);
         }
+
+        # custom format
+        $resource->format($format) if $format_exists;
 
 
         # resource
@@ -470,10 +483,11 @@ sub via {
 
 
 sub _match {
-    my ($self, $method, $path, $request_format) = @_;
+    my ($self, $method, $path) = @_;
 
     # Format
-    if ($self->{format} && !defined($request_format)) {
+    my $request_format;
+    if (!@{$self->children} && $self->{format}) {
         $path =~m/\.([\a-zA-Z0-9]{1,4})$/;
         $request_format = defined $1 ? $1 : '';
 
@@ -498,7 +512,7 @@ sub _match {
         foreach my $child (@{$self->children}) {
 
             # Match?
-            $matches = $child->_match($method => $path, $request_format);
+            $matches = $child->_match($method => $path);
             last if $matches;
 
         }
@@ -541,8 +555,9 @@ sub _match {
     $match->_add_params({%{$self->defaults}, %$captures_hash});
 
     # Format
-    $match->_add_params({format => $request_format})
-      if defined $request_format;
+    unless (@{$self->children}) {
+        $match->_add_params({format => $request_format}) if $self->{format};
+    }
 
     # Captures
     $match->_add_captures($captures_hash);
@@ -873,10 +888,17 @@ sub _is_plural_resource {
 
 sub format {
     my $self = shift;
+    my (@params) = @_;
 
-    return $self->{format} unless defined $_[0];
+    return $self->{format} unless @params;
 
-    my $formats = ref $_[0] eq 'ARRAY' ? $_[0] : [@_];
+    # no format constraint, no format matching performed
+    if (!defined($params[0])) {
+        delete $self->{format};
+        return $self;
+    }
+
+    my $formats = ref $params[0] eq 'ARRAY' ? $params[0] : [@params];
 
     @$formats = map {lc $_} @$formats;
 
@@ -889,10 +911,9 @@ sub format {
 sub _match_format {
     my ($self, $request_format) = @_;
 
-    $request_format ||= '';
-    my $required_format = $self->{format} || [''];
+    return 1 unless defined $self->format;
 
-    my @success = grep { $_ eq $request_format } @{$required_format};
+    my @success = grep { $_ eq $request_format } @{$self->format};
 
     return unless @success;
 

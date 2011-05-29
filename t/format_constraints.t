@@ -7,14 +7,13 @@ use Test::More;
 
 use Forward::Routes;
 
-use Test::More tests => 39;
+use Test::More tests => 45;
 
 
 #############################################################################
 ### format
 
 ### no format constraint, but format passed
-### one format constraint
 my $r = Forward::Routes->new;
 $r->add_route('foo');
 $r->add_route(':foo/:bar');
@@ -85,6 +84,31 @@ is $m, undef;
 
 $m = $r->match(get => 'hello/there.html');
 is $m, undef;
+
+
+# build path
+is $r->build_path('one')->{path}, 'foo';
+is $r->build_path('two', foo => 1, bar => 2)->{path}, '1/2';
+
+
+
+### pass undef format (no contraint validation)
+$r = Forward::Routes->new->format(undef);
+$r->add_route('foo')->name('one');
+$r->add_route(':foo/:bar')->name('two');
+
+$m = $r->match(get => 'foo');
+is_deeply $m->[0]->params => {};
+
+$m = $r->match(get => 'hello/there');
+is_deeply $m->[0]->params => {foo => 'hello', bar => 'there'};
+
+# now paths with format
+$m = $r->match(get => 'foo.html');
+is $m, undef;
+
+$m = $r->match(get => 'hello/there.html');
+is_deeply $m->[0]->params => {foo => 'hello', bar => 'there.html'};
 
 
 # build path

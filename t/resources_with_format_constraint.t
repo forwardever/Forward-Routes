@@ -7,13 +7,14 @@ use Test::More;
 
 use Forward::Routes;
 
-use Test::More tests => 68;
+use Test::More tests => 88;
 
 
 #############################################################################
-### resources with format constraint
+### resources with format constraint: format inheritance
 
-### no format constraint (defaults to format ''), but format passed
+
+### no format constraint, but format passed
 
 my $r = Forward::Routes->new;
 $r->add_resources('users','photos','tags');
@@ -203,3 +204,102 @@ is $m, undef;
 
 $m = $r->match(delete => 'photos/1.xml');
 is $m, undef;
+
+
+#############################################################################
+### resources with format constraint: pass format as parameter
+
+$r = Forward::Routes->new;
+$r->add_resources(
+    'tags',
+    'photos' => -format => 'html',
+    'users'
+);
+
+$m = $r->match(get => 'photos.html');
+is_deeply $m->[0]->params => {controller => 'Photos', action => 'index', format => 'html'};
+
+$m = $r->match(get => 'photos/1.html');
+is_deeply $m->[0]->params => {controller => 'Photos', action => 'show', id => 1, format => 'html'};
+
+
+$m = $r->match(get => 'photos');
+is $m, undef;
+
+$m = $r->match(get => 'photos/1');
+is $m, undef;
+
+
+$m = $r->match(get => 'users');
+is_deeply $m->[0]->params => {controller => 'Users', action => 'index'};
+
+$m = $r->match(get => 'users/1');
+is_deeply $m->[0]->params => {controller => 'Users', action => 'show', id => 1};
+
+
+$m = $r->match(get => 'users.html');
+is $m, undef;
+
+$m = $r->match(get => 'users/1.html');
+is $m, undef;
+
+
+### emtpy format param, parent has format
+$r = Forward::Routes->new->format('html');
+$r->add_resources(
+    'tags',
+    'photos' => -format => '',
+    'users'
+);
+
+
+$m = $r->match(get => 'photos');
+is_deeply $m->[0]->params => {controller => 'Photos', action => 'index', format => ''};
+
+$m = $r->match(get => 'photos/1');
+is_deeply $m->[0]->params => {controller => 'Photos', action => 'show', id => 1, format => ''};
+
+
+$m = $r->match(get => 'photos.html');
+is $m, undef;
+
+$m = $r->match(get => 'photos/1.html');
+is $m, undef;
+
+
+$m = $r->match(get => 'users.html');
+is_deeply $m->[0]->params => {controller => 'Users', action => 'index', format => 'html'};
+
+$m = $r->match(get => 'users/1.html');
+is_deeply $m->[0]->params => {controller => 'Users', action => 'show', id => 1, format => 'html'};
+
+
+
+$r = Forward::Routes->new->format('html');
+$r->add_resources(
+    'tags',
+    'photos' => -format => undef,
+    'users'
+);
+
+
+# should also work with undef
+$m = $r->match(get => 'photos');
+is_deeply $m->[0]->params => {controller => 'Photos', action => 'index'};
+
+$m = $r->match(get => 'photos/1');
+is_deeply $m->[0]->params => {controller => 'Photos', action => 'show', id => 1};
+
+
+$m = $r->match(get => 'photos.html');
+is $m, undef;
+
+$m = $r->match(get => 'photos/1.html');
+is $m, undef;
+
+
+$m = $r->match(get => 'users.html');
+is_deeply $m->[0]->params => {controller => 'Users', action => 'index', format => 'html'};
+
+$m = $r->match(get => 'users/1.html');
+is_deeply $m->[0]->params => {controller => 'Users', action => 'show', id => 1, format => 'html'};
