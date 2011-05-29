@@ -74,4 +74,47 @@ C<-constraint> option:
     $m = $r->match(get => 'photos/abc');
     # $m is undef;
 
+
+=head1 format
+
+The format constraint can be changed with the help of the C<-format> option:
+
+    my $r = Forward::Routes->new;
+    $r->add_resources(
+        'users',
+        'photos' => -format => 'html',
+        'tags'
+    );
+    
+    my $m = $r->match(get => 'photos/123456.html');
+    # $m->[0]->params is {format => 'html', controller => 'Photos', action => 'show',
+    #   id => 123456};
+    
+    $m = $r->match(get => 'photos/123456');
+    # $m is undef;
+
+
+Resources inherit the file extension of their parent. As a result, the format
+constraint can also be changed through format inheritance:
+
+    # in order to match get => /cities/paris/edit.html
+
+    # Routes root object
+    my $root = Forward::Routes->new;
+
+    # Create a parent route with format "html"
+    $route_with_html_extension = $root->add_route->format('html');
+
+    # add a resource on top of parent
+    $route_with_html_extension->add_resources('cities');
+    
+    $m = $root->match(get => '/cities/paris/edit.html');
+    # $m->[0]->params is
+    #   {controller => 'Cities', action => 'cities_update_form',
+    #    format => 'html'};
+
+The inherited format behaviour can be overwritten with the C<-format> option
+for individual resources.
+
+
 =cut

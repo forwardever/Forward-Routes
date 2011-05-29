@@ -61,23 +61,6 @@ Multiple resources can be created with a single C<add_resources> call:
     $routes->add_resources('users');
     $routes->add_resources('articles');    
 
-Resources inherit the file extension of their parent:
-
-    # in order to match get => /cities/paris/edit.html
-
-    # Routes root object
-    my $root = Forward::Routes->new;
-
-    # Create a parent route with format "html"
-    $route_with_html_extension = $root->add_route->format('html');
-
-    # add a resource on top of parent
-    $route_with_html_extension->add_resources('cities');
-    
-    $m = $root->match(get => '/cities/paris/edit.html');
-    # $m->[0]->params is
-    #   {controller => 'Cities', action => 'cities_update_form',
-    #    format => 'html'};
 
 =head1 Singular Resources
 
