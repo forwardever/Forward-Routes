@@ -1,5 +1,9 @@
 Changes for Forward::Routes
 
+0.21    2011-05-29 00:00:00
+        - Fixed "uninitialized value in length" warnings
+        - Fixed small route naming bug (affects bridges)
+
 0.20    2011-05-26 00:00:00
         - Fixed singular resources (camelized controller name)
         - Added custom path naming for resources
