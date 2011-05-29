@@ -894,7 +894,7 @@ sub format {
 
     # no format constraint, no format matching performed
     if (!defined($params[0])) {
-        delete $self->{format};
+        $self->{format} = undef;
         return $self;
     }
 
