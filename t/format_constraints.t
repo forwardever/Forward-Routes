@@ -69,14 +69,14 @@ $r->add_route('foo')->name('one');
 $r->add_route(':foo/:bar')->name('two');
 
 $m = $r->match(get => 'foo');
-is_deeply $m->[0]->params => {};
+is_deeply $m->[0]->params => {format => ''};
 
 $m = $r->match(get => 'hello/there');
-is_deeply $m->[0]->params => {foo => 'hello', bar => 'there'};
+is_deeply $m->[0]->params => {foo => 'hello', bar => 'there', format => ''};
 
 # match again (params empty again)
 $m = $r->match(get => 'foo');
-is_deeply $m->[0]->params => {};
+is_deeply $m->[0]->params => {format => ''};
 
 
 # now paths with format
@@ -148,14 +148,14 @@ $m = $r->match(get => 'hello/there.html');
 is_deeply $m->[0]->params => {foo => 'hello', bar => 'there', format => 'html'};
 
 $m = $r->match(get => 'foo');
-is_deeply $m->[0]->params => {};
+is_deeply $m->[0]->params => {format => ''};
 
 $m = $r->match(get => 'hello/there');
-is_deeply $m->[0]->params => {foo => 'hello', bar => 'there'};
+is_deeply $m->[0]->params => {foo => 'hello', bar => 'there', format => ''};
 
 # match again (params empty again)
 $m = $r->match(get => 'foo');
-is_deeply $m->[0]->params => {};
+is_deeply $m->[0]->params => {format => ''};
 
 # now paths with wrong format
 $m = $r->match(get => 'foo.jpeg');

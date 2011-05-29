@@ -541,7 +541,8 @@ sub _match {
     $match->_add_params({%{$self->defaults}, %$captures_hash});
 
     # Format
-    $match->_add_params({format => $request_format}) if length($request_format);
+    $match->_add_params({format => $request_format})
+      if defined $request_format;
 
     # Captures
     $match->_add_captures($captures_hash);

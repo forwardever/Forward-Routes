@@ -119,28 +119,28 @@ $r = Forward::Routes->new->format('');
 $r->add_resources('users','photos','tags');
 
 $m = $r->match(get => 'photos');
-is_deeply $m->[0]->params => {controller => 'Photos', action => 'index'};
+is_deeply $m->[0]->params => {controller => 'Photos', action => 'index', format => ''};
 
 $m = $r->match(get => 'photos/new');
-is_deeply $m->[0]->params => {controller => 'Photos', action => 'create_form'};
+is_deeply $m->[0]->params => {controller => 'Photos', action => 'create_form', format => ''};
 
 $m = $r->match(post => 'photos');
-is_deeply $m->[0]->params => {controller => 'Photos', action => 'create'};
+is_deeply $m->[0]->params => {controller => 'Photos', action => 'create', format => ''};
 
 $m = $r->match(get => 'photos/1');
-is_deeply $m->[0]->params => {controller => 'Photos', action => 'show', id => 1};
+is_deeply $m->[0]->params => {controller => 'Photos', action => 'show', id => 1, format => ''};
 
 $m = $r->match(get => 'photos/1/edit');
-is_deeply $m->[0]->params => {controller => 'Photos', action => 'update_form', id => 1};
+is_deeply $m->[0]->params => {controller => 'Photos', action => 'update_form', id => 1, format => ''};
 
 $m = $r->match(get => 'photos/1/delete');
-is_deeply $m->[0]->params => {controller => 'Photos', action => 'delete_form', id => 1};
+is_deeply $m->[0]->params => {controller => 'Photos', action => 'delete_form', id => 1, format => ''};
 
 $m = $r->match(put => 'photos/1');
-is_deeply $m->[0]->params => {controller => 'Photos', action => 'update', id => 1};
+is_deeply $m->[0]->params => {controller => 'Photos', action => 'update', id => 1, format => ''};
 
 $m = $r->match(delete => 'photos/1');
-is_deeply $m->[0]->params => {controller => 'Photos', action => 'delete', id => 1};
+is_deeply $m->[0]->params => {controller => 'Photos', action => 'delete', id => 1, format => ''};
 
 is $r->build_path('photos_index')->{path} => 'photos';
 is $r->build_path('photos_create_form')->{path} => 'photos/new';

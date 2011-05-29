@@ -32,7 +32,7 @@ sub _add_name {
     my $self = shift;
     my ($name) = @_;
 
-    $self->{name} = $name unless length $self->{name};
+    $self->{name} = $name unless defined $self->{name} && length $self->{name};
 
     return $self;
 }
@@ -46,7 +46,7 @@ sub params {
     $self->{params} ||= {};
 
     # Get hash
-    return $self->{params} unless length $key;
+    return $self->{params} unless defined $key && length $key;
 
     # Get hash value
     return $self->{params}->{$key};
@@ -61,7 +61,7 @@ sub captures {
     $self->{captures} ||= {};
 
     # Get hash
-    return $self->{captures} unless length $key;
+    return $self->{captures} unless defined $key && length $key;
 
     # Get hash value
     return $self->{captures}->{$key};
