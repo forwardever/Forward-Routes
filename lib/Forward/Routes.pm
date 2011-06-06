@@ -222,6 +222,7 @@ sub add_resources {
         my $namespace;
         my $format;
         my $format_exists;
+        my $only;
 
         # custom resource params
         if ($names->[$i+1] && ref $names->[$i+1] eq 'HASH') {
@@ -232,11 +233,31 @@ sub add_resources {
             $namespace     = $params->{namespace}   if $params->{namespace};
             $format_exists = 1                      if exists $params->{format};
             $format        = $params->{format}      if exists $params->{format};
+            $only          = $params->{only}        if $params->{only};
         }
 
+        # selected routes
+        my %selected = (
+            index       => 1,
+            create      => 1,
+            show        => 1,
+            update      => 1,
+            delete      => 1,
+            create_form => 1,
+            update_form => 1,
+            delete_form => 1
+        );
+
+        # only
+        if ($only) {
+            %selected = ();
+            foreach my $type (@$only) {
+                $selected{$type} = 1;
+            }
+        }
 
         # custom constraint
-        my $id_constraint = $constraints->{id} || qr/[^.\/]+/;
+        my $id_constraint = $constraints->{id} || qr/(?!new\Z)[^.\/]+/;
 
 
         # custom namespace
@@ -278,47 +299,57 @@ sub add_resources {
         $resource->add_route
           ->via('get')
           ->to($ns_ctrl_prefix.$ctrl."#index")
-          ->name($ns_name_prefix.$parent_name_prefix.$name.'_index');
+          ->name($ns_name_prefix.$parent_name_prefix.$name.'_index')
+          if $selected{index};
 
         $resource->add_route
           ->via('post')
           ->to($ns_ctrl_prefix.$ctrl."#create")
-          ->name($ns_name_prefix.$parent_name_prefix.$name.'_create');
+          ->name($ns_name_prefix.$parent_name_prefix.$name.'_create')
+          if $selected{create};
 
         # new resource item
         $resource->add_route('/new')
           ->via('get')
           ->to($ns_ctrl_prefix.$ctrl."#create_form")
-          ->name($ns_name_prefix.$parent_name_prefix.$name.'_create_form');
+          ->name($ns_name_prefix.$parent_name_prefix.$name.'_create_form')
+          if $selected{create_form};
 
         # modify resource item
         my $nested = $resource->add_route(':id')
-          ->constraints('id' => $id_constraint);
+          ->constraints('id' => $id_constraint)
+          if $selected{show} || $selected{update} || $selected{delete}
+            || $selected{update_form} || $selected{delete_form};
 
         $nested->add_route
           ->via('get')
           ->to($ns_ctrl_prefix.$ctrl."#show")
-          ->name($ns_name_prefix.$parent_name_prefix.$name.'_show');
+          ->name($ns_name_prefix.$parent_name_prefix.$name.'_show')
+          if $selected{show};
 
         $nested->add_route
           ->via('put')
           ->to($ns_ctrl_prefix.$ctrl."#update")
-          ->name($ns_name_prefix.$parent_name_prefix.$name.'_update');
+          ->name($ns_name_prefix.$parent_name_prefix.$name.'_update')
+          if $selected{update};
 
         $nested->add_route
           ->via('delete')
           ->to($ns_ctrl_prefix.$ctrl."#delete")
-          ->name($ns_name_prefix.$parent_name_prefix.$name.'_delete');
+          ->name($ns_name_prefix.$parent_name_prefix.$name.'_delete')
+          if $selected{delete};
 
         $nested->add_route('edit')
           ->via('get')
           ->to($ns_ctrl_prefix.$ctrl."#update_form")
-          ->name($ns_name_prefix.$parent_name_prefix.$name.'_update_form');
+          ->name($ns_name_prefix.$parent_name_prefix.$name.'_update_form')
+          if $selected{update_form};
 
         $nested->add_route('delete')
           ->via('get')
           ->to($ns_ctrl_prefix.$ctrl."#delete_form")
-          ->name($ns_name_prefix.$parent_name_prefix.$name.'_delete_form');
+          ->name($ns_name_prefix.$parent_name_prefix.$name.'_delete_form')
+          if $selected{delete_form};
 
         $last_resource = $resource;
     }

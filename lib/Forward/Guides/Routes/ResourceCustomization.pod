@@ -117,4 +117,30 @@ The inherited format behaviour can be overwritten with the C<-format> option
 for individual resources.
 
 
+=head1 only
+
+Instead of creating all default resourceful routes for a resource (i.e. index,
+create, show, update, delete, create_form, update_form, delete_form), only
+selected routes can be generated using the C<-only> option.
+
+    # only generate the "create" and "show" routes for the "users" resource
+    my $root = Forward::Routes->new;
+    $root->add_resources(
+        'photos',
+        'users' => -only => ['create', 'show'],
+        'prices'
+    );
+    
+    my $m = $root->match(get => 'users');
+    # $m is undef, as "index" not included via "only"
+    
+    $m = $root->match(post => 'users');
+    # create:
+    # $m->[0]->params is {controller => 'Users', action => 'create'};
+    
+    $m = $root->match(get => 'users/1');
+    # show
+    # $m->[0]->params is {controller => 'Users', action => 'show', id => 1};
+
+
 =cut
