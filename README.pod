@@ -16,15 +16,16 @@ without the tight couplings with a full featured framework.
 
 Think of routes as kind of simplified regular expressions! First of all, a
 bunch of routes is defined. Each route contains information on
+
 =over 2
 
 =item *
 
-- what kind of URLs to match
+what kind of URLs to match
 
 =item *
 
-- what to do in case of a match
+what to do in case of a match
 
 =back
 
