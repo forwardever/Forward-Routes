@@ -31,7 +31,7 @@ what to do in case of a match
 
 Finally, a HTTP request method and a path are passed and in case of a match,
 an object is returned that tells the framework which controller method to
-exectute and which paramters to make available in the controller method.
+exectute and which parameters to make available in the controller method.
 
 
 =head2 1. Routes setup
