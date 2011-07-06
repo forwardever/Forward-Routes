@@ -982,15 +982,14 @@ what to do in case of a match
 
 =back
 
-Finally, a HTTP request method and a path are passed and in case of a match,
-an object is returned that tells the framework which controller method to
-exectute and which parameters to make available in the controller method.
+Finally, the request method and path of a users HTTP request are passed to
+search for a matching route.
 
 
 =head2 1. Routes setup
 
 Each route represents a specific URL or a bunch of URLs (if placeholders are
-used). The URL path pattern is defined via the add_route command. A route
+used). The URL path pattern is defined via the C<add_route> command. A route
 also contains information on what to do in case of a match. A common use
 case is to provide controller and action defaults, so the framework knows
 which controller method to execute in case of a match:
