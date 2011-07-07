@@ -1,5 +1,9 @@
 Changes for Forward::Routes
 
+0.23    2011-07-07 00:00:00
+        - Added -only option to resources
+        - Added docs
+
 0.22    2011-05-29 00:00:00
         - Fixed format constraint handling (undef and empty values)
         - Added -format option to resources
