@@ -130,6 +130,7 @@ sub add_singular_resources {
         my $namespace;
         my $format;
         my $format_exists;
+        my $only;
 
 
         # custom resource params
@@ -140,8 +141,26 @@ sub add_singular_resources {
             $namespace     = $params->{namespace} if $params->{namespace};
             $format_exists = 1                    if exists $params->{format};
             $format        = $params->{format}    if exists $params->{format};
+            $only          = $params->{only}      if $params->{only};
         }
 
+        # selected routes
+        my %selected = (
+            create      => 1,
+            show        => 1,
+            update      => 1,
+            delete      => 1,
+            create_form => 1,
+            update_form => 1
+        );
+
+        # only
+        if ($only) {
+            %selected = ();
+            foreach my $type (@$only) {
+                $selected{$type} = 1;
+            }
+        }
 
         # custom namespace
         $ns_ctrl_prefix   = $self->format_resource_controller->($namespace).'::' if $namespace;
@@ -160,34 +179,38 @@ sub add_singular_resources {
         $resource->add_route('/new')
           ->via('get')
           ->to($ns_ctrl_prefix."$ctrl#create_form")
-          ->name($ns_name_prefix.$name.'_create_form');
+          ->name($ns_name_prefix.$name.'_create_form')
+          if $selected{create_form};;
     
         $resource->add_route('/edit')
           ->via('get')
           ->to($ns_ctrl_prefix."$ctrl#update_form")
-          ->name($ns_name_prefix.$name.'_update_form');
-    
-    
-        my $nested = $resource->add_route;
-        $nested->add_route
+          ->name($ns_name_prefix.$name.'_update_form')
+          if $selected{update_form};
+
+        $resource->add_route
           ->via('post')
           ->to($ns_ctrl_prefix."$ctrl#create")
-          ->name($ns_name_prefix.$name.'_create');
+          ->name($ns_name_prefix.$name.'_create')
+          if $selected{create};
     
-        $nested->add_route
+        $resource->add_route
           ->via('get')
           ->to($ns_ctrl_prefix."$ctrl#show")
-          ->name($ns_name_prefix.$name.'_show');
+          ->name($ns_name_prefix.$name.'_show')
+          if $selected{show};
     
-        $nested->add_route
+        $resource->add_route
           ->via('put')
           ->to($ns_ctrl_prefix."$ctrl#update")
-          ->name($ns_name_prefix.$name.'_update');
+          ->name($ns_name_prefix.$name.'_update')
+          if $selected{update};
     
-        $nested->add_route
+        $resource->add_route
           ->via('delete')
           ->to($ns_ctrl_prefix."$ctrl#delete")
-          ->name($ns_name_prefix.$name.'_delete');
+          ->name($ns_name_prefix.$name.'_delete')
+          if $selected{delete};
 
         $last_resource = $resource;
     }
