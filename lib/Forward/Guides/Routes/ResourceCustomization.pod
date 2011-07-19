@@ -10,7 +10,7 @@ the C<-namespace> option:
     my $r = Forward::Routes->new;
     $r->add_resources(
         'photos',
-        'users' => -namespace => 'admin',
+        'users' => -namespace => 'Admin',
         'prices'
     );
 
@@ -24,12 +24,12 @@ the C<-namespace> option:
 The C<-namespace> option has no effect on the URL pattern,
 
     # in order to match /admin/users instead of /users,
-    $r->add_route('admin')->add_resources('users' => -namespace => 'admin');
+    $r->add_route('admin')->add_resources('users' => -namespace => 'Admin');
 
-offering a lot more flexibility:
+This offers a lot more flexibility:
 
     $r->bridge('admin')->to('Authorization#admin')
-      ->add_resources('users' => -namespace => 'admin');
+      ->add_resources('users' => -namespace => 'Admin');
     # allows to check whether the current user is really the admin (using
     # bridges) and break the dispatching cycle if authorization fails
 

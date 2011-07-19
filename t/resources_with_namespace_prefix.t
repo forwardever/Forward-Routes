@@ -17,8 +17,8 @@ use Test::More tests => 30;
 my $r = Forward::Routes->new;
 $r->add_resources(
     'photos',
-    'users' => -namespace => 'admin',
-    'prices' => -namespace => 'admin'
+    'users' => -namespace => 'Admin::Manage',
+    'prices' => -namespace => 'Admin'
 );
 
 
@@ -44,39 +44,39 @@ is $r->build_path('photos_create')->{method} => 'post';
 
 # adjusted controller
 $m = $r->match(get => 'users');
-is_deeply $m->[0]->params => {controller => 'Admin::Users', action => 'index'};
+is_deeply $m->[0]->params => {controller => 'Admin::Manage::Users', action => 'index'};
 
 $m = $r->match(get => 'users/new');
-is_deeply $m->[0]->params => {controller => 'Admin::Users', action => 'create_form'};
+is_deeply $m->[0]->params => {controller => 'Admin::Manage::Users', action => 'create_form'};
 
 $m = $r->match(post => 'users');
-is_deeply $m->[0]->params => {controller => 'Admin::Users', action => 'create'};
+is_deeply $m->[0]->params => {controller => 'Admin::Manage::Users', action => 'create'};
 
 $m = $r->match(get => 'users/1');
-is_deeply $m->[0]->params => {controller => 'Admin::Users', action => 'show', id => 1};
+is_deeply $m->[0]->params => {controller => 'Admin::Manage::Users', action => 'show', id => 1};
 
 $m = $r->match(get => 'users/1/edit');
-is_deeply $m->[0]->params => {controller => 'Admin::Users', action => 'update_form', id => 1};
+is_deeply $m->[0]->params => {controller => 'Admin::Manage::Users', action => 'update_form', id => 1};
 
 $m = $r->match(get => 'users/1/delete');
-is_deeply $m->[0]->params => {controller => 'Admin::Users', action => 'delete_form', id => 1};
+is_deeply $m->[0]->params => {controller => 'Admin::Manage::Users', action => 'delete_form', id => 1};
 
 $m = $r->match(put => 'users/1');
-is_deeply $m->[0]->params => {controller => 'Admin::Users', action => 'update', id => 1};
+is_deeply $m->[0]->params => {controller => 'Admin::Manage::Users', action => 'update', id => 1};
 
 $m = $r->match(delete => 'users/1');
-is_deeply $m->[0]->params => {controller => 'Admin::Users', action => 'delete', id => 1};
+is_deeply $m->[0]->params => {controller => 'Admin::Manage::Users', action => 'delete', id => 1};
 
 
 # path building with name prefix
-is $r->build_path('admin_users_index')->{path} => 'users';
-is $r->build_path('admin_users_create_form')->{path} => 'users/new';
-is $r->build_path('admin_users_create')->{path} => 'users';
-is $r->build_path('admin_users_show', id => 456)->{path} => 'users/456';
-is $r->build_path('admin_users_update_form', id => 789)->{path} => 'users/789/edit';
-is $r->build_path('admin_users_update', id => 987)->{path} => 'users/987';
-is $r->build_path('admin_users_delete', id => 654)->{path} => 'users/654';
-is $r->build_path('admin_users_delete_form', id => 222)->{path} => 'users/222/delete';
+is $r->build_path('admin_manage_users_index')->{path} => 'users';
+is $r->build_path('admin_manage_users_create_form')->{path} => 'users/new';
+is $r->build_path('admin_manage_users_create')->{path} => 'users';
+is $r->build_path('admin_manage_users_show', id => 456)->{path} => 'users/456';
+is $r->build_path('admin_manage_users_update_form', id => 789)->{path} => 'users/789/edit';
+is $r->build_path('admin_manage_users_update', id => 987)->{path} => 'users/987';
+is $r->build_path('admin_manage_users_delete', id => 654)->{path} => 'users/654';
+is $r->build_path('admin_manage_users_delete_form', id => 222)->{path} => 'users/222/delete';
 
 
 # also works for prices
@@ -104,12 +104,12 @@ $r->format_resource_controller(
 
 $r->add_resources(
     'photos',
-    'users' => -namespace => 'admin',
-    'prices' => -namespace => 'admin'
+    'users' => -namespace => 'Admin',
+    'prices' => -namespace => 'Admin'
 );
 
 $m = $r->match(get => 'photos');
 is_deeply $m->[0]->params => {controller => 'photos', action => 'index'};
 
 $m = $r->match(get => 'users');
-is_deeply $m->[0]->params => {controller => 'admin::users', action => 'index'};
+is_deeply $m->[0]->params => {controller => 'Admin::users', action => 'index'};

@@ -18,7 +18,7 @@ my $r = Forward::Routes->new;
 $r->add_resources(
     'users',
     'photos' => -constraints => {id => qr/\d{6}/}, -as => 'pictures',
-      -namespace => 'admin',
+      -namespace => 'Admin',
     'tags'
 );
 

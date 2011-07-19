@@ -163,8 +163,8 @@ sub add_singular_resources {
         }
 
         # custom namespace
-        $ns_ctrl_prefix   = $self->format_resource_controller->($namespace).'::' if $namespace;
-        $ns_name_prefix   = $namespace.'_' if $namespace;
+        $ns_ctrl_prefix = $namespace.'::' if $namespace;
+        $ns_name_prefix = $self->namespace_to_name($namespace).'_' if $namespace;
 
 
         # camelize controller name (default)
@@ -284,8 +284,8 @@ sub add_resources {
 
 
         # custom namespace
-        $ns_ctrl_prefix   = $self->format_resource_controller->($namespace).'::' if $namespace;
-        $ns_name_prefix   = $namespace.'_' if $namespace;
+        $ns_ctrl_prefix = $namespace.'::' if $namespace;
+        $ns_name_prefix = $self->namespace_to_name($namespace).'_' if $namespace;
 
 
         # camelize controller name (default)
@@ -378,6 +378,27 @@ sub add_resources {
     }
 
     return $last_resource;
+}
+
+
+sub namespace_to_name {
+    my $self = shift;
+    my ($namespace) = @_;
+
+    my @new_parts;
+
+    my @parts = split /::/, $namespace;
+
+    for my $part (@parts) {
+        my @words;
+        while ($part =~ s/([A-Z]{1}[^A-Z]*)//){
+            my $word = lc $1;
+            push @words, $word;
+        }
+        push @new_parts, join '_', @words;
+    }
+    return join '_', @new_parts;
+
 }
 
 
