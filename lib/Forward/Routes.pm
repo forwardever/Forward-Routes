@@ -169,9 +169,26 @@ sub add_singular_resources {
 
         # camelize controller name (default)
         my $ctrl = $self->format_resource_controller->($name);
-    
 
-        my $resource = $self->add_route($as);
+
+        # Nested resources
+        my $resource;
+        my $parent_name_prefix = '';
+        if ($self->_is_plural_resource) {
+
+            my @parent_names = $self->_parent_resource_names;
+
+            $parent_name_prefix = join('_', @parent_names).'_';
+
+            my $parent_id_name = $self->singularize->($parent_names[-1]).'_id';
+
+            $resource = $self->add_route(':'.$parent_id_name.'/'.$as)
+              ->constraints($parent_id_name => qr/[^.\/]+/);
+        }
+        else {
+            $resource = $self->add_route($as);
+        }
+
 
         # custom format
         $resource->format($format) if $format_exists;
@@ -179,37 +196,37 @@ sub add_singular_resources {
         $resource->add_route('/new')
           ->via('get')
           ->to($ns_ctrl_prefix."$ctrl#create_form")
-          ->name($ns_name_prefix.$name.'_create_form')
+          ->name($ns_name_prefix.$parent_name_prefix.$name.'_create_form')
           if $selected{create_form};;
     
         $resource->add_route('/edit')
           ->via('get')
           ->to($ns_ctrl_prefix."$ctrl#update_form")
-          ->name($ns_name_prefix.$name.'_update_form')
+          ->name($ns_name_prefix.$parent_name_prefix.$name.'_update_form')
           if $selected{update_form};
 
         $resource->add_route
           ->via('post')
           ->to($ns_ctrl_prefix."$ctrl#create")
-          ->name($ns_name_prefix.$name.'_create')
+          ->name($ns_name_prefix.$parent_name_prefix.$name.'_create')
           if $selected{create};
     
         $resource->add_route
           ->via('get')
           ->to($ns_ctrl_prefix."$ctrl#show")
-          ->name($ns_name_prefix.$name.'_show')
+          ->name($ns_name_prefix.$parent_name_prefix.$name.'_show')
           if $selected{show};
     
         $resource->add_route
           ->via('put')
           ->to($ns_ctrl_prefix."$ctrl#update")
-          ->name($ns_name_prefix.$name.'_update')
+          ->name($ns_name_prefix.$parent_name_prefix.$name.'_update')
           if $selected{update};
     
         $resource->add_route
           ->via('delete')
           ->to($ns_ctrl_prefix."$ctrl#delete")
-          ->name($ns_name_prefix.$name.'_delete')
+          ->name($ns_name_prefix.$parent_name_prefix.$name.'_delete')
           if $selected{delete};
 
         $last_resource = $resource;
