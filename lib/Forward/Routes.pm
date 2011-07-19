@@ -164,7 +164,6 @@ sub add_singular_resources {
 
         # custom namespace
         $ns_ctrl_prefix = $namespace.'::' if $namespace;
-        $ns_name_prefix = $self->namespace_to_name($namespace).'_' if $namespace;
 
 
         # camelize controller name (default)
@@ -176,6 +175,9 @@ sub add_singular_resources {
         my $parent_name_prefix = '';
         if ($self->_is_plural_resource) {
 
+            ### only the namespace of the root resource will be included in the route name
+            $ns_name_prefix = $self->_parent_resource_ns_name_prefix || '';
+
             my @parent_names = $self->_parent_resource_names;
 
             $parent_name_prefix = join('_', @parent_names).'_';
@@ -186,6 +188,7 @@ sub add_singular_resources {
               ->constraints($parent_id_name => qr/[^.\/]+/);
         }
         else {
+            $ns_name_prefix = $self->namespace_to_name($namespace).'_' if $namespace;
             $resource = $self->add_route($as);
         }
 
@@ -302,7 +305,6 @@ sub add_resources {
 
         # custom namespace
         $ns_ctrl_prefix = $namespace.'::' if $namespace;
-        $ns_name_prefix = $self->namespace_to_name($namespace).'_' if $namespace;
 
 
         # camelize controller name (default)
@@ -313,6 +315,9 @@ sub add_resources {
         my $resource;
         my $parent_name_prefix = '';
         if ($self->_is_plural_resource) {
+
+            ### only the namespace of the root resource will be included in the route name
+            $ns_name_prefix = $self->_parent_resource_ns_name_prefix || '';
 
             my @parent_names = $self->_parent_resource_names;
 
@@ -326,9 +331,12 @@ sub add_resources {
               ->constraints($parent_id_name => qr/[^.\/]+/);
         }
         else {
+            $ns_name_prefix = $self->namespace_to_name($namespace).'_' if $namespace;
+
             $resource = $self->add_route($as)
               ->_is_plural_resource(1)
-              ->_parent_resource_names($name);
+              ->_parent_resource_names($name)
+              ->_parent_resource_ns_name_prefix($ns_name_prefix);
         }
 
         # custom format
@@ -964,6 +972,18 @@ sub _parent_resource_names {
     }
 
     return @{$self->{_parent_resource_names}};
+}
+
+
+sub _parent_resource_ns_name_prefix {
+    my $self = shift;
+    my @params = @_;
+
+    return $self->{_parent_resource_ns_name_prefix} unless @params;
+
+    $self->{_parent_resource_ns_name_prefix} = $params[0];
+
+    return $self;
 }
 
 
