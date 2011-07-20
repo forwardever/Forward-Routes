@@ -118,27 +118,6 @@ sub add_resources {
 }
 
 
-sub namespace_to_name {
-    my $self = shift;
-    my ($namespace) = @_;
-
-    my @new_parts;
-
-    my @parts = split /::/, $namespace;
-
-    for my $part (@parts) {
-        my @words;
-        while ($part =~ s/([A-Z]{1}[^A-Z]*)//){
-            my $word = lc $1;
-            push @words, $word;
-        }
-        push @new_parts, join '_', @words;
-    }
-    return join '_', @new_parts;
-
-}
-
-
 # overwrite code ref for more advanced approach:
 # sub {
 #     require Lingua::EN::Inflect::Number;
