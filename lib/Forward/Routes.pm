@@ -55,6 +55,24 @@ sub add_route {
 
     my $child = $self->new(@_);
 
+    return $self->_add_to_parent($child);
+
+}
+
+
+sub _add_resource_route {
+    my $self = shift;
+
+    my $child = Forward::Routes::Resources->new(@_);
+
+    return $self->_add_to_parent($child);
+}
+
+
+sub _add_to_parent {
+    my $self = shift;
+    my ($child) = @_;
+
     # Format inheritance
     $child->format([@{$self->{format}}]) if $self->{format};
     $child->method([@{$self->{method}}]) if $self->{method};
@@ -64,6 +82,7 @@ sub add_route {
     $child->parent($self);
 
     return $child;
+
 }
 
 
@@ -669,35 +688,6 @@ sub pattern {
 
     return $self;
 
-}
-
-
-sub _parent_resource_names {
-    my $self = shift;
-    my (@names) = @_;
-
-    # Initialize
-    $self->{_parent_resource_names} ||=[];
-
-
-    if (@names) {
-        $self->{_parent_resource_names} = \@names;
-        return $self;
-    }
-
-    return @{$self->{_parent_resource_names}};
-}
-
-
-sub _parent_resource_ns_name_prefix {
-    my $self = shift;
-    my @params = @_;
-
-    return $self->{_parent_resource_ns_name_prefix} unless @params;
-
-    $self->{_parent_resource_ns_name_prefix} = $params[0];
-
-    return $self;
 }
 
 

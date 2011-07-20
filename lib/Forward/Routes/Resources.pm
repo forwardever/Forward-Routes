@@ -86,12 +86,12 @@ sub add_singular {
 
             my $parent_id_name = $parent->singularize->($parent_names[-1]).'_id';
 
-            $resource = $parent->add_route(':'.$parent_id_name.'/'.$as)
+            $resource = $parent->_add_resource_route(':'.$parent_id_name.'/'.$as)
               ->constraints($parent_id_name => qr/[^.\/]+/);
         }
         else {
             $ns_name_prefix = $parent->namespace_to_name($namespace).'_' if $namespace;
-            $resource = $parent->add_route($as);
+            $resource = $parent->_add_resource_route($as);
         }
 
 
@@ -228,7 +228,7 @@ sub add_plural {
 
             my $parent_id_name = $parent->singularize->($parent_names[-1]).'_id';
 
-            $resource = $parent->add_route(':'.$parent_id_name.'/'.$as)
+            $resource = $parent->_add_resource_route(':'.$parent_id_name.'/'.$as)
               ->_is_plural_resource(1)
               ->_parent_resource_names($parent->_parent_resource_names, $name)
               ->constraints($parent_id_name => qr/[^.\/]+/);
@@ -236,7 +236,7 @@ sub add_plural {
         else {
             $ns_name_prefix = $parent->namespace_to_name($namespace).'_' if $namespace;
 
-            $resource = $parent->add_route($as)
+            $resource = $parent->_add_resource_route($as)
               ->_is_plural_resource(1)
               ->_parent_resource_names($name)
               ->_parent_resource_ns_name_prefix($ns_name_prefix);
@@ -307,6 +307,37 @@ sub add_plural {
 
     return $last_resource;
 }
+
+
+
+sub _parent_resource_names {
+    my $self = shift;
+    my (@names) = @_;
+
+    # Initialize
+    $self->{_parent_resource_names} ||=[];
+
+
+    if (@names) {
+        $self->{_parent_resource_names} = \@names;
+        return $self;
+    }
+
+    return @{$self->{_parent_resource_names}};
+}
+
+
+sub _parent_resource_ns_name_prefix {
+    my $self = shift;
+    my @params = @_;
+
+    return $self->{_parent_resource_ns_name_prefix} unless @params;
+
+    $self->{_parent_resource_ns_name_prefix} = $params[0];
+
+    return $self;
+}
+
 
 
 1;
