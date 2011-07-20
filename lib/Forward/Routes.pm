@@ -104,27 +104,6 @@ sub _is_bridge {
 }
 
 
-sub _prepare_resource_options {
-    my $self    = shift;
-    my (@names) = @_;
-
-    my @final;
-    while (@names) {
-        my $name = shift(@names);
-
-        if ($name =~m/^-/){
-            $name =~s/^-//;
-            push @final, {} unless ref $final[-1] eq 'HASH';
-            $final[-1]->{$name} = shift(@names);
-        }
-        else {
-            push @final, $name;
-        }
-    }
-    return \@final;
-}
-
-
 sub add_singular_resources {
     my $self = shift;
 
