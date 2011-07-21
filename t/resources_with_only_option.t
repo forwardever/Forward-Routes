@@ -3,11 +3,9 @@
 use strict;
 use warnings;
 
-use Test::More;
+use Test::More tests => 74;
 
 use Forward::Routes;
-
-use Test::More tests => 74;
 
 
 
