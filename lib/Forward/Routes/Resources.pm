@@ -93,6 +93,12 @@ sub add_singular {
         }
 
 
+        # save resource attributes
+        $resource->{_name}      = $name;
+        $resource->{_ctrl}      = $ctrl;
+        $resource->{_namespace} = $namespace;
+
+
         # custom format
         $resource->format($format) if $format_exists;
     
@@ -316,7 +322,9 @@ sub add_member_route {
 
     my $child = Forward::Routes->new(@params);
 
-    $self->{_members}->_add_to_parent($child);
+    my $members = $self->_is_plural_resource ? $self->{_members} : $self;
+
+    $members->_add_to_parent($child);
 
 
     # name
