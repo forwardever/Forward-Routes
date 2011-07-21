@@ -5,6 +5,8 @@ use warnings;
 
 use parent qw/Forward::Routes/;
 
+use Carp;
+
 
 sub add_singular {
     my $class  = shift;
@@ -102,7 +104,6 @@ sub add_singular {
         # custom format
         $resource->format($format) if $format_exists;
     
-
         $resource->add_route('/new')
           ->via('get')
           ->to($ns_ctrl_prefix."$ctrl#create_form")
@@ -251,20 +252,26 @@ sub add_plural {
 
 
         # resource
-        $resource->add_route
+
+        my $collection = $resource->add_route
+          if $selected{index} || $selected{create} || $selected{create_form};
+
+        $resource->{_collection} = $collection;
+
+        $collection->add_route
           ->via('get')
           ->to($ns_ctrl_prefix.$ctrl."#index")
           ->name($parent_name_prefix.$ns_name_prefix.$name.'_index')
           if $selected{index};
 
-        $resource->add_route
+        $collection->add_route
           ->via('post')
           ->to($ns_ctrl_prefix.$ctrl."#create")
           ->name($parent_name_prefix.$ns_name_prefix.$name.'_create')
           if $selected{create};
 
         # new resource item
-        $resource->add_route('/new')
+        $collection->add_route('/new')
           ->via('get')
           ->to($ns_ctrl_prefix.$ctrl."#create_form")
           ->name($parent_name_prefix.$ns_name_prefix.$name.'_create_form')
@@ -346,6 +353,37 @@ sub add_member_route {
 
     return $child;
 
+}
+
+
+sub add_collection_route {
+    my $self = shift;
+    my (@params) = @_;
+
+    $self->_is_plural_resource || Carp::croak('add_collection_route can only be called on plural resources');
+
+    my $child = Forward::Routes->new(@params);
+
+    $self->{_collection}->_add_to_parent($child);
+
+    # name
+    my $name = $params[0];
+    $name =~s|^/||;
+    $name =~s|/|_|g;
+
+
+    # custom namespace
+    my $namespace = $self->{_namespace};
+
+    my $ns_ctrl_prefix = $namespace ? $namespace.'::' : '';
+    my $ns_name_prefix = $namespace ? __PACKAGE__->namespace_to_name($namespace).'_' : '';
+
+
+    # Auto set controller and action params and name
+    $child->to($ns_ctrl_prefix.$self->{_ctrl}.'#'.$name);
+    $child->name($ns_name_prefix.$self->{_name}.'_'.$name);
+
+    return $child;
 }
 
 
