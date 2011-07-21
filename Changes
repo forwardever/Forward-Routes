@@ -1,5 +1,14 @@
 Changes for Forward::Routes
 
+0.40    2011-07-21 00:00:00
+        - Added support for adding member routes to resources
+        - Put resource related stuff into a separate namespace
+          Forward::Routes::Resources
+        - Added support for nesting singular resources on top of plural
+          resources
+        - Resource customization: namespace has to be passed in format
+          Foo::Bar
+
 0.23    2011-07-07 00:00:00
         - Added -only option to resources
         - Added docs
