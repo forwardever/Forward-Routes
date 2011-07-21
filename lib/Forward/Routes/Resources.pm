@@ -15,11 +15,11 @@ sub add_singular {
     $names = __PACKAGE__->_prepare_resource_options(@$names);
 
     my $last_resource;
-    my $ns_name_prefix = '';
-    my $ns_ctrl_prefix = '';
-
 
     for (my $i=0; $i<@$names; $i++) {
+
+        my $ns_name_prefix = '';
+        my $ns_ctrl_prefix = '';
 
         my $name = $names->[$i];
 
@@ -155,11 +155,11 @@ sub add_plural {
     $names = __PACKAGE__->_prepare_resource_options(@$names);
 
     my $last_resource;
-    my $ns_name_prefix = '';
-    my $ns_ctrl_prefix = '';
-
 
     for (my $i=0; $i<@$names; $i++) {
+
+        my $ns_name_prefix = '';
+        my $ns_ctrl_prefix = '';
 
         my $name = $names->[$i];
 

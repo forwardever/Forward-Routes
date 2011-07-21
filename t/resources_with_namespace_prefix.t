@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 30;
+use Test::More tests => 32;
 
 use Forward::Routes;
 
@@ -16,7 +16,8 @@ my $r = Forward::Routes->new;
 $r->add_resources(
     'photos',
     'users' => -namespace => 'Admin::Manage',
-    'prices' => -namespace => 'Admin'
+    'prices' => -namespace => 'Admin',
+    'members'
 );
 
 
@@ -87,6 +88,13 @@ is $r->build_path('admin_prices_index')->{path} => 'prices';
 # just make sure:
 $m = $r->match(get => 'admin');
 is $m, undef;
+
+
+# also works for members (no namespace)
+$m = $r->match(get => 'members');
+is_deeply $m->[0]->params => {controller => 'Members', action => 'index'};
+is $r->build_path('members_index')->{path} => 'members';
+
 
 
 #############################################################################

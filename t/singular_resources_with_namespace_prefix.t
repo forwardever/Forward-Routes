@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 21;
+use Test::More tests => 23;
 
 use Forward::Routes;
 
@@ -17,7 +17,8 @@ my $r = Forward::Routes->new;
 $r->add_singular_resources(
     'geocoder',
     'contact' => -namespace => 'Admin',
-    'test' => -namespace => 'Admin'
+    'test' => -namespace => 'Admin',
+    'member'
 );
 
 my $m = $r->match(get => 'geocoder/new');
@@ -76,4 +77,10 @@ is_deeply $m->[0]->params => {controller => 'Admin::Test', action => 'create_for
 
 is $r->build_path('admin_test_create_form')->{path} => 'test/new';
 
+
+### now "member" (no namespace)
+$m = $r->match(get => 'member/new');
+is_deeply $m->[0]->params => {controller => 'Member', action => 'create_form'};
+
+is $r->build_path('member_create_form')->{path} => 'member/new';
 
