@@ -1,5 +1,8 @@
 Changes for Forward::Routes
 
+0.41    2011-07-21 00:00:00
+        - fixed small namespace bug
+
 0.40    2011-07-21 00:00:00
         - Added support for adding member routes to resources
         - Put resource related stuff into a separate namespace
