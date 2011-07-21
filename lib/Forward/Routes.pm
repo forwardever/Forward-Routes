@@ -707,7 +707,7 @@ sub _match_format {
 
 1;
 __END__
-=head1 Name
+=head1 NAME
 
 Forward::Routes - restful routes for web framework developers
 

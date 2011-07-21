@@ -1,10 +1,10 @@
 =pod
 
-=head1 Name
+=head1 NAME
 
 Forward::Routes - restful routes for web framework developers
 
-=head1 Description
+=head1 DESCRIPTION
 
 Instead of letting a web server like Apache decide which files to serve based
 on the provided URL, the whole work can be done by your framework using the
@@ -106,7 +106,7 @@ placeholder values extracted from the passed URL path
 =back
 
 
-=head1 Features and Methods
+=head1 FEATURES AND METHODS
 
 =head2 Add new routes
 
@@ -451,18 +451,23 @@ documentation on nested resources.
     # $m->[1]->params is {controller => 'My', action => 'stuff'}
 
 
-=head1 Author
+=head1 AUTHOR
 
 ForwardEver
 
-=head1 Copyright and License
+=head1 DEVELOPMENT
+
+=head2 Repository
+    http://github.com/forwardever/Forward-Routes
+
+=head1 COPYRIGHT AND LICENSE
 
 Copyright (C) 2011, ForwardEver
 
 This program is free software, you can redistribute it and/or modify it under
 the terms of the Artistic License version 2.0.
 
-=head1 Credits
+=head1 CREDITS
 
 Path matching and path building inspired by Viacheslav Tykhanovskyi's Router module
 L<https://github.com/vti/router>
