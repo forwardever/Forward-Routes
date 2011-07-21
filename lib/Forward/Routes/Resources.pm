@@ -95,6 +95,7 @@ sub add_singular {
         # custom format
         $resource->format($format) if $format_exists;
     
+
         $resource->add_route('/new')
           ->via('get')
           ->to($ns_ctrl_prefix."$ctrl#create_form")
@@ -232,6 +233,7 @@ sub add_plural {
               ->_parent_resource_names($ns_name_prefix.$name);
         }
 
+
         # custom format
         $resource->format($format) if $format_exists;
 
@@ -316,18 +318,6 @@ sub _parent_resource_names {
     }
 
     return @{$self->{_parent_resource_names}};
-}
-
-
-sub _parent_resource_ns_name_prefix {
-    my $self = shift;
-    my @params = @_;
-
-    return $self->{_parent_resource_ns_name_prefix} unless @params;
-
-    $self->{_parent_resource_ns_name_prefix} = $params[0];
-
-    return $self;
 }
 
 
