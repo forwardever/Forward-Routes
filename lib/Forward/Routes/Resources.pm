@@ -233,6 +233,11 @@ sub add_plural {
               ->_parent_resource_names($ns_name_prefix.$name);
         }
 
+        # save resource attributes
+        $resource->{_name}      = $name;
+        $resource->{_ctrl}      = $ctrl;
+        $resource->{_namespace} = $namespace;
+
 
         # custom format
         $resource->format($format) if $format_exists;
@@ -301,6 +306,37 @@ sub add_plural {
     }
 
     return $last_resource;
+}
+
+
+sub add_member_route {
+    my $self = shift;
+    my (@params) = @_;
+
+    my $child = Forward::Routes->new(@params);
+
+    $self->{_members}->_add_to_parent($child);
+
+
+    # name
+    my $name = $params[0];
+    $name =~s|^/||;
+    $name =~s|/|_|g;
+
+
+    # custom namespace
+    my $namespace = $self->{_namespace};
+
+    my $ns_ctrl_prefix = $namespace ? $namespace.'::' : '';
+    my $ns_name_prefix = $namespace ? __PACKAGE__->namespace_to_name($namespace).'_' : '';
+
+
+    # Auto set controller and action params and name
+    $child->to($ns_ctrl_prefix.$self->{_ctrl}.'#'.$name);
+    $child->name($ns_name_prefix.$self->{_name}.'_'.$name);
+
+    return $child;
+
 }
 
 
