@@ -12,8 +12,6 @@ use Test::More tests => 4;
 
 #############################################################################
 ### nested resources and namespaces
-### only the namespace of the root resource will be included in the route name
-
 
 # magazine routes
 my $r = Forward::Routes->new;
@@ -34,15 +32,15 @@ $ads = $r->add_resources('magazines' => -namespace => 'Admin')
   ->add_singular_resources('manager' => -namespace => 'Admin');
 
 $m = $r->match(get => 'magazines/4/manager/new');
-is $m->[0]->name, 'admin_magazines_manager_create_form';
+is $m->[0]->name, 'admin_magazines_admin_manager_create_form';
 
 
 
 # controller namespace organized exactly as resource nesting
 $r = Forward::Routes->new;
 $ads = $r->add_resources('magazines' => -namespace => 'Admin')
-  ->add_singular_resources('manager' => -namespace => 'Admin::Manager');
+  ->add_singular_resources('manager' => -namespace => 'Admin::Magazines');
 
 $m = $r->match(get => 'magazines/4/manager/new');
-is $m->[0]->name, 'admin_magazines_manager_create_form';
+is $m->[0]->name, 'admin_magazines_admin_magazines_manager_create_form';
 
