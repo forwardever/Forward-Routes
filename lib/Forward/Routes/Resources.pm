@@ -85,10 +85,11 @@ sub add_singular {
             my $parent_id_name = $parent->singularize->($parent_names[-1]).'_id';
 
             $resource = $parent->_add_resource_route(':'.$parent_id_name.'/'.$as)
-              ->constraints($parent_id_name => qr/[^.\/]+/);
+              ->constraints($parent_id_name => qr/[^.\/]+/)
+              ->_is_singular_resource(1);
         }
         else {
-            $resource = $parent->_add_resource_route($as);
+            $resource = $parent->_add_resource_route($as)->_is_singular_resource(1);
         }
 
 

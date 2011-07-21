@@ -7,7 +7,7 @@ use Test::More;
 
 use Forward::Routes;
 
-use Test::More tests => 35;
+use Test::More tests => 36;
 
 
 
@@ -15,7 +15,9 @@ use Test::More tests => 35;
 ### plural resources
 
 my $r = Forward::Routes->new;
-$r->add_resources('users','photos','tags');
+my $resource = $r->add_resources('users','photos','tags');
+
+is $resource->_is_plural_resource, 1;
 
 my $m = $r->match(get => 'photos');
 is_deeply $m->[0]->params => {controller => 'Photos', action => 'index'};

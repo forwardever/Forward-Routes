@@ -7,7 +7,7 @@ use Test::More;
 
 use Forward::Routes;
 
-use Test::More tests => 20;
+use Test::More tests => 21;
 
 
 #############################################################################
@@ -15,7 +15,9 @@ use Test::More tests => 20;
 
 my $r = Forward::Routes->new;
 
-$r->add_singular_resources('geocoder');
+my $resource = $r->add_singular_resources('geocoder');
+
+is $resource->_is_singular_resource, 1;
 
 my $m = $r->match(get => 'geocoder/new');
 is_deeply $m->[0]->params => {controller => 'Geocoder', action => 'create_form'};

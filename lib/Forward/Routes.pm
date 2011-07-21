@@ -660,6 +660,17 @@ sub _is_plural_resource {
 }
 
 
+sub _is_singular_resource {
+    my $self = shift;
+
+    return $self->{_is_singular_resource} unless defined $_[0];
+
+    $self->{_is_singular_resource} = $_[0];
+
+    return $self;
+}
+
+
 sub format {
     my $self = shift;
     my (@params) = @_;
