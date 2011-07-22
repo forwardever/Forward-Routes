@@ -66,13 +66,25 @@ sub compile {
             # Regex
             my $name = $1;
             my $constraint;
+            my $re_part;
             if (exists $self->constraints->{$name}) {
                 $constraint = $self->constraints->{$name};
-                $re .= "($constraint)";
+                $re_part = "$constraint";
             }
             else {
-                $re .= '([^\/]+)';
+                $re_part = '[^\/]+';
             }
+
+            if(exists $self->{exclude}->{$name}){
+                my $exclude;
+                my @words = @{$self->{exclude}->{$name}};
+                foreach my $word (@words) {
+                    $exclude .= "(?!$word".'\Z)';
+                }
+                $re_part = $exclude.$re_part;
+            }
+
+            $re .= '('.$re_part.')';
 
             # Parts
             push @parts, {

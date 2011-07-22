@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 39;
+use Test::More tests => 45;
 
 use Forward::Routes;
 
@@ -27,12 +27,12 @@ is_deeply $m->[0]->params => {controller => 'Photos', action => 'search_form'};
 is $m->[0]->name, 'photos_search_form';
 
 
-### should provide undef, but matches show
-### impossible to predict whether this behaviour is correct or not right now
-### TO DO: exclude values from placeholders ???
-### $m = $r->match(get => 'photos/search');
-### is_deeply $m->[0]->params => {controller => 'Photos', action => 'show', id => 'search'};
-warn "TO DO: exclude values from placeholders";
+# has to provide undef (could match show without regex adjustment)
+$m = $r->match(get => 'photos/search');
+is $m, undef;
+my $re = '(?!new\Z)(?!search_form\Z)(?!search\Z)';
+like $photos->{_members}->pattern->pattern, qr/$re/;
+
 
 
 $m = $r->match(post => 'photos/search');
@@ -130,3 +130,27 @@ is_deeply $m->[0]->params => {controller => 'Admin::Photos', action => 'search_f
 is $m->[0]->name, 'admin_photos_search_form';
 
 
+#############################################################################
+# with only option
+# no default collection routes
+
+$r = Forward::Routes->new;
+$photos = $r->add_resources('photos' => -only => [qw/show/]);
+isa_ok $photos->add_collection_route('search_form'), 'Forward::Routes';
+
+
+#############################################################################
+# with only option
+# has to provide undef (could match show without regex adjustment)
+
+$r = Forward::Routes->new;
+$photos = $r->add_resources('photos' => -only => [qw/show/]);
+$photos->add_collection_route('search_form');
+$photos->add_collection_route('search')->via('post');
+
+$m = $r->match(get => 'photos/search_form');
+ok $m;
+$m = $r->match(get => 'photos/search');
+is $m, undef;
+$m = $r->match(get => 'photos/new');
+is $m, undef;

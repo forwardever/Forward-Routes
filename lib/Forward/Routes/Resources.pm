@@ -208,7 +208,7 @@ sub add_plural {
         }
 
         # custom constraint
-        my $id_constraint = $constraints->{id} || qr/(?!new\Z)[^.\/]+/;
+        my $id_constraint = $constraints->{id} || qr/[^.\/]+/;
 
 
         # custom namespace
@@ -278,10 +278,17 @@ sub add_plural {
           if $selected{create_form};
 
         # modify resource item
-        my $nested = $resource->add_route(':id')
-          ->constraints('id' => $id_constraint)
-          if $selected{show} || $selected{update} || $selected{delete}
-            || $selected{update_form} || $selected{delete_form};
+        my $nested;
+        if($selected{show} || $selected{update} || $selected{delete}
+            || $selected{update_form} || $selected{delete_form}) {
+
+            $nested = $resource->add_route(':id')
+              ->constraints('id' => $id_constraint);
+    
+            $nested->pattern->{exclude}->{id} ||= [];
+            push @{$nested->pattern->{exclude}->{id}}, 'new';
+        }
+
 
         # save members in $resource
         $resource->{_members} = $nested;
@@ -364,12 +371,20 @@ sub add_collection_route {
 
     my $child = Forward::Routes->new(@params);
 
+    unless ($self->{_collection}) {
+        $self->{_collection} = $self->add_route;
+    }
+
     $self->{_collection}->_add_to_parent($child);
 
     # name
     my $name = $params[0];
     $name =~s|^/||;
     $name =~s|/|_|g;
+
+
+    $self->{_members}->pattern->{exclude}->{id} ||= [];
+    push @{$self->{_members}->pattern->{exclude}->{id}}, $name;
 
 
     # custom namespace
