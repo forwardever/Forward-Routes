@@ -1165,7 +1165,8 @@ ForwardEver
 =head1 DEVELOPMENT
 
 =head2 Repository
-    http://github.com/forwardever/Forward-Routes
+
+L<https://github.com/forwardever/Forward-Routes>
 
 =head1 COPYRIGHT AND LICENSE
 
