@@ -242,10 +242,10 @@ sub add_plural {
         }
 
         # save resource attributes
-        $resource->{_name}      = $name;
-        $resource->{_ctrl}      = $ctrl;
-        $resource->{_namespace} = $namespace;
-
+        $resource->{_name}          = $name;
+        $resource->{_ctrl}          = $ctrl;
+        $resource->{_namespace}     = $namespace;
+        $resource->{_id_constraint} = $id_constraint;
 
         # custom format
         $resource->format($format) if $format_exists;
@@ -253,10 +253,8 @@ sub add_plural {
 
         # resource
 
-        my $collection = $resource->add_route
+        my $collection = $resource->_collection
           if $selected{index} || $selected{create} || $selected{create_form};
-
-        $resource->{_collection} = $collection;
 
         $collection->add_route
           ->via('get')
@@ -277,47 +275,38 @@ sub add_plural {
           ->name($parent_name_prefix.$ns_name_prefix.$name.'_create_form')
           if $selected{create_form};
 
+
         # modify resource item
-        my $nested;
-        if($selected{show} || $selected{update} || $selected{delete}
-            || $selected{update_form} || $selected{delete_form}) {
-
-            $nested = $resource->add_route(':id')
-              ->constraints('id' => $id_constraint);
-    
-            $nested->pattern->{exclude}->{id} ||= [];
-            push @{$nested->pattern->{exclude}->{id}}, 'new';
-        }
+        my $members = $resource->_members if $selected{show} || $selected{update}
+          || $selected{delete} || $selected{update_form}
+          || $selected{delete_form};
 
 
-        # save members in $resource
-        $resource->{_members} = $nested;
-
-        $nested->add_route
+        $members->add_route
           ->via('get')
           ->to($ns_ctrl_prefix.$ctrl."#show")
           ->name($parent_name_prefix.$ns_name_prefix.$name.'_show')
           if $selected{show};
 
-        $nested->add_route
+        $members->add_route
           ->via('put')
           ->to($ns_ctrl_prefix.$ctrl."#update")
           ->name($parent_name_prefix.$ns_name_prefix.$name.'_update')
           if $selected{update};
 
-        $nested->add_route
+        $members->add_route
           ->via('delete')
           ->to($ns_ctrl_prefix.$ctrl."#delete")
           ->name($parent_name_prefix.$ns_name_prefix.$name.'_delete')
           if $selected{delete};
 
-        $nested->add_route('edit')
+        $members->add_route('edit')
           ->via('get')
           ->to($ns_ctrl_prefix.$ctrl."#update_form")
           ->name($parent_name_prefix.$ns_name_prefix.$name.'_update_form')
           if $selected{update_form};
 
-        $nested->add_route('delete')
+        $members->add_route('delete')
           ->via('get')
           ->to($ns_ctrl_prefix.$ctrl."#delete_form")
           ->name($parent_name_prefix.$ns_name_prefix.$name.'_delete_form')
@@ -336,15 +325,9 @@ sub add_member_route {
 
     my $child = Forward::Routes->new(@params);
 
-    my $members = $self->_is_plural_resource ? $self->{_members} : $self;
-
-    if ($self->_is_plural_resource && !$self->{_members}) {
-        $members = $self->{_members} = $self->add_route(':id')
-          ->constraints('id' => qr/[^.\/]+/);
-    }
+    my $members = $self->_is_plural_resource ? $self->_members : $self;
 
     $members->_add_to_parent($child);
-
 
     # name
     my $name = $params[0];
@@ -368,6 +351,21 @@ sub add_member_route {
 }
 
 
+sub _members {
+    my $self = shift;
+
+    my $id_constraint = $self->{_id_constraint} || die 'missing id constraint';
+
+    $self->{_members} ||= $self->add_route(':id')
+      ->constraints('id' => $id_constraint);
+
+    $self->{_members}->pattern->{exclude}->{id} ||= [];
+    push @{$self->{_members}->pattern->{exclude}->{id}}, 'new';
+
+    return $self->{_members};
+}
+
+
 sub add_collection_route {
     my $self = shift;
     my (@params) = @_;
@@ -376,11 +374,7 @@ sub add_collection_route {
 
     my $child = Forward::Routes->new(@params);
 
-    unless ($self->{_collection}) {
-        $self->{_collection} = $self->add_route;
-    }
-
-    $self->{_collection}->_add_to_parent($child);
+    $self->_collection->_add_to_parent($child);
 
     # name
     my $name = $params[0];
@@ -404,6 +398,15 @@ sub add_collection_route {
     $child->name($ns_name_prefix.$self->{_name}.'_'.$name);
 
     return $child;
+}
+
+
+sub _collection {
+    my $self = shift;
+
+    $self->{_collection} ||= $self->add_route;
+
+    return $self->{_collection};
 }
 
 

@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 43;
+use Test::More tests => 46;
 
 use Forward::Routes;
 
@@ -136,3 +136,17 @@ $m = $r->match(get => 'photos/1/edit');
 is $m, undef;
 $m = $r->match(get => 'photos/1/search_form');
 is_deeply $m->[0]->params => {controller => 'Photos', action => 'search_form', id => 1};
+
+
+# now with constraints and no default member routes
+$r = Forward::Routes->new;
+$photos = $r->add_resources(
+  'photos' =>
+      -only => [qw/index/], 
+      -constraints => {id => qr/\d{6}/});
+isa_ok $photos->add_member_route('search_form'), 'Forward::Routes';
+$m = $r->match(get => 'photos/1/search_form');
+is $m, undef;
+$m = $r->match(get => 'photos/123456/search_form');
+is_deeply $m->[0]->params => {controller => 'Photos', action => 'search_form', id => 123456};
+
