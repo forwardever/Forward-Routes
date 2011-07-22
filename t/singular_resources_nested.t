@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 28;
+use Test::More tests => 32;
 
 use Forward::Routes;
 
@@ -93,3 +93,20 @@ like $@ => qr/Required param 'magazine_id' was not passed when building a path/;
 undef $e;
 
 
+# constraint for parent id
+$r = Forward::Routes->new;
+
+$ads = $r->add_resources('magazines' => -constraints => {id => qr/[\d]{2}/})
+  ->add_singular_resources('manager');
+
+$m = $r->match(get => 'magazines/1');
+is $m, undef;
+
+$m = $r->match(get => 'magazines/22');
+is_deeply $m->[0]->params => {controller => 'Magazines', action => 'show', id => 22};
+
+$m = $r->match(get => 'magazines/1/manager');
+is $m, undef;
+
+$m = $r->match(get => 'magazines/22/manager');
+is_deeply $m->[0]->params => {controller => 'Manager', action => 'show', magazine_id => 22};

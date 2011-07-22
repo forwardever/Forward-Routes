@@ -87,7 +87,7 @@ sub add_singular {
             my $parent_id_name = $parent->singularize->($parent_names[-1]).'_id';
 
             $resource = $parent->_add_resource_route(':'.$parent_id_name.'/'.$as)
-              ->constraints($parent_id_name => qr/[^.\/]+/)
+              ->constraints($parent_id_name => $parent->{_id_constraint})
               ->_is_singular_resource(1);
         }
         else {
@@ -233,7 +233,7 @@ sub add_plural {
             $resource = $parent->_add_resource_route(':'.$parent_id_name.'/'.$as)
               ->_is_plural_resource(1)
               ->_parent_resource_names($parent->_parent_resource_names, $ns_name_prefix.$name)
-              ->constraints($parent_id_name => qr/[^.\/]+/);
+              ->constraints($parent_id_name => $parent->{_id_constraint});
         }
         else {
             $resource = $parent->_add_resource_route($as)

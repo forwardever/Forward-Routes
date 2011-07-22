@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 58;
+use Test::More tests => 62;
 
 use Forward::Routes;
 
@@ -71,6 +71,7 @@ is_deeply $m->[0]->params => {controller => 'Ads', action => 'delete_form', maga
 
 $m = $r->match(post => 'magazines/1.2/ads');
 is $m, undef;
+
 
 
 # build path
@@ -186,3 +187,23 @@ is_deeply $m->[0]->params => {controller => 'Ads', action => 'delete_form', maga
 
 $m = $r->match(post => 'magazines/1.2/ads');
 is $m, undef;
+
+
+
+# constraint for parent id
+$r = Forward::Routes->new;
+
+$ads = $r->add_resources('magazines' => -constraints => {id => qr/[\d]{2}/})
+  ->add_resources('ads');
+
+$m = $r->match(get => 'magazines/1');
+is $m, undef;
+
+$m = $r->match(get => 'magazines/22');
+is_deeply $m->[0]->params => {controller => 'Magazines', action => 'show', id => 22};
+
+$m = $r->match(get => 'magazines/1/ads/4');
+is $m, undef;
+
+$m = $r->match(get => 'magazines/22/ads/4');
+is_deeply $m->[0]->params => {controller => 'Ads', action => 'show', magazine_id => 22, id => 4};
