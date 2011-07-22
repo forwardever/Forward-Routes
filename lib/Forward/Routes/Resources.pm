@@ -338,6 +338,11 @@ sub add_member_route {
 
     my $members = $self->_is_plural_resource ? $self->{_members} : $self;
 
+    if ($self->_is_plural_resource && !$self->{_members}) {
+        $members = $self->{_members} = $self->add_route(':id')
+          ->constraints('id' => qr/[^.\/]+/);
+    }
+
     $members->_add_to_parent($child);
 
 
