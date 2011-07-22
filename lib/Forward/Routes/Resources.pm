@@ -73,26 +73,32 @@ sub add_singular {
         # camelize controller name (default)
         my $ctrl = Forward::Routes::Resources->format_resource_controller->($name);
 
-        $ns_name_prefix = __PACKAGE__->namespace_to_name($namespace).'_' if $namespace;
 
-        # Nested resources
-        my $resource;
-        my $parent_name_prefix = '';
+        # final name
+        $ns_name_prefix = __PACKAGE__->namespace_to_name($namespace).'_' if $namespace;
+        my $final_name = $ns_name_prefix.$name;
+
+
+        # nested resource name adjustment
+        my @parent_names;
         if ($parent->_is_plural_resource) {
 
-            my @parent_names = $parent->_parent_resource_names;
+            @parent_names = $parent->_parent_resource_names;
 
-            $parent_name_prefix = join('_', @parent_names).'_';
-
-            my $parent_id_name = $parent->singularize->($parent_names[-1]).'_id';
-
-            $resource = $parent->_add_resource_route(':'.$parent_id_name.'/'.$as)
-              ->constraints($parent_id_name => $parent->{_id_constraint})
-              ->_is_singular_resource(1);
+            my $parent_name_prefix = join('_', @parent_names).'_';
+            $final_name = $parent_name_prefix.$final_name;
         }
-        else {
-            $resource = $parent->_add_resource_route($as)->_is_singular_resource(1);
-        }
+
+
+        # nested resource members
+        # e.g. /magazines/:magazine_id/geocoder (:magazine_id represents the
+        # nested resource members)
+        $parent = $parent->_nested_resource_members
+          if $parent->_is_plural_resource;
+
+
+        # create resource
+        my $resource = $parent->_add_resource_route($as)->_is_singular_resource(1);
 
 
         # save resource attributes
@@ -100,44 +106,45 @@ sub add_singular {
         $resource->{_ctrl}      = $ctrl;
         $resource->{_namespace} = $namespace;
 
-
         # custom format
         $resource->format($format) if $format_exists;
-    
+
+
+        # members
         $resource->add_route('/new')
           ->via('get')
           ->to($ns_ctrl_prefix."$ctrl#create_form")
-          ->name($parent_name_prefix.$ns_name_prefix.$name.'_create_form')
+          ->name($final_name.'_create_form')
           if $selected{create_form};;
-    
+
         $resource->add_route('/edit')
           ->via('get')
           ->to($ns_ctrl_prefix."$ctrl#update_form")
-          ->name($parent_name_prefix.$ns_name_prefix.$name.'_update_form')
+          ->name($final_name.'_update_form')
           if $selected{update_form};
 
         $resource->add_route
           ->via('post')
           ->to($ns_ctrl_prefix."$ctrl#create")
-          ->name($parent_name_prefix.$ns_name_prefix.$name.'_create')
+          ->name($final_name.'_create')
           if $selected{create};
-    
+
         $resource->add_route
           ->via('get')
           ->to($ns_ctrl_prefix."$ctrl#show")
-          ->name($parent_name_prefix.$ns_name_prefix.$name.'_show')
+          ->name($final_name.'_show')
           if $selected{show};
-    
+
         $resource->add_route
           ->via('put')
           ->to($ns_ctrl_prefix."$ctrl#update")
-          ->name($parent_name_prefix.$ns_name_prefix.$name.'_update')
+          ->name($final_name.'_update')
           if $selected{update};
-    
+
         $resource->add_route
           ->via('delete')
           ->to($ns_ctrl_prefix."$ctrl#delete")
-          ->name($parent_name_prefix.$ns_name_prefix.$name.'_delete')
+          ->name($final_name.'_delete')
           if $selected{delete};
 
         $last_resource = $resource;
@@ -218,28 +225,35 @@ sub add_plural {
         # camelize controller name (default)
         my $ctrl = Forward::Routes::Resources->format_resource_controller->($name);
 
+
+        # final name
         $ns_name_prefix = __PACKAGE__->namespace_to_name($namespace).'_' if $namespace;
+        my $final_name = $ns_name_prefix.$name;
 
-        # Nested resources
-        my $resource;
-        my $parent_name_prefix = '';
+
+        # nested resource name adjustment
+        my @parent_names;
         if ($parent->_is_plural_resource) {
-            my @parent_names = $parent->_parent_resource_names;
+            @parent_names = $parent->_parent_resource_names;
 
-            $parent_name_prefix = join('_', @parent_names).'_';
-
-            my $parent_id_name = $parent->singularize->($parent_names[-1]).'_id';
-
-            $resource = $parent->_add_resource_route(':'.$parent_id_name.'/'.$as)
-              ->_is_plural_resource(1)
-              ->_parent_resource_names($parent->_parent_resource_names, $ns_name_prefix.$name)
-              ->constraints($parent_id_name => $parent->{_id_constraint});
+            my $parent_name_prefix = join('_', @parent_names).'_';
+            $final_name = $parent_name_prefix.$final_name;
         }
-        else {
-            $resource = $parent->_add_resource_route($as)
-              ->_is_plural_resource(1)
-              ->_parent_resource_names($ns_name_prefix.$name);
-        }
+        push @parent_names, $ns_name_prefix.$name;
+
+
+        # nested resource members
+        # e.g. /magazines/:magazine_id/ads/:id (:magazine_id represents the
+        # nested resource members)
+        $parent = $parent->_nested_resource_members
+          if $parent->_is_plural_resource;
+
+
+        # create resource
+        my $resource = $parent->_add_resource_route($as)
+          ->_is_plural_resource(1)
+          ->_parent_resource_names(@parent_names);
+
 
         # save resource attributes
         $resource->{_name}          = $name;
@@ -251,71 +265,81 @@ sub add_plural {
         $resource->format($format) if $format_exists;
 
 
-        # resource
-
+        # collection
         my $collection = $resource->_collection
           if $selected{index} || $selected{create} || $selected{create_form};
 
         $collection->add_route
           ->via('get')
           ->to($ns_ctrl_prefix.$ctrl."#index")
-          ->name($parent_name_prefix.$ns_name_prefix.$name.'_index')
+          ->name($final_name.'_index')
           if $selected{index};
 
         $collection->add_route
           ->via('post')
           ->to($ns_ctrl_prefix.$ctrl."#create")
-          ->name($parent_name_prefix.$ns_name_prefix.$name.'_create')
+          ->name($final_name.'_create')
           if $selected{create};
 
         # new resource item
         $collection->add_route('/new')
           ->via('get')
           ->to($ns_ctrl_prefix.$ctrl."#create_form")
-          ->name($parent_name_prefix.$ns_name_prefix.$name.'_create_form')
+          ->name($final_name.'_create_form')
           if $selected{create_form};
 
 
-        # modify resource item
+        # members
         my $members = $resource->_members if $selected{show} || $selected{update}
           || $selected{delete} || $selected{update_form}
           || $selected{delete_form};
 
-
         $members->add_route
           ->via('get')
           ->to($ns_ctrl_prefix.$ctrl."#show")
-          ->name($parent_name_prefix.$ns_name_prefix.$name.'_show')
+          ->name($final_name.'_show')
           if $selected{show};
 
         $members->add_route
           ->via('put')
           ->to($ns_ctrl_prefix.$ctrl."#update")
-          ->name($parent_name_prefix.$ns_name_prefix.$name.'_update')
+          ->name($final_name.'_update')
           if $selected{update};
 
         $members->add_route
           ->via('delete')
           ->to($ns_ctrl_prefix.$ctrl."#delete")
-          ->name($parent_name_prefix.$ns_name_prefix.$name.'_delete')
+          ->name($final_name.'_delete')
           if $selected{delete};
 
         $members->add_route('edit')
           ->via('get')
           ->to($ns_ctrl_prefix.$ctrl."#update_form")
-          ->name($parent_name_prefix.$ns_name_prefix.$name.'_update_form')
+          ->name($final_name.'_update_form')
           if $selected{update_form};
 
         $members->add_route('delete')
           ->via('get')
           ->to($ns_ctrl_prefix.$ctrl."#delete_form")
-          ->name($parent_name_prefix.$ns_name_prefix.$name.'_delete_form')
+          ->name($final_name.'_delete_form')
           if $selected{delete_form};
 
         $last_resource = $resource;
     }
 
     return $last_resource;
+}
+
+
+sub _nested_resource_members {
+    my $self = shift;
+
+    my $parent_name = ($self->_parent_resource_names)[-1];
+
+    my $parent_id_name = $self->singularize->($parent_name).'_id';
+
+    return $self->add_route(':'.$parent_id_name)
+      ->constraints($parent_id_name => $self->{_id_constraint});
 }
 
 
