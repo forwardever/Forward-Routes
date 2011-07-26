@@ -16,13 +16,9 @@ our $routes;
 sub new {
     my $class = shift;
 
-    my $is_root = 1 unless ref $class;
-
     $class = ref $class if ref $class;
 
     my $self = bless {}, $class;
-
-    $routes = $self if $is_root;
 
     # Pattern
     my $pattern = @_ % 2 ? shift : undef;
