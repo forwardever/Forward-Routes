@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 45;
+use Test::More tests => 51;
 
 use Forward::Routes;
 
@@ -21,6 +21,8 @@ $photos->add_collection_route('search')->via('post');
 my $m = $r->match(get => 'photos/search_form');
 is_deeply $m->[0]->params => {controller => 'Photos', action => 'search_form'};
 is $m->[0]->name, 'photos_search_form';
+is $r->build_path('photos_search_form')->{path} => 'photos/search_form';
+is $r->build_path('photos_search_form')->{method} => undef;
 
 $m = $r->match(post => 'photos/search_form');
 is_deeply $m->[0]->params => {controller => 'Photos', action => 'search_form'};
@@ -38,7 +40,8 @@ like $photos->{_members}->pattern->pattern, qr/$re/;
 $m = $r->match(post => 'photos/search');
 is_deeply $m->[0]->params => {controller => 'Photos', action => 'search'};
 is $m->[0]->name, 'photos_search';
-
+is $r->build_path('photos_search')->{path} => 'photos/search';
+is $r->build_path('photos_search')->{method} => 'post';
 
 
 # overwrite controller and action defaults
@@ -60,6 +63,8 @@ $photos->add_collection_route('/find3');
 $m = $r->match(get => 'photos/find3');
 is_deeply $m->[0]->params => {controller => 'Photos', action => 'find3'};
 is $m->[0]->name, 'photos_find3';
+is $r->build_path('photos_find3')->{path} => 'photos/find3';
+is $r->build_path('photos_find3')->{method} => undef;
 
 
 $photos->add_collection_route('/find4/find5');
