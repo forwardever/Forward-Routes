@@ -11,8 +11,6 @@ use Carp 'croak';
 
 our $VERSION = '0.43';
 
-our $routes;
-
 sub new {
     my $class = shift;
 
