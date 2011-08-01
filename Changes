@@ -1,5 +1,8 @@
 Changes for Forward::Routes
 
+0.44    2011-08-01 00:00:00
+        - Added "parent" to list of dependencies in Makefile
+
 0.43    2011-07-23 00:00:00
         - Added support for adding collection routes to resources
         - Many smaller bug fixes
