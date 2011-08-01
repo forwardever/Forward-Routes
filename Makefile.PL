@@ -34,7 +34,10 @@ WriteMakefile(
             },
         )
     ),
-    PREREQ_PM => {'Carp' => 0},
+    PREREQ_PM => {
+      'Carp'   => 0,
+      'parent' => 0
+    },
     test      => {TESTS => 't/*.t t/*/*.t'}
 );
 
