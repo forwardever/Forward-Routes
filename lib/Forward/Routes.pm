@@ -82,7 +82,6 @@ sub _add_to_parent {
     $child->parent($self);
 
     return $child;
-
 }
 
 
@@ -335,6 +334,7 @@ sub _match {
     }
     elsif (!$matches->[0]){
         $match = $matches->[0] = Forward::Routes::Match->new;
+        $match->_add_name($self->name);
     }
     else {
         $match = $matches->[0];
@@ -352,9 +352,6 @@ sub _match {
 
     # Captures
     $match->_add_captures($captures_hash);
-
-    # Name
-    $match->_add_name($self->name);
 
     return $matches;
 }

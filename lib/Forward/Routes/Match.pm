@@ -30,9 +30,9 @@ sub _add_captures {
 
 sub _add_name {
     my $self = shift;
-    my ($name) = @_;
+    my (@params) = @_;
 
-    $self->{name} = $name unless defined $self->{name} && length $self->{name};
+    $self->{name} = $params[0] if @params;
 
     return $self;
 }

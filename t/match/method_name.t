@@ -21,7 +21,7 @@ is $m->_add_name('hello'), $m;
 is $m->name, 'hello';
 
 is $m->_add_name('you'), $m;
-is $m->name, 'hello';
+is $m->name, 'you';
 
 
 #############################################################################
