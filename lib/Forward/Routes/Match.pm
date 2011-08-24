@@ -38,6 +38,16 @@ sub _add_name {
 }
 
 
+sub _add_namespace {
+    my $self = shift;
+    my (@params) = @_;
+
+    $self->{namespace} = $params[0] if @params;
+
+    return $self;
+}
+
+
 sub params {
     my $self = shift;
     my ($key) = @_;
@@ -83,6 +93,25 @@ sub is_bridge {
 sub name {
     my $self = shift;
     return $self->{name};
+}
+
+
+sub namespace {
+    my $self = shift;
+    return $self->{namespace};
+}
+
+
+sub controller_class {
+    my $self = shift;
+
+    my $class = $self->{namespace}.'::' if $self->{namespace};
+    return $class .= $self->{params}->{controller};
+}
+
+
+sub action {
+    return shift->{params}->{action};
 }
 
 

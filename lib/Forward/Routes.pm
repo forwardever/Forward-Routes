@@ -73,9 +73,10 @@ sub _add_to_parent {
     my $self = shift;
     my ($child) = @_;
 
-    # Format inheritance
+    # Format, method and namespace inheritance
     $child->format([@{$self->{format}}]) if $self->{format};
     $child->method([@{$self->{method}}]) if $self->{method};
+    $child->namespace($self->{namespace}) if $self->{namespace};
 
     push @{$self->children}, $child;
 
@@ -197,6 +198,18 @@ sub name {
     return $self->{name} unless defined $name;
 
     $self->{name} = $name;
+
+    return $self;
+}
+
+
+sub namespace {
+    my $self = shift;
+    my (@params) = @_;
+
+    return $self->{namespace} unless @params;
+
+    $self->{namespace} = $params[0];
 
     return $self;
 }
@@ -328,6 +341,7 @@ sub _match {
             $match->_add_params(\%{$m->captures});
             $match->_add_captures(\%{$m->captures});
             $match->_add_name($m->name);
+            $match->_add_namespace($m->namespace);
         }
 
         unshift @$matches, $match;
@@ -335,6 +349,7 @@ sub _match {
     elsif (!$matches->[0]){
         $match = $matches->[0] = Forward::Routes::Match->new;
         $match->_add_name($self->name);
+        $match->_add_namespace($self->namespace);
     }
     else {
         $match = $matches->[0];

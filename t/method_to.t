@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 6;
+use Test::More tests => 8;
 
 use Forward::Routes;
 
@@ -15,15 +15,20 @@ use Forward::Routes;
 my $r = Forward::Routes->new;
 
 # set
-my $route = $r->add_route('articles')->to('hello#world');
-is_deeply $route->{defaults}, {controller => 'hello', action => 'world'};
+my $route = $r->add_route('articles')->to('Hello#world');
+is_deeply $route->{defaults}, {controller => 'Hello', action => 'world'};
 
 # no getter
 is $route->to, undef;
 
+# Match->controller_class and Match->action
+my $matches = $r->match(get => 'articles');
+is $matches->[0]->controller_class, 'Hello';
+is $matches->[0]->action, 'world';
+
 # overwrite
-$route->to('country#city');
-is_deeply $route->{defaults}, {controller => 'country', action => 'city'};
+$route->to('Country#city');
+is_deeply $route->{defaults}, {controller => 'Country', action => 'city'};
 
 
 
@@ -32,7 +37,7 @@ is_deeply $route->{defaults}, {controller => 'country', action => 'city'};
 
 $r = Forward::Routes->new;
 $route = $r->add_route('articles');
-my $rv = $route->to('hello#world');
+my $rv = $route->to('Hello#world');
 is $route, $rv;
 
 
@@ -44,5 +49,5 @@ $route = $r->add_route('articles')->to('#world');
 is_deeply $route->{defaults}, {controller => undef, action => 'world'};
 
 $r = Forward::Routes->new;
-$route = $r->add_route('articles')->to('hello#');
-is_deeply $route->{defaults}, {controller => 'hello', action => undef};
+$route = $r->add_route('articles')->to('Hello#');
+is_deeply $route->{defaults}, {controller => 'Hello', action => undef};
