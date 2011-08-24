@@ -1,5 +1,9 @@
 Changes for Forward::Routes
 
+0.46    2011-08-24 00:00:00
+        - Added namespace method and namespace inheritance to Routes, added
+          controller_class and action accessors to Routes::Match
+
 0.44    2011-08-01 00:00:00
         - Added "parent" to list of dependencies in Makefile
 
