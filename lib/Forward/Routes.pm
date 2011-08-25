@@ -9,7 +9,7 @@ use Forward::Routes::Resources;
 use Scalar::Util qw/weaken/;
 use Carp 'croak';
 
-our $VERSION = '0.47';
+our $VERSION = '0.48';
 
 sub new {
     my $class = shift;
