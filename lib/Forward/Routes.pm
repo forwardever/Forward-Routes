@@ -342,7 +342,7 @@ sub _match {
             $match->_add_params(\%{$m->captures});
             $match->_add_captures(\%{$m->captures});
             $match->_add_name($m->name);
-            $match->_add_namespace($m->namespace);
+            $match->_add_namespace($self->namespace);
         }
 
         unshift @$matches, $match;
