@@ -20,7 +20,7 @@ my $m = $r->match(get => 'magazines');
 is $m->[0]->name, 'magazines_index';
 is $m->[0]->app_namespace, 'My';
 is $m->[0]->namespace, undef;
-is $m->[0]->controller_class, 'My::Magazines';
+is $m->[0]->class, 'My::Magazines';
 
 
 
@@ -32,7 +32,7 @@ $m = $r->match(get => 'magazines');
 is $m->[0]->name, 'admin_magazines_index';
 is $m->[0]->app_namespace, 'My';
 is $m->[0]->namespace, 'Admin';
-is $m->[0]->controller_class, 'My::Admin::Magazines';
+is $m->[0]->class, 'My::Admin::Magazines';
 
 
 
@@ -45,13 +45,13 @@ $m = $r->match(get => 'magazines/4');
 is $m->[0]->name, 'magazines_show';
 is $m->[0]->app_namespace, 'My';
 is $m->[0]->namespace, undef;
-is $m->[0]->controller_class, 'My::Magazines';
+is $m->[0]->class, 'My::Magazines';
 
 $m = $r->match(get => 'magazines/4/ads/new');
 is $m->[0]->name, 'magazines_ads_create_form';
 is $m->[0]->app_namespace, 'My';
 is $m->[0]->namespace, undef;
-is $m->[0]->controller_class, 'My::Ads';
+is $m->[0]->class, 'My::Ads';
 
 
 
@@ -64,13 +64,13 @@ $m = $r->match(get => 'magazines/4');
 is $m->[0]->name, 'admin_magazines_show';
 is $m->[0]->app_namespace, 'My';
 is $m->[0]->namespace, 'Admin';
-is $m->[0]->controller_class, 'My::Admin::Magazines';
+is $m->[0]->class, 'My::Admin::Magazines';
 
 $m = $r->match(get => 'magazines/4/ads/new');
 is $m->[0]->name, 'admin_magazines_admin_ads_create_form';
 is $m->[0]->app_namespace, 'My';
 is $m->[0]->namespace, 'Admin';
-is $m->[0]->controller_class, 'My::Admin::Ads';
+is $m->[0]->class, 'My::Admin::Ads';
 
 
 
@@ -85,10 +85,10 @@ $m = $r->match(get => 'magazines/4');
 is $m->[0]->name, 'admin_magazines_show';
 is $m->[0]->app_namespace, 'My';
 is $m->[0]->namespace, 'Admin';
-is $m->[0]->controller_class, 'My::Admin::Magazines';
+is $m->[0]->class, 'My::Admin::Magazines';
 
 $m = $r->match(get => 'magazines/4/ads/new');
 is $m->[0]->name, 'admin_magazines_admin_ads_create_form';
 is $m->[0]->app_namespace, 'My';
 is $m->[0]->namespace, 'Admin';
-is $m->[0]->controller_class, 'My::Admin::Ads';
+is $m->[0]->class, 'My::Admin::Ads';

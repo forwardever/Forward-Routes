@@ -44,35 +44,35 @@ is $r->build_path('photos_create')->{method} => 'post';
 # adjusted controller
 $m = $r->match(get => 'users');
 is_deeply $m->[0]->params => {controller => 'Users', action => 'index'};
-is $m->[0]->controller_class, 'Admin::Manage::Users';
+is $m->[0]->class, 'Admin::Manage::Users';
 
 $m = $r->match(get => 'users/new');
 is_deeply $m->[0]->params => {controller => 'Users', action => 'create_form'};
-is $m->[0]->controller_class, 'Admin::Manage::Users';
+is $m->[0]->class, 'Admin::Manage::Users';
 
 $m = $r->match(post => 'users');
 is_deeply $m->[0]->params => {controller => 'Users', action => 'create'};
-is $m->[0]->controller_class, 'Admin::Manage::Users';
+is $m->[0]->class, 'Admin::Manage::Users';
 
 $m = $r->match(get => 'users/1');
 is_deeply $m->[0]->params => {controller => 'Users', action => 'show', id => 1};
-is $m->[0]->controller_class, 'Admin::Manage::Users';
+is $m->[0]->class, 'Admin::Manage::Users';
 
 $m = $r->match(get => 'users/1/edit');
 is_deeply $m->[0]->params => {controller => 'Users', action => 'update_form', id => 1};
-is $m->[0]->controller_class, 'Admin::Manage::Users';
+is $m->[0]->class, 'Admin::Manage::Users';
 
 $m = $r->match(get => 'users/1/delete');
 is_deeply $m->[0]->params => {controller => 'Users', action => 'delete_form', id => 1};
-is $m->[0]->controller_class, 'Admin::Manage::Users';
+is $m->[0]->class, 'Admin::Manage::Users';
 
 $m = $r->match(put => 'users/1');
 is_deeply $m->[0]->params => {controller => 'Users', action => 'update', id => 1};
-is $m->[0]->controller_class, 'Admin::Manage::Users';
+is $m->[0]->class, 'Admin::Manage::Users';
 
 $m = $r->match(delete => 'users/1');
 is_deeply $m->[0]->params => {controller => 'Users', action => 'delete', id => 1};
-is $m->[0]->controller_class, 'Admin::Manage::Users';
+is $m->[0]->class, 'Admin::Manage::Users';
 
 
 # path building with name prefix
@@ -89,7 +89,7 @@ is $r->build_path('admin_manage_users_delete_form', id => 222)->{path} => 'users
 # also works for prices
 $m = $r->match(get => 'prices');
 is_deeply $m->[0]->params => {controller => 'Prices', action => 'index'};
-is $m->[0]->controller_class, 'Admin::Prices';
+is $m->[0]->class, 'Admin::Prices';
 
 is $r->build_path('admin_prices_index')->{path} => 'prices';
 
@@ -128,4 +128,4 @@ is_deeply $m->[0]->params => {controller => 'photos', action => 'index'};
 
 $m = $r->match(get => 'users');
 is_deeply $m->[0]->params => {controller => 'users', action => 'index'};
-is $m->[0]->controller_class, 'Admin::users';
+is $m->[0]->class, 'Admin::users';

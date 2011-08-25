@@ -41,27 +41,27 @@ is $r->build_path('geocoder_show', id => 456)->{path} => 'geocoder';
 
 $m = $r->match(get => 'contact/new');
 is_deeply $m->[0]->params => {controller => 'Contact', action => 'create_form'};
-is $m->[0]->controller_class, 'Admin::Contact';
+is $m->[0]->class, 'Admin::Contact';
 
 $m = $r->match(post => 'contact');
 is_deeply $m->[0]->params => {controller => 'Contact', action => 'create'};
-is $m->[0]->controller_class, 'Admin::Contact';
+is $m->[0]->class, 'Admin::Contact';
 
 $m = $r->match(get => 'contact');
 is_deeply $m->[0]->params => {controller => 'Contact', action => 'show'};
-is $m->[0]->controller_class, 'Admin::Contact';
+is $m->[0]->class, 'Admin::Contact';
 
 $m = $r->match(get => 'contact/edit');
 is_deeply $m->[0]->params => {controller => 'Contact', action => 'update_form'};
-is $m->[0]->controller_class, 'Admin::Contact';
+is $m->[0]->class, 'Admin::Contact';
 
 $m = $r->match(put => 'contact');
 is_deeply $m->[0]->params => {controller => 'Contact', action => 'update'};
-is $m->[0]->controller_class, 'Admin::Contact';
+is $m->[0]->class, 'Admin::Contact';
 
 $m = $r->match(delete => 'contact');
 is_deeply $m->[0]->params => {controller => 'Contact', action => 'delete'};
-is $m->[0]->controller_class, 'Admin::Contact';
+is $m->[0]->class, 'Admin::Contact';
 
 
 is $r->build_path('admin_contact_create_form')->{path} => 'contact/new';
@@ -80,7 +80,7 @@ is $m, undef;
 ### now "test"
 $m = $r->match(get => 'test/new');
 is_deeply $m->[0]->params => {controller => 'Test', action => 'create_form'};
-is $m->[0]->controller_class, 'Admin::Test';
+is $m->[0]->class, 'Admin::Test';
 
 is $r->build_path('admin_test_create_form')->{path} => 'test/new';
 

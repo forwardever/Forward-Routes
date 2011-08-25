@@ -23,7 +23,7 @@ $r->add_resources(
 
 my $m = $r->match(get => '/pictures/123456');
 is_deeply $m->[0]->params => {controller => 'Photos', action => 'show', id => 123456};
-is $m->[0]->controller_class, 'Admin::Photos';
+is $m->[0]->class, 'Admin::Photos';
 
 is $r->build_path('admin_photos_show', id => 123456)->{path} => 'pictures/123456';
 

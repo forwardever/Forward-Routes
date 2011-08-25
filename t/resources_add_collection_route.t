@@ -132,7 +132,7 @@ $photos->add_collection_route('search_form');
 
 $m = $r->match(get => 'photos/search_form');
 is_deeply $m->[0]->params => {controller => 'Photos', action => 'search_form'};
-is $m->[0]->controller_class, 'Admin::Photos';
+is $m->[0]->class, 'Admin::Photos';
 is $m->[0]->name, 'admin_photos_search_form';
 
 

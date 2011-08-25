@@ -19,12 +19,12 @@ my $ads = $r->add_resources('magazines' => -namespace => 'Admin')
 
 my $m = $r->match(get => 'magazines');
 is $m->[0]->name, 'admin_magazines_index';
-is $m->[0]->controller_class, 'Admin::Magazines';
+is $m->[0]->class, 'Admin::Magazines';
 
 
 $m = $r->match(get => 'magazines/4/ads/new');
 is $m->[0]->name, 'admin_magazines_ads_create_form';
-is $m->[0]->controller_class, 'Ads';
+is $m->[0]->class, 'Ads';
 
 
 
@@ -35,7 +35,7 @@ $ads = $r->add_resources('magazines' => -namespace => 'Admin')
 
 $m = $r->match(get => 'magazines/4/ads/new');
 is $m->[0]->name, 'admin_magazines_admin_ads_create_form';
-is $m->[0]->controller_class, 'Admin::Ads';
+is $m->[0]->class, 'Admin::Ads';
 
 
 
@@ -46,7 +46,7 @@ $ads = $r->add_resources('magazines' => -namespace => 'Admin')
 
 $m = $r->match(get => 'magazines/4/ads/new');
 is $m->[0]->name, 'admin_magazines_admin_ads_create_form';
-is $m->[0]->controller_class, 'Admin::Ads';
+is $m->[0]->class, 'Admin::Ads';
 
 
 # controller namespace organized exactly as resource nesting
@@ -56,4 +56,4 @@ $ads = $r->add_resources('magazines' => -namespace => 'Admin')
 
 $m = $r->match(get => 'magazines/4/ads/new');
 is $m->[0]->name, 'admin_magazines_admin_magazines_ads_create_form';
-is $m->[0]->controller_class, 'Admin::Magazines::Ads';
+is $m->[0]->class, 'Admin::Magazines::Ads';

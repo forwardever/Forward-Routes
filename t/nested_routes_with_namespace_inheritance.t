@@ -25,8 +25,8 @@ is $m, undef;
 $m = $root->match(get => 'foo/bar');
 is $m->[0]->namespace, 'Hello::Foo';
 
-# Match->controller_class and Match->action
-is $m->[0]->controller_class, 'Hello::Foo::Controller';
+# Match->class and Match->action
+is $m->[0]->class, 'Hello::Foo::Controller';
 is $m->[0]->action, 'action';
 
 $m = $root->match(post => '/baz');

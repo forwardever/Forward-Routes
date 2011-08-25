@@ -118,7 +118,7 @@ sub app_namespace {
 }
 
 
-sub controller_class {
+sub class {
     my $self = shift;
 
     return undef unless $self->{params}->{controller};

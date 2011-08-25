@@ -22,7 +22,7 @@ is $nested2->{namespace}, 'Hello::Foo';
 my $m = $root->match(get => 'foo/bar');
 is $m->[0]->app_namespace, 'Root';
 is $m->[0]->namespace, 'Hello::Foo';
-is $m->[0]->controller_class, 'Root::Hello::Foo::Controller';
+is $m->[0]->class, 'Root::Hello::Foo::Controller';
 is $m->[0]->action, 'action';
 
 
@@ -34,7 +34,7 @@ $root = Forward::Routes->new->app_namespace('Root');
 $m = $root->match(post => '/biz');
 is $m->[0]->app_namespace, 'Root';
 is $m->[0]->namespace, undef;
-is $m->[0]->controller_class, 'Root::Oh';
+is $m->[0]->class, 'Root::Oh';
 is $m->[0]->action, 'no';
 
 
@@ -46,7 +46,7 @@ $root = Forward::Routes->new->app_namespace('Root');
 $m = $root->match(get => '/buz');
 is $m->[0]->app_namespace, 'Root';
 is $m->[0]->namespace, 'Buz';
-is $m->[0]->controller_class, undef;
+is $m->[0]->class, undef;
 is $m->[0]->action, undef;
 
 
@@ -58,7 +58,7 @@ $root = Forward::Routes->new->app_namespace('Root');
 $m = $root->match(get => '/boz');
 is $m->[0]->app_namespace, 'Root';
 is $m->[0]->namespace, 'Boz';
-is $m->[0]->controller_class, 'Root::Boz::You';
+is $m->[0]->class, 'Root::Boz::You';
 is $m->[0]->action, 'me';
 
 
@@ -70,7 +70,7 @@ $root = Forward::Routes->new->app_namespace('Root');
 $m = $root->match(get => '/undef_app_namespace');
 is $m->[0]->app_namespace, undef;
 is $m->[0]->namespace, undef;
-is $m->[0]->controller_class, 'AA';
+is $m->[0]->class, 'AA';
 is $m->[0]->action, 'bb';
 
 
@@ -82,7 +82,7 @@ $root = Forward::Routes->new->app_namespace('Root');
 $m = $root->match(get => '/undef_app_namespace');
 is $m->[0]->app_namespace, 'What';
 is $m->[0]->namespace, undef;
-is $m->[0]->controller_class, 'What::AA';
+is $m->[0]->class, 'What::AA';
 is $m->[0]->action, 'bb';
 
 
@@ -94,7 +94,7 @@ $root = Forward::Routes->new->app_namespace('Root');
 $m = $root->match(get => 'foo/bar');
 is $m->[0]->app_namespace, 'Root';
 is $m->[0]->namespace, undef;
-is $m->[0]->controller_class, 'Root::Controller';
+is $m->[0]->class, 'Root::Controller';
 is $m->[0]->action, 'action';
 
 
@@ -106,7 +106,7 @@ $root = Forward::Routes->new->app_namespace('Root');
 $m = $root->match(get => 'foo/bar');
 is $m->[0]->app_namespace, 'Root';
 is $m->[0]->namespace, 'Boo';
-is $m->[0]->controller_class, 'Root::Boo::Controller';
+is $m->[0]->class, 'Root::Boo::Controller';
 is $m->[0]->action, 'action';
 
 
@@ -118,5 +118,5 @@ $root = Forward::Routes->new->app_namespace('Root');
 $m = $root->match(get => 'foo/bar');
 is $m->[0]->app_namespace, 'Foo';
 is $m->[0]->namespace, 'Boo';
-is $m->[0]->controller_class, 'Foo::Boo::Controller';
+is $m->[0]->class, 'Foo::Boo::Controller';
 is $m->[0]->action, 'action';

@@ -5,7 +5,7 @@ Forward::Guides::Routes::ResourceCustomization - Customizing resourceful routes
 =head1 namespace
 
 The C<-namespace> option works like the C<namespace> command. It might be
-needed to determine the full controller class name ($match->controller_class).
+needed to determine the full controller class name ($match->class).
 It also effects the names automatically generated for your routes, so make sure
 to use C<app_namespace> instead of C<namespace> for your application base
 namespace to keep route names as short as possible (use namespace for sub
@@ -23,7 +23,7 @@ namespaces only).
     # controller param is still 'Users'...
     # $m->[0]->params is {controller => 'Users', action => 'index'};
     # ... but:
-    # $m->[0]->controller_class is "Admin::Users"
+    # $m->[0]->class is "Admin::Users"
     # $m->[0]->action is "index"
     # $m->[0]->name is "admin_users_index"
 

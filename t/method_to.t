@@ -21,9 +21,9 @@ is_deeply $route->{defaults}, {controller => 'Hello', action => 'world'};
 # no getter
 is $route->to, undef;
 
-# Match->controller_class and Match->action
+# Match->class and Match->action
 my $matches = $r->match(get => 'articles');
-is $matches->[0]->controller_class, 'Hello';
+is $matches->[0]->class, 'Hello';
 is $matches->[0]->action, 'world';
 
 # overwrite

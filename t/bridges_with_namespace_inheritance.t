@@ -18,9 +18,9 @@ $root->bridge('hi')->to('One#two')->namespace('My::Bridges')
 my $m = $root->match(get => '/hi/there');
 is $m->[0]->namespace, 'My::Bridges';
 is $m->[1]->namespace, 'My::Bridges';
-is $m->[0]->controller_class, 'My::Bridges::One';
+is $m->[0]->class, 'My::Bridges::One';
 is $m->[0]->action, 'two';
-is $m->[1]->controller_class, 'My::Bridges::Three';
+is $m->[1]->class, 'My::Bridges::Three';
 is $m->[1]->action, 'four';
 
 
@@ -31,7 +31,7 @@ $root->bridge('hi')->to('One#two')
 $m = $root->match(get => '/hi/here');
 is $m->[0]->namespace, 'Root';
 is $m->[1]->namespace, 'My::Bridges';
-is $m->[0]->controller_class, 'Root::One';
+is $m->[0]->class, 'Root::One';
 is $m->[0]->action, 'two';
-is $m->[1]->controller_class, 'My::Bridges::Three';
+is $m->[1]->class, 'My::Bridges::Three';
 is $m->[1]->action, 'four';
