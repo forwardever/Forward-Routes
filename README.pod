@@ -353,7 +353,7 @@ controller class name.
     $root->add_route('hello')->to('Foo#bar');
 
     my $matches = $root->match(get => '/hello');
-    # $matches->[0]->controller_class is My::Project::Foo
+    # $matches->[0]->class is My::Project::Foo
     # $matches->[0]->action is bar
 
 The C<namespace> method can be used to define sub namespaces on top of the app
@@ -364,7 +364,7 @@ class name.
     my $root = Forward::Routes->new->app_namespace('My::Project');
     $root->add_route('hi')->namespace('Greetings')->to('Foo#hi');
     my $matches = $root->match(get => '/hello');
-    # $matches->[0]->controller_class is My::Project::Greetings::Foo
+    # $matches->[0]->class is My::Project::Greetings::Foo
     # $matches->[0]->action is "hi"
 
 
