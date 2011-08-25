@@ -1,5 +1,12 @@
 Changes for Forward::Routes
 
+0.47    2011-08-24 00:00:00
+        - Made namespace customization for resourceful routes more consistent
+          (works more like default namespace option for standard routes, e.g.
+           nested resources and routes inherit namespace from parent resource)
+        - Full controller class name for resources is only provided by
+          $match->controller_class accessor (no longer by controller param)
+
 0.46    2011-08-24 00:00:00
         - Added namespace method and namespace inheritance to Routes, added
           controller_class and action accessors to Routes::Match
