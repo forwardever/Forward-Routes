@@ -4,7 +4,7 @@ Forward::Guides::Routes::ResourceCustomization - Customizing resourceful routes
 
 =head1 namespace
 
-The controller parameter and the route name can be changed with the help of
+The controller_class return value and the route name can be changed with the help of
 the C<-namespace> option:
 
     my $r = Forward::Routes->new;
@@ -15,7 +15,10 @@ the C<-namespace> option:
     );
 
     $m = $r->match(get => 'users');
-    # $m->[0]->params is {controller => 'Admin::Users', action => 'index'};
+    # controller param is still 'Users'...
+    # $m->[0]->params is {controller => 'Users', action => 'index'};
+    # ... but:
+    # $m->[0]->controller_class is Admin::Users
 
     my $path = $r->build_path('admin_users_index');
     # $path->{path} is 'users'
@@ -33,6 +36,7 @@ This offers a lot more flexibility:
     # allows to check whether the current user is really the admin (using
     # bridges) and break the dispatching cycle if authorization fails
 
+Changes of a resources namespace also effects nested resources (inheritance)!
 
 =head1 as
 

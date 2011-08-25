@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 46;
+use Test::More tests => 47;
 
 use Forward::Routes;
 
@@ -120,7 +120,8 @@ $photos = $r->add_resources('photos' => -namespace => 'Admin');
 $photos->add_member_route('search_form');
 
 $m = $r->match(get => 'photos/1/search_form');
-is_deeply $m->[0]->params => {controller => 'Admin::Photos', action => 'search_form', id => 1};
+is_deeply $m->[0]->params => {controller => 'Photos', action => 'search_form', id => 1};
+is $m->[0]->controller_class, 'Admin::Photos';
 is $m->[0]->name, 'admin_photos_search_form';
 
 

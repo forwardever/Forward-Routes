@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 18;
+use Test::More tests => 19;
 
 use Forward::Routes;
 
@@ -21,6 +21,7 @@ $root->bridge('hi')->to('One#two')->namespace('My::Bridges')
   ->add_route('there')->to('Three#Four');
 $root->bridge('hi')->to('One#two')
   ->add_route('here')->to('Three#Four')->namespace('My::Bridges');
+$root->add_route('undef_namespace')->namespace(undef);
 
 
 my $m = $root->match(get => '/foo');
@@ -38,6 +39,10 @@ is $m->[0]->namespace, 'Root';
 
 $m = $root->match(get => '/buz');
 is $m->[0]->namespace, 'Buz';
+
+$m = $root->match(get => '/undef_namespace');
+is $m->[0]->namespace, undef;
+
 
 # bridge
 $m = $root->match(get => '/hi/there');

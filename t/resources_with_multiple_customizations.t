@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 3;
+use Test::More tests => 4;
 
 use Forward::Routes;
 
@@ -22,7 +22,8 @@ $r->add_resources(
 );
 
 my $m = $r->match(get => '/pictures/123456');
-is_deeply $m->[0]->params => {controller => 'Admin::Photos', action => 'show', id => 123456};
+is_deeply $m->[0]->params => {controller => 'Photos', action => 'show', id => 123456};
+is $m->[0]->controller_class, 'Admin::Photos';
 
 is $r->build_path('admin_photos_show', id => 123456)->{path} => 'pictures/123456';
 

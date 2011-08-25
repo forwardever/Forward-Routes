@@ -39,6 +39,7 @@ sub initialize {
     # Save to route
     $self->method(delete $params->{method});
     $self->method(delete $params->{via});
+    $self->namespace(delete $params->{namespace});
     $self->defaults(delete $params->{defaults});
     $self->name(delete $params->{name});
     $self->to(delete $params->{to});

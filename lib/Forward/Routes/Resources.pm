@@ -21,7 +21,6 @@ sub add_singular {
     for (my $i=0; $i<@$names; $i++) {
 
         my $ns_name_prefix = '';
-        my $ns_ctrl_prefix = '';
 
         my $name = $names->[$i];
 
@@ -34,6 +33,7 @@ sub add_singular {
         my $namespace;
         my $format;
         my $format_exists;
+        my $namespace_exists;
         my $only;
 
 
@@ -41,11 +41,12 @@ sub add_singular {
         if ($names->[$i+1] && ref $names->[$i+1] eq 'HASH') {
             my $params = $names->[$i+1];
 
-            $as            = $params->{as}        if $params->{as};
-            $namespace     = $params->{namespace} if $params->{namespace};
-            $format_exists = 1                    if exists $params->{format};
-            $format        = $params->{format}    if exists $params->{format};
-            $only          = $params->{only}      if $params->{only};
+            $as               = $params->{as}        if $params->{as};
+            $format_exists    = 1                    if exists $params->{format};
+            $namespace_exists = 1                    if exists $params->{namespace};
+            $format           = $params->{format}    if exists $params->{format};
+            $namespace        = $params->{namespace} if exists $params->{namespace};
+            $only             = $params->{only}      if $params->{only};
         }
 
         # selected routes
@@ -67,7 +68,7 @@ sub add_singular {
         }
 
         # custom namespace
-        $ns_ctrl_prefix = $namespace.'::' if $namespace;
+        $namespace = $namespace_exists ? $namespace : $parent->namespace;
 
 
         # camelize controller name (default)
@@ -104,46 +105,46 @@ sub add_singular {
         # save resource attributes
         $resource->{_name}      = $name;
         $resource->{_ctrl}      = $ctrl;
-        $resource->{_namespace} = $namespace;
 
         # custom format
         $resource->format($format) if $format_exists;
+        $resource->namespace($namespace) if $namespace_exists;
 
 
         # members
         $resource->add_route('/new')
           ->via('get')
-          ->to($ns_ctrl_prefix."$ctrl#create_form")
+          ->to("$ctrl#create_form")
           ->name($final_name.'_create_form')
           if $selected{create_form};;
 
         $resource->add_route('/edit')
           ->via('get')
-          ->to($ns_ctrl_prefix."$ctrl#update_form")
+          ->to("$ctrl#update_form")
           ->name($final_name.'_update_form')
           if $selected{update_form};
 
         $resource->add_route
           ->via('post')
-          ->to($ns_ctrl_prefix."$ctrl#create")
+          ->to("$ctrl#create")
           ->name($final_name.'_create')
           if $selected{create};
 
         $resource->add_route
           ->via('get')
-          ->to($ns_ctrl_prefix."$ctrl#show")
+          ->to("$ctrl#show")
           ->name($final_name.'_show')
           if $selected{show};
 
         $resource->add_route
           ->via('put')
-          ->to($ns_ctrl_prefix."$ctrl#update")
+          ->to("$ctrl#update")
           ->name($final_name.'_update')
           if $selected{update};
 
         $resource->add_route
           ->via('delete')
-          ->to($ns_ctrl_prefix."$ctrl#delete")
+          ->to("$ctrl#delete")
           ->name($final_name.'_delete')
           if $selected{delete};
 
@@ -167,7 +168,6 @@ sub add_plural {
     for (my $i=0; $i<@$names; $i++) {
 
         my $ns_name_prefix = '';
-        my $ns_ctrl_prefix = '';
 
         my $name = $names->[$i];
 
@@ -180,18 +180,20 @@ sub add_plural {
         my $namespace;
         my $format;
         my $format_exists;
+        my $namespace_exists;
         my $only;
 
         # custom resource params
         if ($names->[$i+1] && ref $names->[$i+1] eq 'HASH') {
             my $params = $names->[$i+1];
 
-            $as            = $params->{as}          if $params->{as};
-            $constraints   = $params->{constraints} if $params->{constraints};
-            $namespace     = $params->{namespace}   if $params->{namespace};
-            $format_exists = 1                      if exists $params->{format};
-            $format        = $params->{format}      if exists $params->{format};
-            $only          = $params->{only}        if $params->{only};
+            $as               = $params->{as}          if $params->{as};
+            $constraints      = $params->{constraints} if $params->{constraints};
+            $format_exists    = 1                      if exists $params->{format};
+            $namespace_exists = 1                      if exists $params->{namespace};
+            $format           = $params->{format}      if exists $params->{format};
+            $namespace        = $params->{namespace}   if exists $params->{namespace};
+            $only             = $params->{only}        if $params->{only};
         }
 
         # selected routes
@@ -219,7 +221,7 @@ sub add_plural {
 
 
         # custom namespace
-        $ns_ctrl_prefix = $namespace.'::' if $namespace;
+        $namespace = $namespace_exists ? $namespace : $parent->namespace;
 
 
         # camelize controller name (default)
@@ -258,11 +260,11 @@ sub add_plural {
         # save resource attributes
         $resource->{_name}          = $name;
         $resource->{_ctrl}          = $ctrl;
-        $resource->{_namespace}     = $namespace;
         $resource->{_id_constraint} = $id_constraint;
 
         # custom format
         $resource->format($format) if $format_exists;
+        $resource->namespace($namespace) if $namespace_exists;
 
 
         # collection
@@ -271,20 +273,20 @@ sub add_plural {
 
         $collection->add_route
           ->via('get')
-          ->to($ns_ctrl_prefix.$ctrl."#index")
+          ->to($ctrl."#index")
           ->name($final_name.'_index')
           if $selected{index};
 
         $collection->add_route
           ->via('post')
-          ->to($ns_ctrl_prefix.$ctrl."#create")
+          ->to($ctrl."#create")
           ->name($final_name.'_create')
           if $selected{create};
 
         # new resource item
         $collection->add_route('/new')
           ->via('get')
-          ->to($ns_ctrl_prefix.$ctrl."#create_form")
+          ->to($ctrl."#create_form")
           ->name($final_name.'_create_form')
           if $selected{create_form};
 
@@ -296,31 +298,31 @@ sub add_plural {
 
         $members->add_route
           ->via('get')
-          ->to($ns_ctrl_prefix.$ctrl."#show")
+          ->to($ctrl."#show")
           ->name($final_name.'_show')
           if $selected{show};
 
         $members->add_route
           ->via('put')
-          ->to($ns_ctrl_prefix.$ctrl."#update")
+          ->to($ctrl."#update")
           ->name($final_name.'_update')
           if $selected{update};
 
         $members->add_route
           ->via('delete')
-          ->to($ns_ctrl_prefix.$ctrl."#delete")
+          ->to($ctrl."#delete")
           ->name($final_name.'_delete')
           if $selected{delete};
 
         $members->add_route('edit')
           ->via('get')
-          ->to($ns_ctrl_prefix.$ctrl."#update_form")
+          ->to($ctrl."#update_form")
           ->name($final_name.'_update_form')
           if $selected{update_form};
 
         $members->add_route('delete')
           ->via('get')
-          ->to($ns_ctrl_prefix.$ctrl."#delete_form")
+          ->to($ctrl."#delete_form")
           ->name($final_name.'_delete_form')
           if $selected{delete_form};
 
@@ -351,6 +353,7 @@ sub add_member_route {
 
     my $members = $self->_is_plural_resource ? $self->_members : $self;
 
+    # makes sure that inheritance works
     $members->_add_to_parent($child);
 
     # name
@@ -360,14 +363,13 @@ sub add_member_route {
 
 
     # custom namespace
-    my $namespace = $self->{_namespace};
+    my $namespace = $self->namespace;
 
-    my $ns_ctrl_prefix = $namespace ? $namespace.'::' : '';
     my $ns_name_prefix = $namespace ? __PACKAGE__->namespace_to_name($namespace).'_' : '';
 
 
     # Auto set controller and action params and name
-    $child->to($ns_ctrl_prefix.$self->{_ctrl}.'#'.$name);
+    $child->to($self->{_ctrl}.'#'.$name);
     $child->name($ns_name_prefix.$self->{_name}.'_'.$name);
 
     return $child;
@@ -398,6 +400,7 @@ sub add_collection_route {
 
     my $child = Forward::Routes->new(@params);
 
+    # makes sure that inheritance works
     $self->_collection->_add_to_parent($child);
 
     # name
@@ -411,14 +414,13 @@ sub add_collection_route {
 
 
     # custom namespace
-    my $namespace = $self->{_namespace};
+    my $namespace = $self->namespace;
 
-    my $ns_ctrl_prefix = $namespace ? $namespace.'::' : '';
     my $ns_name_prefix = $namespace ? __PACKAGE__->namespace_to_name($namespace).'_' : '';
 
 
     # Auto set controller and action params and name
-    $child->to($ns_ctrl_prefix.$self->{_ctrl}.'#'.$name);
+    $child->to($self->{_ctrl}.'#'.$name);
     $child->name($ns_name_prefix.$self->{_name}.'_'.$name);
 
     return $child;
