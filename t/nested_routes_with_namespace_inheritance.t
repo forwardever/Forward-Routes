@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 7;
+use Test::More tests => 8;
 
 use Forward::Routes;
 
@@ -26,6 +26,7 @@ $m = $root->match(get => 'foo/bar');
 is $m->[0]->namespace, 'Hello::Foo';
 
 # Match->class and Match->action
+is $m->[0]->controller, 'Controller';
 is $m->[0]->class, 'Hello::Foo::Controller';
 is $m->[0]->action, 'action';
 

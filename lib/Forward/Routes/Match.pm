@@ -106,6 +106,12 @@ sub name {
 }
 
 
+sub controller {
+    my $self = shift;
+    return $self->{params}->{controller};
+}
+
+
 sub namespace {
     my $self = shift;
     return $self->{namespace};
