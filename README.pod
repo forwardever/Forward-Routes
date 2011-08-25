@@ -342,6 +342,32 @@ make routes reversible (see C<build_path>).
     $r->add_route('logout')->name('foo');
 
 
+=head2 Namespaces
+
+The C<app_namespace> method can be used to define the base namespace of your
+application. All nested routes inherit the app_namespace, unless it is
+overwritten. The app_namespace value is used to determine the full
+controller class name.
+
+    my $root = Forward::Routes->new->app_namespace('My::Project');
+    $root->add_route('hello')->to('Foo#bar');
+
+    my $matches = $root->match(get => '/hello');
+    # $matches->[0]->controller_class is My::Project::Foo
+    # $matches->[0]->action is bar
+
+The C<namespace> method can be used to define sub namespaces on top of the app
+namespace. All nested routes inherit the (sub) namespace, unless it is
+overwritten. The namespace value is used to determine the full controller
+class name.
+
+    my $root = Forward::Routes->new->app_namespace('My::Project');
+    $root->add_route('hi')->namespace('Greetings')->to('Foo#hi');
+    my $matches = $root->match(get => '/hello');
+    # $matches->[0]->controller_class is My::Project::Greetings::Foo
+    # $matches->[0]->action is "hi"
+
+
 =head2 Path Building
 
 Routes are reversible, i.e. paths can be generated through the C<build_path>

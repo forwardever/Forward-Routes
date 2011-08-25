@@ -40,6 +40,7 @@ sub initialize {
     $self->method(delete $params->{method});
     $self->method(delete $params->{via});
     $self->namespace(delete $params->{namespace});
+    $self->app_namespace(delete $params->{app_namespace});
     $self->defaults(delete $params->{defaults});
     $self->name(delete $params->{name});
     $self->to(delete $params->{to});
@@ -78,6 +79,7 @@ sub _add_to_parent {
     $child->format([@{$self->{format}}]) if $self->{format};
     $child->method([@{$self->{method}}]) if $self->{method};
     $child->namespace($self->{namespace}) if $self->{namespace};
+    $child->app_namespace($self->{app_namespace}) if $self->{app_namespace};
 
     push @{$self->children}, $child;
 
@@ -216,6 +218,18 @@ sub namespace {
 }
 
 
+sub app_namespace {
+    my $self = shift;
+    my (@params) = @_;
+
+    return $self->{app_namespace} unless @params;
+
+    $self->{app_namespace} = $params[0];
+
+    return $self;
+}
+
+
 sub to {
     my $self = shift;
     my ($to) = @_;
@@ -342,6 +356,7 @@ sub _match {
             $match->_add_params(\%{$m->captures});
             $match->_add_captures(\%{$m->captures});
             $match->_add_name($m->name);
+            $match->_add_app_namespace($self->app_namespace);
             $match->_add_namespace($self->namespace);
         }
 
@@ -350,6 +365,7 @@ sub _match {
     elsif (!$matches->[0]){
         $match = $matches->[0] = Forward::Routes::Match->new;
         $match->_add_name($self->name);
+        $match->_add_app_namespace($self->app_namespace);
         $match->_add_namespace($self->namespace);
     }
     else {
@@ -1060,6 +1076,32 @@ make routes reversible (see C<build_path>).
 
     $r = Forward::Routes->new;
     $r->add_route('logout')->name('foo');
+
+
+=head2 Namespaces
+
+The C<app_namespace> method can be used to define the base namespace of your
+application. All nested routes inherit the app_namespace, unless it is
+overwritten. The app_namespace value is used to determine the full
+controller class name.
+
+    my $root = Forward::Routes->new->app_namespace('My::Project');
+    $root->add_route('hello')->to('Foo#bar');
+
+    my $matches = $root->match(get => '/hello');
+    # $matches->[0]->controller_class is My::Project::Foo
+    # $matches->[0]->action is bar
+
+The C<namespace> method can be used to define sub namespaces on top of the app
+namespace. All nested routes inherit the (sub) namespace, unless it is
+overwritten. The namespace value is used to determine the full controller
+class name.
+
+    my $root = Forward::Routes->new->app_namespace('My::Project');
+    $root->add_route('hi')->namespace('Greetings')->to('Foo#hi');
+    my $matches = $root->match(get => '/hello');
+    # $matches->[0]->controller_class is My::Project::Greetings::Foo
+    # $matches->[0]->action is "hi"
 
 
 =head2 Path Building

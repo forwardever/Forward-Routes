@@ -48,6 +48,16 @@ sub _add_namespace {
 }
 
 
+sub _add_app_namespace {
+    my $self = shift;
+    my (@params) = @_;
+
+    $self->{app_namespace} = $params[0] if @params;
+
+    return $self;
+}
+
+
 sub params {
     my $self = shift;
     my ($key) = @_;
@@ -102,11 +112,26 @@ sub namespace {
 }
 
 
+sub app_namespace {
+    my $self = shift;
+    return $self->{app_namespace};
+}
+
+
 sub controller_class {
     my $self = shift;
 
-    my $class = $self->{namespace}.'::' if $self->{namespace};
-    return $class .= $self->{params}->{controller};
+    return undef unless $self->{params}->{controller};
+
+    my @class;
+
+    push @class, $self->{app_namespace} if $self->{app_namespace};
+
+    push @class, $self->{namespace} if $self->{namespace};
+
+    push @class, $self->{params}->{controller};
+
+    return join('::', @class);
 }
 
 

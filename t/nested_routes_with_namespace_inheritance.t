@@ -13,8 +13,8 @@ use Forward::Routes;
 ### nested routes with namespace inheritance
 
 my $root = Forward::Routes->new->namespace('Root');
-my $nested = $root->add_route('foo')->namespace('Hello::Foo');
-$nested->add_route('bar')->to('Controller#action');
+my $nested1 = $root->add_route('foo')->namespace('Hello::Foo');
+$nested1->add_route('bar')->to('Controller#action');
 $root->add_route('baz')->name('two');
 $root->add_route('buz')->name('three')->namespace('Buz');
 $root->add_route('undef_namespace')->namespace(undef);
@@ -37,4 +37,5 @@ is $m->[0]->namespace, 'Buz';
 
 $m = $root->match(get => '/undef_namespace');
 is $m->[0]->namespace, undef;
+
 
