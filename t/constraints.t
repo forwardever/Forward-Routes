@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 16;
+use Test::More tests => 23;
 use lib 'lib';
 use Forward::Routes;
 
@@ -25,13 +25,11 @@ is_deeply $m->[0]->params => {id => 123};
 
 
 # path building
-my $e = eval {$r->build_path('article')->{path}};
+is eval {$r->build_path('article')->{path}}, undef;
 like $@ => qr/Required param 'id' was not passed when building a path/;
-undef $e;
 
-$e = eval {$r->build_path('article', id => 'abc')->{path}};
+is eval {$r->build_path('article', id => 'abc')->{path}}, undef;
 like $@ => qr/Param 'id' fails a constraint/;
-undef $e;
 
 is $r->build_path('article', id => 123)->{path} => 'articles/123';
 
@@ -56,24 +54,19 @@ is_deeply $m->[0]->params => {id => 123, comment => 'ab'};
 
 
 # path building
-$e = eval {$r->build_path('article')->{path}};
+is eval {$r->build_path('article')->{path}}, undef;
 like $@ => qr/Required param 'id' was not passed when building a path/;
-undef $e;
 
-$e = eval {$r->build_path('article', id => '123')->{path}};
+is eval {$r->build_path('article', id => '123')->{path}}, undef;
 like $@ => qr/Required param 'comment' was not passed when building a path/;
-undef $e;
 
-$e = eval {$r->build_path('article', comment => 'ab')->{path}};
+is eval {$r->build_path('article', comment => 'ab')->{path}}, undef;
 like $@ => qr/Required param 'id' was not passed when building a path/;
-undef $e;
 
-$e = eval {$r->build_path('article', id => 'abc', comment => 'ab')->{path}};
+is eval {$r->build_path('article', id => 'abc', comment => 'ab')->{path}}, undef;
 like $@ => qr/Param 'id' fails a constraint/;
-undef $e;
 
-$e = eval {$r->build_path('article', id => '123', comment => 'abc')->{path}};
+is eval {$r->build_path('article', id => '123', comment => 'abc')->{path}}, undef;
 like $@ => qr/Param 'comment' fails a constraint/;
-undef $e;
 
 is $r->build_path('article', id => 123, comment => 'ab')->{path} => 'articles/123/ab';
