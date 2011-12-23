@@ -1,10 +1,7 @@
-#!/usr/bin/env perl
-
 use strict;
 use warnings;
-
 use Test::More tests => 7;
-
+use lib 'lib';
 use Forward::Routes;
 
 
