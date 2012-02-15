@@ -22,10 +22,10 @@ is_deeply $m->[0]->params => {foo => 'hello', bar => 'there.html'};
 
 
 
-### one format constraint
-$r = Forward::Routes->new->format('html');
-$r->add_route('foo')->name('one');
-$r->add_route(':foo/:bar')->name('two');
+### format constraint
+$r = Forward::Routes->new;
+$r->add_route('foo')->name('one')->format('html');
+$r->add_route(':foo/:bar')->name('two')->format('html');
 
 $m = $r->match(get => 'foo.html');
 is_deeply $m->[0]->params => {format => 'html'};
@@ -58,10 +58,11 @@ is $r->build_path('two', foo => 1, bar => 2)->{path}, '1/2.html';
 is $r->build_path('two', foo => 0, bar => 2)->{path}, '0/2.html';
 
 
+
 ### pass empty format explicitly
-$r = Forward::Routes->new->format('');
-$r->add_route('foo')->name('one');
-$r->add_route(':foo/:bar')->name('two');
+$r = Forward::Routes->new;
+$r->add_route('foo')->name('one')->format('');
+$r->add_route(':foo/:bar')->name('two')->format('');
 
 $m = $r->match(get => 'foo');
 is_deeply $m->[0]->params => {format => ''};
@@ -89,9 +90,9 @@ is $r->build_path('two', foo => 1, bar => 2)->{path}, '1/2';
 
 
 ### pass undef format (no contraint validation)
-$r = Forward::Routes->new->format(undef);
-$r->add_route('foo')->name('one');
-$r->add_route(':foo/:bar')->name('two');
+$r = Forward::Routes->new;
+$r->add_route('foo')->name('one')->format(undef);
+$r->add_route(':foo/:bar')->name('two')->format(undef);
 
 $m = $r->match(get => 'foo');
 is_deeply $m->[0]->params => {};
@@ -114,9 +115,9 @@ is $r->build_path('two', foo => 1, bar => 2)->{path}, '1/2';
 
 
 ### multiple format constraints
-$r = Forward::Routes->new->format('html','xml');
-$r->add_route('foo')->name('one');
-$r->add_route(':foo/:bar')->name('two');
+$r = Forward::Routes->new;
+$r->add_route('foo')->name('one')->format('html','xml');
+$r->add_route(':foo/:bar')->name('two')->format('html','xml');
 
 $m = $r->match(get => 'foo.html');
 is_deeply $m->[0]->params => {format => 'html'};
@@ -157,9 +158,9 @@ is $r->build_path('two', foo => 1, bar => 2)->{path}, '1/2.html';
 
 
 ### multiple format constraints, with empty format allowed
-$r = Forward::Routes->new->format('html','');
-$r->add_route('foo')->name('one');
-$r->add_route(':foo/:bar')->name('two');
+$r = Forward::Routes->new;
+$r->add_route('foo')->name('one')->format('html','');
+$r->add_route(':foo/:bar')->name('two')->format('html','');
 
 $m = $r->match(get => 'foo.html');
 is_deeply $m->[0]->params => {format => 'html'};

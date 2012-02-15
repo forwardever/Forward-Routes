@@ -1,5 +1,4 @@
 package Forward::Routes;
-
 use strict;
 use warnings;
 
@@ -301,26 +300,58 @@ sub via {
 
 
 sub _match {
-    my ($self, $method, $path) = @_;
+    my $self = shift;
+    my ($method, $path, $format_extracted_from_path, $last_path_part, $last_pattern) = @_;
 
-    # Format
-    my $request_format;
-    if (!@{$self->children} && $self->{format}) {
-        $path =~m/\.([\a-zA-Z0-9]{1,4})$/;
-        $request_format = defined $1 ? $1 : '';
-
-        # format extension is only replaced if format constraint exists
-        $path =~s/\.[\a-zA-Z0-9]{1,4}$// if $request_format;
+    # re-evaluate last path part if format changes from undef to def or vice versa
+    # and last path part has already been checked (empty path)
+    my $re_eval_pattern;
+    if (!(length $path) && defined($self->format) ne defined($self->parent->format)) {
+        $path = $last_path_part;
+        $re_eval_pattern = 1;
     }
 
-    # Current pattern match
-    my $captures = [];
+
+    # change from def to undef format -> add format extension back to path
+    # (reverse format extraction)
+    if (!(defined $self->format) && $self->parent && defined $self->parent->format) {
+        $path .= '.' . $format_extracted_from_path if $format_extracted_from_path ne '';
+        $format_extracted_from_path = undef;
+    }
+
+
+    # use pattern of current route, or if it does not exist and path has to be
+    # re-evaluated because of format change, use last pattern
+    my $pattern;
     if (defined $self->pattern->pattern) {
-        $captures = $self->_match_current_pattern(\$path) || return;
+        $pattern = $self->pattern;
+    }
+    elsif ($re_eval_pattern) {
+        $pattern = $last_pattern;
+    }
+    else {
+        $pattern = undef;
     }
 
-    # No Match, as path not empty, but further children
-    return if length($path) && !@{$self->children};
+
+    # extract format from path if not already done and format option is activated
+    if ($self->format && !(defined $format_extracted_from_path)) {
+        $path =~m/\.([\a-zA-Z0-9]{1,4})$/;
+        $format_extracted_from_path = defined $1 ? $1 : '';
+
+        $path =~s/\.[\a-zA-Z0-9]{1,4}$// if $format_extracted_from_path ne '';
+    }
+
+
+    # match current pattern or return
+    my $captures = [];
+    if ($pattern) {
+        ($captures, $last_path_part, $last_pattern) = $self->_match_current_pattern(\$path, $pattern);
+        $captures || return;
+    }
+
+    # no match, as path not empty and no further children exist
+    return if length $path && !@{$self->children};
 
     # Children match
     my $matches = [];
@@ -330,7 +361,7 @@ sub _match {
         foreach my $child (@{$self->children}) {
 
             # Match?
-            $matches = $child->_match($method => $path);
+            $matches = $child->_match($method => $path, $format_extracted_from_path, $last_path_part, $last_pattern);
             last if $matches;
 
         }
@@ -341,7 +372,7 @@ sub _match {
     # Format and Method
     unless (@{$self->children}) {
         $self->_match_method($method) || return;
-        $self->_match_format($request_format) || return;
+        $self->_match_format($format_extracted_from_path) || return;
     }
 
     # Match object
@@ -372,14 +403,17 @@ sub _match {
         $match = $matches->[0];
     }
 
-    my $captures_hash = $self->_captures_to_hash(@$captures);
+    my $captures_hash = {};
+    if ($pattern) {
+        $captures_hash = $self->_captures_to_hash($pattern, @$captures);
+    }
 
     # Merge defaults and captures, Copy! of $self->defaults
     $match->_add_params({%{$self->defaults}, %$captures_hash});
 
     # Format
     unless (@{$self->children}) {
-        $match->_add_params({format => $request_format}) if $self->{format};
+        $match->_add_params({format => $format_extracted_from_path}) if $self->{format};
     }
 
     # Captures
@@ -390,20 +424,25 @@ sub _match {
 
 
 sub _match_current_pattern {
-    my ($self, $path_ref) = @_;
+    my ($self, $path_ref, $pattern) = @_;
+
+    my $last_path_part = $$path_ref;
 
     # Pattern
-    my $regex = $self->pattern->compile->pattern;
+    my $regex = $pattern->compile->pattern;
+
     my @captures = ($$path_ref =~ m/$regex/);
     return unless @captures;
 
     # Remove 1 at the end of array if no real captures present
-    splice @captures, @{$self->pattern->captures};
+    splice @captures, @{$pattern->captures};
 
     # Replace matching part
     $$path_ref =~ s/$regex//;
 
-
+    if (length($last_path_part) && !(length $$path_ref)) {
+        return (\@captures, $last_path_part, $pattern);
+    }
 
     return \@captures;
 }
@@ -411,13 +450,13 @@ sub _match_current_pattern {
 
 sub _captures_to_hash {
     my $self = shift;
-    my (@captures) = @_;
+    my ($pattern, @captures) = @_;
 
     my $captures = {};
 
     my $defaults = $self->{defaults};
 
-    foreach my $name (@{$self->pattern->captures}) {
+    foreach my $name (@{$pattern->captures}) {
         my $capture = shift @captures;
 
         if (defined $capture) {
@@ -723,11 +762,11 @@ sub format {
 
 
 sub _match_format {
-    my ($self, $request_format) = @_;
+    my ($self, $format) = @_;
 
     return 1 unless defined $self->format;
 
-    my @success = grep { $_ eq $request_format } @{$self->format};
+    my @success = grep { $_ eq $format } @{$self->format};
 
     return unless @success;
 
