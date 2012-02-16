@@ -275,6 +275,13 @@ sub match {
     my $matches = $self->_match(lc($method) => $path);
     return unless $matches;
 
+    my $m = $matches->[-1];
+    for (my $i=0; $i<(@$matches-1); $i++) {
+        $matches->[$i]->{params} = {%{$m->params}, %{$matches->[$i]->params} }; # all params except controller and action
+        $matches->[$i]->{captures} = $m->captures;
+        $matches->[$i]->_add_name($m->name);
+    }
+
     return $matches;
 }
 
@@ -376,32 +383,35 @@ sub _match {
     }
 
     # Match object
-    my $match;
+    if (!@$matches){
+        my $m = Forward::Routes::Match->new;
+        $m->_add_name($self->name);
+        $m->_add_app_namespace($self->app_namespace);
+        $m->_add_namespace($self->namespace);
 
-    if ($self->_is_bridge) {
-        $match = Forward::Routes::Match->new;
-        $match->is_bridge(1);
-
-        # make earlier captures available to bridge
-        if (my $m = $matches->[0]) {
-            $match->_add_params(\%{$m->captures});
-            $match->_add_captures(\%{$m->captures});
-            $match->_add_name($m->name);
-            $match->_add_app_namespace($self->app_namespace);
-            $match->_add_namespace($self->namespace);
+        if ($self->{format}) {
+            $m->_add_params({format => $format_extracted_from_path});
         }
 
-        unshift @$matches, $match;
+        push @$matches, $m;
     }
-    elsif (!$matches->[0]){
-        $match = $matches->[0] = Forward::Routes::Match->new;
-        $match->_add_name($self->name);
-        $match->_add_app_namespace($self->app_namespace);
-        $match->_add_namespace($self->namespace);
+
+    if ($self->_is_bridge) {
+        my $m = Forward::Routes::Match->new;
+        $m->_add_app_namespace($self->app_namespace);
+        $m->_add_namespace($self->namespace);
+
+        $m->is_bridge(1);
+
+        $m->_add_params({
+            controller => $self->defaults->{controller},
+            action     => $self->defaults->{action}
+        });
+
+        unshift @$matches, $m;
     }
-    else {
-        $match = $matches->[0];
-    }
+
+    my $match = $matches->[-1];
 
     my $captures_hash = {};
     if ($pattern) {
@@ -410,11 +420,6 @@ sub _match {
 
     # Merge defaults and captures, Copy! of $self->defaults
     $match->_add_params({%{$self->defaults}, %$captures_hash});
-
-    # Format
-    unless (@{$self->children}) {
-        $match->_add_params({format => $format_extracted_from_path}) if $self->{format};
-    }
 
     # Captures
     $match->_add_captures($captures_hash);
@@ -970,10 +975,10 @@ Perl regular expression.
 
     # placeholder only matches integers
     $r->add_route('articles/:id')->constraints(id => qr/\d+/);
-    
+
     $m = $r->match(get => 'articles/abc');
     # $m is undef
-    
+
     $m = $r->match(get => 'articles/123');
     # $m->[0]->params is {id => 123}
 
@@ -1038,7 +1043,7 @@ matching route.
 
     my $m = $r->match(get => 'logout');
     # $m is undef
-    
+
     my $m = $r->match(post => 'logout');
     # $m->[0] is {}
 
@@ -1069,14 +1074,14 @@ All child routes inherit the format constraint of their parent, unless the
 format constraint of the child is overwritten. For example, adding a format
 constraint to the route root object affects all child routes added
 via add_route.
-    
+
     my $root = Forward::Routes->new->format('html');
     $root->add_route('foo')->format('xml');
     $root->add_route('baz');
 
     $m = $root->match(get => 'foo.html');
     # $m is undef;
-    
+
     $m = $root->match(get => 'foo.xml');
     # $m->[0]->params is {format => 'xml'};
 
