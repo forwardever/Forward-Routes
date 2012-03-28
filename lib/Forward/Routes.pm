@@ -17,6 +17,10 @@ sub new {
 
     my $self = bless {}, $class;
 
+    # block
+    my $code_ref = pop @_ if @_ && ref $_[-1] eq 'CODE';
+    $code_ref->($self) if $code_ref;
+
     # Pattern
     my $pattern = @_ % 2 ? shift : undef;
     $self->pattern->pattern($pattern) if defined $pattern;
