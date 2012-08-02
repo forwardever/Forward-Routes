@@ -507,21 +507,20 @@ sub _match_method {
 sub build_path {
     my ($self, $name, @params) = @_;
 
-    my $child = $self->find_route($name);
+    my $route = $self->find_route($name);
+    croak qq/Unknown name '$name' used to build a path/ unless $route;
 
-    my $path = $child->_build_path(@params) if $child;
+    my $path = $route->_build_path(@params);
 
     # Format extension
-    $path->{path} .= '.'.$child->{format}->[0] if $child->{format} && $child->{format}->[0];
+    $path->{path} .= '.' . $route->{format}->[0] if $route->{format} && $route->{format}->[0];
 
     # Method
-    $path->{method} = $child->{method}->[0] if $child->{method};
+    $path->{method} = $route->{method}->[0] if $route->{method};
 
-    $path->{path} =~s/^\/// if $path;
+    $path->{path} =~s/^\///;
 
-    return $path if $path;
-
-    croak qq/Unknown name '$name' used to build a path/;
+    return $path;
 }
 
 
