@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 45;
+use Test::More tests => 51;
 use lib 'lib';
 use Forward::Routes;
 
@@ -154,6 +154,15 @@ is $m, undef;
 is $r->build_path('one')->{path}, 'foo.html';
 is $r->build_path('two', foo => 1, bar => 2)->{path}, '1/2.html';
 
+# build path with format => xml
+is $r->build_path('one', format => 'xml')->{path}, 'foo.xml';
+is $r->build_path('two', foo => 1, bar => 2, format => 'xml')->{path}, '1/2.xml';
+
+# build path with invalid format => jpeg
+is eval{$r->build_path('one', format => 'jpeg')}, undef;
+like $@, qr/Invalid format 'jpeg' used to build a path/;
+is eval{$r->build_path('two', foo => 1, bar => 2, format => 'jpeg')}, undef;
+like $@, qr/Invalid format 'jpeg' used to build a path/;
 
 
 

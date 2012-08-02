@@ -505,15 +505,21 @@ sub _match_method {
 
 
 sub build_path {
-    my ($self, $name, @params) = @_;
+    my ($self, $name, %params) = @_;
 
     my $route = $self->find_route($name);
     croak qq/Unknown name '$name' used to build a path/ unless $route;
 
-    my $path = $route->_build_path(@params);
+    my $path = $route->_build_path(%params);
 
-    # Format extension
-    $path->{path} .= '.' . $route->{format}->[0] if $route->{format} && $route->{format}->[0];
+    # format extension
+    my $format;
+    if ($format = $params{format}) {
+        $route->_match_format($format) || die qq/Invalid format '$format' used to build a path/;
+    }
+    $format ||= $route->{format} ? $route->{format}->[0] : undef;
+    $path->{path} .= '.' . $format if $format;
+
 
     # Method
     $path->{method} = $route->{method}->[0] if $route->{method};
