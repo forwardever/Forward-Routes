@@ -778,7 +778,11 @@ sub format {
 sub _match_format {
     my ($self, $format) = @_;
 
-    return 1 unless defined $self->format;
+    # just relevant for path building, not path matching, as $format
+    # is only extraced if format constraint exists ($self->format)
+    return if !defined($self->format) && defined($format);
+
+    return 1 if !defined($self->format);
 
     my @success = grep { $_ eq $format } @{$self->format};
 

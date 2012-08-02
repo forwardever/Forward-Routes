@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 51;
+use Test::More tests => 55;
 use lib 'lib';
 use Forward::Routes;
 
@@ -11,8 +11,8 @@ use Forward::Routes;
 
 ### no format constraint, but format passed
 my $r = Forward::Routes->new;
-$r->add_route('foo');
-$r->add_route(':foo/:bar');
+$r->add_route('foo')->name('one');
+$r->add_route(':foo/:bar')->name('two');
 
 my $m = $r->match(get => 'foo.html');
 is $m, undef;
@@ -20,6 +20,10 @@ is $m, undef;
 $m = $r->match(get => 'hello/there.html');
 is_deeply $m->[0]->params => {foo => 'hello', bar => 'there.html'};
 
+is eval {$r->build_path('one', format => 'html')}, undef;
+like $@, qr/Invalid format 'html' used to build a path/;
+is eval {$r->build_path('two', foo => 'hello', bar => 'there', format => 'html')}, undef;
+like $@, qr/Invalid format 'html' used to build a path/;
 
 
 ### format constraint
