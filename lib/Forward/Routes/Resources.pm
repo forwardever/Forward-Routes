@@ -354,7 +354,7 @@ sub add_member_route {
     my $members = $self->_is_plural_resource ? $self->_members : $self;
 
     # makes sure that inheritance works
-    $members->_add_to_parent($child);
+    $members->_add_child($child);
 
     # name
     my $name = $params[0];
@@ -401,7 +401,7 @@ sub add_collection_route {
     my $child = Forward::Routes->new(@params);
 
     # makes sure that inheritance works
-    $self->_collection->_add_to_parent($child);
+    $self->_collection->_add_child($child);
 
     # name
     my $name = $params[0];

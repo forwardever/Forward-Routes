@@ -68,7 +68,7 @@ sub add_route {
 
     my $child = $self->new(@_);
 
-    return $self->_add_to_parent($child);
+    return $self->_add_child($child);
 }
 
 
@@ -117,11 +117,11 @@ sub _add_resource_route {
 
     my $child = Forward::Routes::Resources->new(@_);
 
-    return $self->_add_to_parent($child);
+    return $self->_add_child($child);
 }
 
 
-sub _add_to_parent {
+sub _add_child {
     my $self = shift;
     my ($child) = @_;
 
