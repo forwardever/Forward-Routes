@@ -95,12 +95,7 @@ sub bridge {
 
 sub children {
     my $self = shift;
-
-    $self->{children} ||= [];
-    return $self->{children} unless $_[0];
-
-    $self->{children} = $_[0];
-    return $self;
+    return $self->{children} ||= [];
 }
 
 
