@@ -10,6 +10,11 @@ use Carp 'croak';
 
 our $VERSION = '0.51';
 
+
+## ---------------------------------------------------------------------------
+##  Constructor
+## ---------------------------------------------------------------------------
+
 sub new {
     my $class = shift;
 
@@ -51,9 +56,12 @@ sub initialize {
     $self->constraints(delete $params->{constraints});
 
     return $self;
-
 }
 
+
+## ---------------------------------------------------------------------------
+##  Routes tree
+## ---------------------------------------------------------------------------
 
 sub add_route {
     my $self = shift;
@@ -61,7 +69,51 @@ sub add_route {
     my $child = $self->new(@_);
 
     return $self->_add_to_parent($child);
+}
 
+
+sub add_resources {
+    my $self = shift;
+
+    return Forward::Routes::Resources->add_plural($self, @_);
+}
+
+
+sub add_singular_resources {
+    my $self = shift;
+
+    return Forward::Routes::Resources->add_singular($self, @_);
+}
+
+
+sub bridge {
+    my $self = shift;
+
+    return $self->add_route(@_)->_is_bridge(1);
+}
+
+
+sub children {
+    my $self = shift;
+
+    $self->{children} ||= [];
+    return $self->{children} unless $_[0];
+
+    $self->{children} = $_[0];
+    return $self;
+}
+
+
+sub parent {
+    my $self = shift;
+
+    return $self->{parent} unless $_[0];
+
+    $self->{parent} = $_[0];
+
+    weaken $self->{parent};
+
+    return $self;
 }
 
 
@@ -92,13 +144,6 @@ sub _add_to_parent {
 }
 
 
-sub bridge {
-    my $self = shift;
-
-    return $self->add_route(@_)->_is_bridge(1);
-}
-
-
 sub _is_bridge {
     my $self = shift;
 
@@ -110,69 +155,30 @@ sub _is_bridge {
 }
 
 
-sub add_singular_resources {
+## ---------------------------------------------------------------------------
+##  Route attributes
+## ---------------------------------------------------------------------------
+
+sub app_namespace {
     my $self = shift;
+    my (@params) = @_;
 
-    return Forward::Routes::Resources->add_singular($self, @_);
-}
+    return $self->{app_namespace} unless @params;
 
-
-sub add_resources {
-    my $self = shift;
-
-    return Forward::Routes::Resources->add_plural($self, @_);
-}
-
-
-# overwrite code ref for more advanced approach:
-# sub {
-#     require Lingua::EN::Inflect::Number;
-#     return &Lingua::EN::Inflect::Number::to_S($value);
-# }
-sub singularize {
-    my $self = shift;
-    my ($code_ref) = @_;
-
-    # Initialize very basic singularize code ref
-    $Forward::Routes::singularize ||= sub {
-        my $value = shift;
-
-        if ($value =~ s/ies$//) {
-            $value .= 'y';
-        }
-        else {
-            $value =~ s/s$//;
-        }
-
-        return $value;
-    };
-
-    return $Forward::Routes::singularize unless $code_ref;
-
-    $Forward::Routes::singularize = $code_ref;
+    $self->{app_namespace} = $params[0];
 
     return $self;
-
 }
 
 
-sub format_resource_controller {
+sub constraints {
     my $self = shift;
-    my ($code_ref) = @_;
 
-    $Forward::Routes::format_controller ||= sub {
-        my $value = shift;
+    return $self->pattern->constraints unless defined $_[0];
 
-        my @parts = split /-/, $value;
-        for my $part (@parts) {
-            $part = join '', map {ucfirst} split /_/, $part;
-        }
-        return join '::', @parts;
-    };
+    my $constraints = ref $_[0] eq 'HASH' ? $_[0] : {@_};
 
-    return $Forward::Routes::format_controller unless $code_ref;
-
-    $Forward::Routes::format_controller = $code_ref;
+    $self->pattern->constraints($constraints);
 
     return $self;
 }
@@ -193,6 +199,28 @@ sub defaults {
 
     # Merge defaults
     %$d = (%$d, %$passed_defaults);
+
+    return $self;
+}
+
+
+sub format {
+    my $self = shift;
+    my (@params) = @_;
+
+    return $self->{format} unless @params;
+
+    # no format constraint, no format matching performed
+    if (!defined($params[0])) {
+        $self->{format} = undef;
+        return $self;
+    }
+
+    my $formats = ref $params[0] eq 'ARRAY' ? $params[0] : [@params];
+
+    @$formats = map {lc $_} @$formats;
+
+    $self->{format} = $formats;
 
     return $self;
 }
@@ -221,13 +249,30 @@ sub namespace {
 }
 
 
-sub app_namespace {
+sub pattern {
     my $self = shift;
     my (@params) = @_;
 
-    return $self->{app_namespace} unless @params;
+    $self->{pattern} ||= Forward::Routes::Pattern->new;
 
-    $self->{app_namespace} = $params[0];
+    return $self->{pattern} unless @params;
+
+    $self->{pattern}->pattern(@params);
+
+    return $self;
+}
+
+
+sub method {
+    my $self = shift;
+
+    return $self->{method} unless $_[0];
+
+    my $methods = ref $_[0] eq 'ARRAY' ? $_[0] : [@_];
+
+    @$methods = map {lc $_} @$methods;
+
+    $self->{method} = $methods;
 
     return $self;
 }
@@ -247,6 +292,37 @@ sub to {
     return $self->defaults($params);
 }
 
+
+sub via {
+    shift->method(@_);
+}
+
+
+sub _is_plural_resource {
+    my $self = shift;
+
+    return $self->{_is_plural_resource} unless defined $_[0];
+
+    $self->{_is_plural_resource} = $_[0];
+
+    return $self;
+}
+
+
+sub _is_singular_resource {
+    my $self = shift;
+
+    return $self->{_is_singular_resource} unless defined $_[0];
+
+    $self->{_is_singular_resource} = $_[0];
+
+    return $self;
+}
+
+
+## ---------------------------------------------------------------------------
+##  Path matching and search
+## ---------------------------------------------------------------------------
 
 sub find_route {
     my ($self, $name) = @_;
@@ -287,26 +363,6 @@ sub match {
     }
 
     return $matches;
-}
-
-
-sub method {
-    my $self = shift;
-
-    return $self->{method} unless $_[0];
-
-    my $methods = ref $_[0] eq 'ARRAY' ? $_[0] : [@_];
-
-    @$methods = map {lc $_} @$methods;
-
-    $self->{method} = $methods;
-
-    return $self;
-}
-
-
-sub via {
-    shift->method(@_);
 }
 
 
@@ -457,6 +513,34 @@ sub _match_current_pattern {
 }
 
 
+sub _match_format {
+    my ($self, $format) = @_;
+
+    # just relevant for path building, not path matching, as $format
+    # is only extraced if format constraint exists ($self->format)
+    return if !defined($self->format) && defined($format);
+
+    return 1 if !defined($self->format);
+
+    my @success = grep { $_ eq $format } @{$self->format};
+
+    return unless @success;
+
+    return 1;
+}
+
+
+sub _match_method {
+    my ($self, $value) = @_;
+
+    return 1 unless defined $self->method;
+
+    return unless defined $value;
+
+    return !!grep { $_ eq $value } @{$self->method};
+}
+
+
 sub _captures_to_hash {
     my $self = shift;
     my ($pattern, @captures) = @_;
@@ -480,29 +564,9 @@ sub _captures_to_hash {
 }
 
 
-sub constraints {
-    my $self = shift;
-
-    return $self->pattern->constraints unless defined $_[0];
-
-    my $constraints = ref $_[0] eq 'HASH' ? $_[0] : {@_};
-
-    $self->pattern->constraints($constraints);
-
-    return $self;
-}
-
-
-sub _match_method {
-    my ($self, $value) = @_;
-
-    return 1 unless defined $self->method;
-
-    return unless defined $value;
-
-    return !!grep { $_ eq $value } @{$self->method};
-}
-
+## ---------------------------------------------------------------------------
+##  Path building
+## ---------------------------------------------------------------------------
 
 sub build_path {
     my ($self, $name, %params) = @_;
@@ -691,105 +755,64 @@ sub capture_error {
 }
 
 
-sub children {
+## ---------------------------------------------------------------------------
+##  Helpers
+## ---------------------------------------------------------------------------
+
+# overwrite code ref for more advanced approach:
+# sub {
+#     require Lingua::EN::Inflect::Number;
+#     return &Lingua::EN::Inflect::Number::to_S($value);
+# }
+sub singularize {
     my $self = shift;
+    my ($code_ref) = @_;
 
-    $self->{children} ||= [];
-    return $self->{children} unless $_[0];
+    # Initialize very basic singularize code ref
+    $Forward::Routes::singularize ||= sub {
+        my $value = shift;
 
-    $self->{children} = $_[0];
-    return $self;
-}
+        if ($value =~ s/ies$//) {
+            $value .= 'y';
+        }
+        else {
+            $value =~ s/s$//;
+        }
 
+        return $value;
+    };
 
-sub parent {
-    my $self = shift;
+    return $Forward::Routes::singularize unless $code_ref;
 
-    return $self->{parent} unless $_[0];
-
-    $self->{parent} = $_[0];
-
-    weaken $self->{parent};
-
-    return $self;
-
-}
-
-
-sub pattern {
-    my $self = shift;
-    my (@params) = @_;
-
-    $self->{pattern} ||= Forward::Routes::Pattern->new;
-
-    return $self->{pattern} unless @params;
-
-    $self->{pattern}->pattern(@params);
+    $Forward::Routes::singularize = $code_ref;
 
     return $self;
 
 }
 
 
-sub _is_plural_resource {
+sub format_resource_controller {
     my $self = shift;
+    my ($code_ref) = @_;
 
-    return $self->{_is_plural_resource} unless defined $_[0];
+    $Forward::Routes::format_controller ||= sub {
+        my $value = shift;
 
-    $self->{_is_plural_resource} = $_[0];
+        my @parts = split /-/, $value;
+        for my $part (@parts) {
+            $part = join '', map {ucfirst} split /_/, $part;
+        }
+        return join '::', @parts;
+    };
+
+    return $Forward::Routes::format_controller unless $code_ref;
+
+    $Forward::Routes::format_controller = $code_ref;
 
     return $self;
 }
 
 
-sub _is_singular_resource {
-    my $self = shift;
-
-    return $self->{_is_singular_resource} unless defined $_[0];
-
-    $self->{_is_singular_resource} = $_[0];
-
-    return $self;
-}
-
-
-sub format {
-    my $self = shift;
-    my (@params) = @_;
-
-    return $self->{format} unless @params;
-
-    # no format constraint, no format matching performed
-    if (!defined($params[0])) {
-        $self->{format} = undef;
-        return $self;
-    }
-
-    my $formats = ref $params[0] eq 'ARRAY' ? $params[0] : [@params];
-
-    @$formats = map {lc $_} @$formats;
-
-    $self->{format} = $formats;
-
-    return $self;
-}
-
-
-sub _match_format {
-    my ($self, $format) = @_;
-
-    # just relevant for path building, not path matching, as $format
-    # is only extraced if format constraint exists ($self->format)
-    return if !defined($self->format) && defined($format);
-
-    return 1 if !defined($self->format);
-
-    my @success = grep { $_ eq $format } @{$self->format};
-
-    return unless @success;
-
-    return 1;
-}
 
 1;
 __END__
