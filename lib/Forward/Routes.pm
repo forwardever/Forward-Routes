@@ -144,17 +144,6 @@ sub _add_to_parent {
 }
 
 
-sub _is_bridge {
-    my $self = shift;
-
-    return $self->{_is_bridge} unless defined $_[0];
-
-    $self->{_is_bridge} = $_[0];
-
-    return $self;
-}
-
-
 ## ---------------------------------------------------------------------------
 ##  Route attributes
 ## ---------------------------------------------------------------------------
@@ -295,6 +284,17 @@ sub to {
 
 sub via {
     shift->method(@_);
+}
+
+
+sub _is_bridge {
+    my $self = shift;
+
+    return $self->{_is_bridge} unless defined $_[0];
+
+    $self->{_is_bridge} = $_[0];
+
+    return $self;
 }
 
 
