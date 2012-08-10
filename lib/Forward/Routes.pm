@@ -211,7 +211,8 @@ sub format {
 
 
 sub name {
-    my ($self, $name) = @_;
+    my $self = shift;
+    my ($name) = @_;
 
     return $self->{name} unless defined $name;
 
@@ -278,7 +279,8 @@ sub to {
 
 
 sub via {
-    shift->method(@_);
+    my $self = shift;
+    $self->method(@_);
 }
 
 
@@ -320,7 +322,8 @@ sub _is_singular_resource {
 ## ---------------------------------------------------------------------------
 
 sub find_route {
-    my ($self, $name) = @_;
+    my $self = shift;
+    my ($name) = @_;
 
     $self->{routes_by_name} ||= {};
     return $self->{routes_by_name}->{$name} if $self->{routes_by_name}->{$name};
@@ -338,7 +341,8 @@ sub find_route {
 
 
 sub match {
-    my ($self, $method, $path) = @_;
+    my $self = shift;
+    my ($method, $path) = @_;
 
     length $method || croak 'Forward::Routes->match: missing request method';
     defined $path || croak 'Forward::Routes->match: missing path';
@@ -484,7 +488,8 @@ sub _match {
 
 
 sub _match_current_pattern {
-    my ($self, $path_ref, $pattern) = @_;
+    my $self = shift;
+    my ($path_ref, $pattern) = @_;
 
     my $last_path_part = $$path_ref;
 
@@ -509,7 +514,8 @@ sub _match_current_pattern {
 
 
 sub _match_format {
-    my ($self, $format) = @_;
+    my $self = shift;
+    my ($format) = @_;
 
     # just relevant for path building, not path matching, as $format
     # is only extraced if format constraint exists ($self->format)
@@ -526,7 +532,8 @@ sub _match_format {
 
 
 sub _match_method {
-    my ($self, $value) = @_;
+    my $self = shift;
+    my ($value) = @_;
 
     return 1 unless defined $self->method;
 
@@ -564,7 +571,8 @@ sub _captures_to_hash {
 ## ---------------------------------------------------------------------------
 
 sub build_path {
-    my ($self, $name, %params) = @_;
+    my $self = shift;
+    my ($name, %params) = @_;
 
     my $route = $self->find_route($name);
     croak qq/Unknown name '$name' used to build a path/ unless $route;
@@ -590,7 +598,8 @@ sub build_path {
 
 
 sub _build_path {
-    my ($self, %params) = @_;
+    my $self = shift;
+    my (%params) = @_;
 
     my $path = {};
     $path->{path} = '';
@@ -744,7 +753,8 @@ sub _build_path {
 
 
 sub capture_error {
-    my ($self, $capture_name) = @_;
+    my $self = shift;
+    my ($capture_name) = @_;
 
     croak qq/Required param '$capture_name' was not passed when building a path/;
 }

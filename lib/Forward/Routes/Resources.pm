@@ -454,7 +454,7 @@ sub _parent_resource_names {
 
 
 sub _prepare_resource_options {
-    my $self    = shift;
+    my $self = shift;
     my (@names) = @_;
 
     my @final;
