@@ -8,7 +8,7 @@ use Forward::Routes::Resources;
 use Scalar::Util qw/weaken/;
 use Carp 'croak';
 
-our $VERSION = '0.51';
+our $VERSION = '0.52';
 
 
 ## ---------------------------------------------------------------------------

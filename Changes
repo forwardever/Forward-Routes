@@ -1,4 +1,10 @@
 Changes for Forward::Routes
+
+0.52    2012-11-07 00:00:00
+        - sort methods in Forward::Routes by category and name
+        - bug fix for path building: make sure that params with empty values
+          behave like undef params
+
 0.51    2012-02-16 00:00:00
         - added block syntax (api alternativ)
         - added tests for empty routes and home paths
