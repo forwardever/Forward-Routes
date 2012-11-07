@@ -1,19 +1,72 @@
 use strict;
 use warnings;
-use Test::More tests => 38;
+use Test::More tests => 41;
 use lib 'lib';
 use Forward::Routes;
 
 
 
 #############################################################################
-### optional placeholders
+### one placeholder marked as optional, excluding slash (just the placeholder
+### is optional)
 
 my $r = Forward::Routes->new;
+$r->add_route(':year/(:month)?/:day')->name('foo');
+
+my $m = $r->match(get => '2009/12');
+is $m, undef;
+
+$m = $r->match(get => '2009/12/2');
+is_deeply $m->[0]->params => {year => 2009, month => 12, day => 2};
+
+$m = $r->match(get => '2009//2');
+is_deeply $m->[0]->params => {year => 2009, day => 2};
+
+# build path
+my $e = eval{$r->build_path('foo', year => 2009, month => 12)->{path}; };
+like $@ => qr/Required param 'day' was not passed when building a path/;
+undef $e;
+
+is $r->build_path('foo', year => 2009, month => 12, day => 2)->{path}, '2009/12/2';
+
+is $r->build_path('foo', year => 2009, day => 2)->{path}, '2009//2';
+
+
+
+#############################################################################
+### one placeholder with slash marked as optional
+
+$r = Forward::Routes->new;
+$r->add_route(':year(/:month)?/:day')->name('foo');
+
+$m = $r->match(get => '2009');
+is $m, undef;
+
+$m = $r->match(get => '2009/12');
+is_deeply $m->[0]->params => {year => 2009, day => 12};
+
+$m = $r->match(get => '2009/12/2');
+is_deeply $m->[0]->params => {year => 2009, month => 12, day => 2};
+
+# build path
+$e = eval {$r->build_path('foo', year => 2009)->{path}; };
+like $@ => qr/Required param 'day' was not passed when building a path/;
+undef $e;
+
+is $r->build_path('foo', year => 2009, day => 12)->{path}, '2009/12';
+
+is $r->build_path('foo', year => 2009, month => 12, day => 2)->{path}, '2009/12/2';
+
+
+
+#############################################################################
+### multiple placeholders with slashes marked as optional at once
+
+$r = Forward::Routes->new;
 
 $r->add_route(':year(/:month/:day)?')->name('foo');
 
-my $m = $r->match(get => '2009');
+$m = $r->match(get => '2009');
 is_deeply $m->[0]->params => {year => 2009};
 
 $m = $r->match(get => '2009/12');
@@ -26,7 +79,7 @@ is_deeply $m->[0]->params => {year => 2009, month => 12, day => 10};
 # build path
 is $r->build_path('foo', year => 2009)->{path}, '2009';
 
-my $e = eval {$r->build_path('foo', year => 2009, month => 12)->{path}; };
+$e = eval {$r->build_path('foo', year => 2009, month => 12)->{path}; };
 like $@ => qr/Required param 'day' was not passed when building a path/;
 undef $e;
 
@@ -34,53 +87,17 @@ is $r->build_path('foo', year => 2009, month => 12, day => 10)->{path}, '2009/12
 
 
 
-$r = Forward::Routes->new;
-$r->add_route(':year(/:month)?/:day')->name('foo');
-
-$m = $r->match(get => '2009/12');
-is_deeply $m->[0]->params => {year => 2009, day => 12};
-
-$m = $r->match(get => '2009/12/2');
-is_deeply $m->[0]->params => {year => 2009, month => 12, day => 2};
-
-# build path
-is $r->build_path('foo', year => 2009, day => 12)->{path}, '2009/12';
-
-$e = eval {$r->build_path('foo', year => 2009)->{path}; };
-like $@ => qr/Required param 'day' was not passed when building a path/;
-undef $e;
-
-is $r->build_path('foo', year => 2009, day => 2, month => 12)->{path}, '2009/12/2';
-
-
-
-$r = Forward::Routes->new;
-$r->add_route(':year/(:month)?/:day')->name('foo');
-
-$m = $r->match(get => '2009/12');
-ok not defined $m;
-
-$m = $r->match(get => '2009/12/2');
-is_deeply $m->[0]->params => {year => 2009, month => 12, day => 2};
-
-$m = $r->match(get => '2009//2');
-is_deeply $m->[0]->params => {year => 2009, day => 2};
-
-# build path
-$e = eval{$r->build_path('foo', year => 2009, month => 12)->{path}; };
-like $@ => qr/Required param 'day' was not passed when building a path/;
-undef $e;
-
-is $r->build_path('foo', year => 2009, month => 12, day => 2)->{path}, '2009/12/2';
-is $r->build_path('foo', year => 2009, day => 2)->{path}, '2009//2';
-
-
+#############################################################################
+### placeholder marked as optional, with preceding text
 
 $r = Forward::Routes->new;
 $r->add_route(':year/month(:month)?/:day')->name('foo');
 
 $m = $r->match(get => '2009/12/2');
-ok not defined $m;
+is $m, undef;
+
+$m = $r->match(get => '2009//2');
+is $m, undef;
 
 $m = $r->match(get => '2009/month/2');
 is_deeply $m->[0]->params => {year => 2009, day => 2};
@@ -90,10 +107,14 @@ is_deeply $m->[0]->params => {year => 2009, month => '08', day => 2};
 
 # build path
 is $r->build_path('foo', year => 2009, month => 12, day => 2)->{path}, '2009/month12/2';
+
 is $r->build_path('foo', year => 2009, day => 2)->{path}, '2009/month/2';
+
 is $r->build_path('foo', year => 2009, month => '08', day => 2)->{path}, '2009/month08/2';
 
 
+#############################################################################
+### placeholder and hyphen marked as optional, with preceding text
 
 $r = Forward::Routes->new;
 $r->add_route('/hello/world(-:city)?')->name('foo');
@@ -105,12 +126,14 @@ $m = $r->match(get => 'hello/world-paris');
 is_deeply $m->[0]->params => {city => 'paris'};
 
 # build path
-is $r->build_path('foo', city => "berlin")->{path}, 'hello/world-berlin';
 is $r->build_path('foo')->{path}, 'hello/world';
 
+is $r->build_path('foo', city => "berlin")->{path}, 'hello/world-berlin';
 
 
-# group city
+#############################################################################
+### grouped placeholder an hyphen marked as optional, with preceding text
+
 $r = Forward::Routes->new;
 $r->add_route('/hello/world(-(:city))?')->name('foo');
 
@@ -121,13 +144,19 @@ $m = $r->match(get => 'hello/world-paris');
 is_deeply $m->[0]->params => {city => 'paris'};
 
 # build path
-is $r->build_path('foo', city => "berlin")->{path}, 'hello/world-berlin';
 is $r->build_path('foo')->{path}, 'hello/world';
 
+is $r->build_path('foo', city => "berlin")->{path}, 'hello/world-berlin';
 
+
+#############################################################################
+### multiple placeholders within slashes marked as optional
 
 $r = Forward::Routes->new;
 $r->add_route('world/(:country)?-(:cities)?')->name('hello');
+
+$m = $r->match(get => 'world/-');
+is_deeply $m->[0]->params => {};
 
 $m = $r->match(get => 'world/us-');
 is_deeply $m->[0]->params => {country => 'us'};
@@ -139,7 +168,11 @@ $m = $r->match(get => 'world/us-new_york');
 is_deeply $m->[0]->params => {country => 'us', cities => 'new_york'};
 
 # build path
-is $r->build_path('hello', country => 'us', cities => 'new_york')->{path}, 'world/us-new_york';
-is $r->build_path('hello', cities => 'new_york')->{path}, 'world/-new_york';
-is $r->build_path('hello', country => 'us')->{path}, 'world/us-';
 is $r->build_path('hello')->{path}, 'world/-';
+
+is $r->build_path('hello', country => 'us')->{path}, 'world/us-';
+
+is $r->build_path('hello', cities => 'new_york')->{path}, 'world/-new_york';
+
+is $r->build_path('hello', country => 'us', cities => 'new_york')->{path}, 'world/us-new_york';
+
