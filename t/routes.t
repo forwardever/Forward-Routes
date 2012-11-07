@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 177;
+use Test::More tests => 174;
 use lib 'lib';
 use Forward::Routes;
 
@@ -656,7 +656,6 @@ $r->add_route(':foo/:bar', name => 'two');
 $r->add_route('photos/*other',                   name => 'glob1');
 $r->add_route('books/*section/:title',           name => 'glob2');
 $r->add_route('*a/foo/*b',                       name => 'glob3');
-$r->add_route('archive/:year(/:month/:day)?',    name => 'optional1');
 $r->add_route('archive/:year(/:month(/:day)?)?', name => 'optional2');
 
 
@@ -680,15 +679,6 @@ is $r->build_path(
 )->{path} => 'books/fiction/fantasy/hello';
 is $r->build_path('glob3', a => 'foo/bar', b => 'baz/zab')->{path} =>
   'foo/bar/foo/baz/zab';
-
-is $r->build_path('optional1', year => 2010)->{path} => 'archive/2010';
-
-$e = eval {$r->build_path('optional1', year => 2010, month => 5)->{path}; };
-like $@ => qr/Required param 'day' was not passed when building a path/;
-undef $e;
-
-is $r->build_path('optional1', year => 2010, month => 5, day => 4)->{path} =>
-  'archive/2010/5/4';
 
 is $r->build_path('optional2', year => 2010)->{path} => 'archive/2010';
 is $r->build_path('optional2', year => 2010, month => 3)->{path} =>
