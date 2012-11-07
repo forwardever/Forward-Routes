@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 41;
+use Test::More tests => 65;
 use lib 'lib';
 use Forward::Routes;
 
@@ -132,7 +132,7 @@ is $r->build_path('foo', city => "berlin")->{path}, 'hello/world-berlin';
 
 
 #############################################################################
-### grouped placeholder an hyphen marked as optional, with preceding text
+### grouped placeholder and hyphen marked as optional, with preceding text
 
 $r = Forward::Routes->new;
 $r->add_route('/hello/world(-(:city))?')->name('foo');
@@ -147,6 +147,94 @@ is_deeply $m->[0]->params => {city => 'paris'};
 is $r->build_path('foo')->{path}, 'hello/world';
 
 is $r->build_path('foo', city => "berlin")->{path}, 'hello/world-berlin';
+
+
+#############################################################################
+### multiple grouped placeholders and text (hyphen) marked as optional
+### (two captures in one optional group, no defaults)
+
+$r = Forward::Routes->new;
+$r->add_route('world/((((:country)))-(:cities))?')->name('hello');
+
+$m = $r->match(get => 'world/');
+is_deeply $m->[0]->params => {};
+
+$m = $r->match(get => 'world/us-');
+ok not defined $m;
+
+$m = $r->match(get => 'world/-new_york');
+ok not defined $m;
+
+$m = $r->match(get => 'world/us-new_york');
+is_deeply $m->[0]->params => {country => 'us', cities => 'new_york'};
+
+# build path
+is $r->build_path('hello')->{path}, 'world/';
+
+$e = eval {$r->build_path('hello', country => 'us')->{path}; };
+like $@ => qr/Required param 'cities' was not passed when building a path/;
+undef $e;
+
+$e = eval {$r->build_path('hello', cities => 'new_york')->{path}; };
+like $@ => qr/Required param 'country' was not passed when building a path/;
+undef $e;
+
+is $r->build_path('hello', country => 'us', cities => 'new_york')->{path}, 'world/us-new_york';
+
+
+#############################################################################
+### grouped text between optional placeholders
+$r = Forward::Routes->new;
+$r->add_route('world/(:country)?(-and-)(:cities)?')->name('hello');
+
+$m = $r->match(get => 'world/-and-');
+is_deeply $m->[0]->params => {};
+
+$m = $r->match(get => 'world/us-and-');
+is_deeply $m->[0]->params => {country => 'us'};
+
+$m = $r->match(get => 'world/-and-new_york');
+is_deeply $m->[0]->params => {cities => 'new_york'};
+
+$m = $r->match(get => 'world/us-and-new_york');
+is_deeply $m->[0]->params => {country => 'us', cities => 'new_york'};
+
+# build path
+is $r->build_path('hello', country => 'us')->{path}, 'world/us-and-';
+
+is $r->build_path('hello', cities => 'new_york')->{path}, 'world/-and-new_york';
+
+is $r->build_path('hello', country => 'us', cities => 'new_york')->{path}, 'world/us-and-new_york';
+
+is $r->build_path('hello')->{path}, 'world/-and-';
+
+
+#############################################################################
+### ungrouped text after optional placeholders
+
+$r = Forward::Routes->new;
+$r->add_route('world/(:country)?(-and-)(:cities)?-text')->name('hello');
+
+$m = $r->match(get => 'world/-and--text');
+is_deeply $m->[0]->params => {};
+
+$m = $r->match(get => 'world/us-and--text');
+is_deeply $m->[0]->params => {country => 'us'};
+
+$m = $r->match(get => 'world/-and-new_york-text');
+is_deeply $m->[0]->params => {cities => 'new_york'};
+
+$m = $r->match(get => 'world/us-and-new_york-text');
+is_deeply $m->[0]->params => {country => 'us', cities => 'new_york'};
+
+# build path
+is $r->build_path('hello')->{path}, 'world/-and--text';
+
+is $r->build_path('hello', country => 'us')->{path}, 'world/us-and--text';
+
+is $r->build_path('hello', cities => 'new_york')->{path}, 'world/-and-new_york-text';
+
+is $r->build_path('hello', country => 'us', cities => 'new_york')->{path}, 'world/us-and-new_york-text';
 
 
 #############################################################################
