@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 174;
+use Test::More tests => 173;
 use lib 'lib';
 use Forward::Routes;
 
@@ -38,18 +38,13 @@ is $r->{pattern}, undef;
 ### match
 $r = Forward::Routes->new;
 $r->add_route('foo');
-$r->add_route(':foo/:bar');
 
 my $m = $r->match(get => 'foo');
 is_deeply $m->[0]->params => {};
 
-$m = $r->match(get => 'hello/there');
-is_deeply $m->[0]->params => {foo => 'hello', bar => 'there'};
-
 # match again (params empty again)
 $m = $r->match(get => 'foo');
 is_deeply $m->[0]->params => {};
-
 
 
 #############################################################################
