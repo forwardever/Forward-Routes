@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 65;
+use Test::More tests => 67;
 use lib 'lib';
 use Forward::Routes;
 
@@ -57,6 +57,17 @@ is $r->build_path('foo', year => 2009, day => 12)->{path}, '2009/12';
 
 is $r->build_path('foo', year => 2009, month => 12, day => 2)->{path}, '2009/12/2';
 
+
+#############################################################################
+### empty value -> same behavior as undef
+
+$r = Forward::Routes->new;
+$r->add_route(':year(/:month)?/:day')->name('foo');
+
+$m = $r->match(get => '2009//2');
+is $m, undef;
+
+is $r->build_path('foo', year => 2009, month => '', day => 12)->{path}, '2009/12';
 
 
 #############################################################################

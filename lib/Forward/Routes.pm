@@ -679,7 +679,7 @@ sub _build_path {
 
             # Param
             $path_part = $params{$name};
-            $path_part = defined $path_part ? $path_part : $self->{defaults}->{$name};
+            $path_part = defined $path_part && length $path_part ? $path_part : $self->{defaults}->{$name};
 
             if (!$depth && !defined $path_part) {
                 $self->capture_error($name);
