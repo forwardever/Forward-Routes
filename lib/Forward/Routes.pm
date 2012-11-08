@@ -160,9 +160,7 @@ sub constraints {
 
     return $self->pattern->constraints unless defined $_[0];
 
-    my $constraints = ref $_[0] eq 'HASH' ? $_[0] : {@_};
-
-    $self->pattern->constraints($constraints);
+    $self->pattern->constraints(@_);
 
     return $self;
 }

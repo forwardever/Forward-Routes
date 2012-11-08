@@ -259,10 +259,14 @@ sub captures {
 sub constraints {
     my $self = shift;
 
-    $self->{constraints} ||= {};
-    return $self->{constraints} unless $_[0];
+    my $constraints = $self->{constraints} ||= {};
 
-    $self->{constraints} = $_[0];
+    return $constraints unless defined $_[0];
+
+    my %new_constraints = ref $_[0] eq 'HASH' ? %{$_[0]} : @_;
+
+    %$constraints = (%$constraints, %new_constraints);
+
     return $self;
 }
 
