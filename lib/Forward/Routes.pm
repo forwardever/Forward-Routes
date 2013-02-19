@@ -575,7 +575,9 @@ sub build_path {
     my $route = $self->find_route($name);
     croak qq/Unknown name '$name' used to build a path/ unless $route;
 
-    my $path = $route->_build_path(%params);
+    my $path_string = $route->_build_path(%params);
+    my $path = {};
+    $path->{path} = $path_string;
 
     # format extension
     my $format;
@@ -599,8 +601,7 @@ sub _build_path {
     my $self = shift;
     my (%params) = @_;
 
-    my $path = {};
-    $path->{path} = '';
+    my $path = '';
 
     if ($self->{parent}) {
         $path = $self->{parent}->_build_path(%params);
@@ -625,7 +626,7 @@ sub _build_path {
 
     # Use pre-generated pattern->path in case no captures exist for current route
     if (my $new_path = $self->{pattern}->path) {
-        $path->{path} = $path->{path}.$new_path;
+        $path .= $new_path;
         return $path;
     }
 
@@ -739,10 +740,10 @@ sub _build_path {
     my $new_path = join('' => @{$parts->{0}});
 
     if ($self->{parent}) {
-        $path->{path} = $path->{path}.$new_path;
+        $path .= $new_path;
     }
     else {
-        $path->{path} = $new_path;
+        $path = $new_path;
     }
 
     return $path;
