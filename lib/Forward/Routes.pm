@@ -575,7 +575,7 @@ sub build_path {
     my $route = $self->find_route($name);
     croak qq/Unknown name '$name' used to build a path/ unless $route;
 
-    my $path_string = $route->_build_path(%params);
+    my $path_string = $route->_build_path(\%params);
     my $path = {};
     $path->{path} = $path_string;
 
@@ -599,12 +599,12 @@ sub build_path {
 
 sub _build_path {
     my $self = shift;
-    my (%params) = @_;
+    my ($params) = @_;
 
     my $path = '';
 
     if ($self->{parent}) {
-        $path = $self->{parent}->_build_path(%params);
+        $path = $self->{parent}->_build_path($params);
     }
 
     # Return path if current route has no pattern
@@ -677,7 +677,7 @@ sub _build_path {
         if ($type eq 'capture') {
 
             # Param
-            $path_part = $params{$name};
+            $path_part = $params->{$name};
             $path_part = defined $path_part && length $path_part ? $path_part : $self->{defaults}->{$name};
 
             if (!$depth && !defined $path_part) {
@@ -719,9 +719,9 @@ sub _build_path {
             my $name = $part->{name};
 
             croak qq/Required glob param '$name' was not passed when building a path/
-              unless exists $params{$name};
+              unless exists $params->{$name};
 
-            $path_part = $params{$name};
+            $path_part = $params->{$name};
         }
         # Text
         elsif ($type eq 'text') {
