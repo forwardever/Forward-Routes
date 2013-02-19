@@ -640,35 +640,39 @@ sub _build_path {
             next;
         }
 
-        # Close optional group
-        if ($type eq 'close_group' && ${$part->{optional}}) {
+        if ($type eq 'close_group') {
 
-            # Only pass group content to lower levels if captures have values
-            if ($existing_capture->{$depth}) {
+            # Close optional group          
+            if (${$part->{optional}}) {
 
-                # push data to optional level
-                push @{$parts->{$depth-1}}, @{$parts->{$depth}};
-
-                # error, if lower level optional group has emtpy captures, but current
-                # optional group has filled captures
-                $self->capture_error($empty_capture->{$depth-1})
-                  if $empty_capture->{$depth-1};
-
-                # all other captures in lower level must have values now
-                $existing_capture->{$depth-1} += $existing_capture->{$depth};
+                # Only pass group content to lower levels if captures have values
+                if ($existing_capture->{$depth}) {
+    
+                    # push data to optional level
+                    push @{$parts->{$depth-1}}, @{$parts->{$depth}};
+    
+                    # error, if lower level optional group has emtpy captures, but current
+                    # optional group has filled captures
+                    $self->capture_error($empty_capture->{$depth-1})
+                      if $empty_capture->{$depth-1};
+    
+                    # all other captures in lower level must have values now
+                    $existing_capture->{$depth-1} += $existing_capture->{$depth};
+                }
+    
+                $existing_capture->{$depth} = 0;
+                $empty_capture->{$depth} = undef;
+                $parts->{$depth} = [];
+    
+                $depth--;
+    
+                next;
+            }
+            # Close non optional group
+            else {
+                next;
             }
 
-            $existing_capture->{$depth} = 0;
-            $empty_capture->{$depth} = undef;
-            $parts->{$depth} = [];
-
-            $depth--;
-
-            next;
-        }
-        # Close non optional group
-        elsif ($type eq 'close_group' && !${$part->{optional}}) {
-            next;
         }
 
         my $path_part;
