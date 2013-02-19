@@ -612,6 +612,12 @@ sub _build_path {
 
     $self->{pattern}->compile;
 
+    # Use pre-generated pattern->path in case no captures exist for current route
+    if (my $new_path = $self->{pattern}->path) {
+        $path .= $new_path;
+        return $path;
+    }
+
     # Path parts by optional level
     my $parts = {};
 
@@ -623,12 +629,6 @@ sub _build_path {
 
     # Optional depth
     my $depth = 0;
-
-    # Use pre-generated pattern->path in case no captures exist for current route
-    if (my $new_path = $self->{pattern}->path) {
-        $path .= $new_path;
-        return $path;
-    }
 
     foreach my $part (@{$self->{pattern}->parts}) {
         my $type = $part->{type};
