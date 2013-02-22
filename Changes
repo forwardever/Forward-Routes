@@ -1,5 +1,9 @@
 Changes for Forward::Routes
 
+0.53    2013-02-22 00:00:00
+        - performance improvements for building paths
+        - make sure that multiple calls to constraints methods does not result in reset of previous constraints
+
 0.52    2012-11-07 00:00:00
         - sort methods in Forward::Routes by category and name
         - bug fix for path building: make sure that params with empty values
