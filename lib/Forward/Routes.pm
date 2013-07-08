@@ -331,6 +331,12 @@ sub find_route {
 }
 
 
+sub routes_by_name {
+    my $self = shift;
+    return $self->{routes_by_name};
+}
+
+
 sub match {
     my $self = shift;
     my ($method, $path) = @_;

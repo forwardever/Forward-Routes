@@ -610,11 +610,11 @@ $r = Forward::Routes->new;
 $r->add_resources('photos');
 
 is $r->find_route('photos_foo'), undef;
-is $r->{routes_by_name}->{photos_foo}, undef;
+is $r->routes_by_name->{photos_foo}, undef;
 
-is $r->{routes_by_name}->{photos_index}, undef;
+is $r->routes_by_name->{photos_index}, undef;
 is $r->find_route('photos_index')->name, 'photos_index';
-is $r->{routes_by_name}->{photos_index}->name, 'photos_index';
+is $r->routes_by_name->{photos_index}->name, 'photos_index';
 
 
 
