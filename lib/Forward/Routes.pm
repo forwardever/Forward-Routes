@@ -583,12 +583,12 @@ sub build_path {
     if ($format = $params{format}) {
         $route->_match_format($format) || die qq/Invalid format '$format' used to build a path/;
     }
-    $format ||= $route->{format} ? $route->{format}->[0] : undef;
+    $format ||= $route->format ? $route->format->[0] : undef;
     $path->{path} .= '.' . $format if $format;
 
 
     # Method
-    $path->{method} = $route->{via}->[0] if $route->{via};
+    $path->{method} = $route->via->[0] if $route->via;
 
     $path->{path} =~s/^\///;
 
