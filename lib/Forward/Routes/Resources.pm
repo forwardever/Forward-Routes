@@ -14,7 +14,7 @@ sub add_singular {
 
     my $names = $_[0] && ref $_[0] eq 'ARRAY' ? [@{$_[0]}] : [@_];
 
-    $names = __PACKAGE__->_prepare_resource_options(@$names);
+    $names = Forward::Routes::Resources->_prepare_resource_options(@$names);
 
     my $last_resource;
 
@@ -76,7 +76,7 @@ sub add_singular {
 
 
         # final name
-        $ns_name_prefix = __PACKAGE__->namespace_to_name($namespace).'_' if $namespace;
+        $ns_name_prefix = Forward::Routes::Resources->namespace_to_name($namespace).'_' if $namespace;
         my $final_name = $ns_name_prefix.$name;
 
 
@@ -161,7 +161,7 @@ sub add_plural {
 
     my $names = $_[0] && ref $_[0] eq 'ARRAY' ? [@{$_[0]}] : [@_];
 
-    $names = __PACKAGE__->_prepare_resource_options(@$names);
+    $names = Forward::Routes::Resources->_prepare_resource_options(@$names);
 
     my $last_resource;
 
@@ -229,7 +229,7 @@ sub add_plural {
 
 
         # final name
-        $ns_name_prefix = __PACKAGE__->namespace_to_name($namespace).'_' if $namespace;
+        $ns_name_prefix = Forward::Routes::Resources->namespace_to_name($namespace).'_' if $namespace;
         my $final_name = $ns_name_prefix.$name;
 
 
@@ -365,7 +365,7 @@ sub add_member_route {
     # custom namespace
     my $namespace = $self->namespace;
 
-    my $ns_name_prefix = $namespace ? __PACKAGE__->namespace_to_name($namespace).'_' : '';
+    my $ns_name_prefix = $namespace ? Forward::Routes::Resources->namespace_to_name($namespace).'_' : '';
 
 
     # Auto set controller and action params and name
@@ -416,7 +416,7 @@ sub add_collection_route {
     # custom namespace
     my $namespace = $self->namespace;
 
-    my $ns_name_prefix = $namespace ? __PACKAGE__->namespace_to_name($namespace).'_' : '';
+    my $ns_name_prefix = $namespace ? Forward::Routes::Resources->namespace_to_name($namespace).'_' : '';
 
 
     # Auto set controller and action params and name
