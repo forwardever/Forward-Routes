@@ -103,8 +103,8 @@ sub add_singular {
 
 
         # save resource attributes
-        $resource->{_name}      = $name;
-        $resource->{_ctrl}      = $ctrl;
+        $resource->_name($name);
+        $resource->_ctrl($ctrl);
 
         # custom format
         $resource->format($format) if $format_exists;
@@ -258,9 +258,9 @@ sub add_plural {
 
 
         # save resource attributes
-        $resource->{_name}          = $name;
-        $resource->{_ctrl}          = $ctrl;
-        $resource->{_id_constraint} = $id_constraint;
+        $resource->_name($name);
+        $resource->_ctrl($ctrl);
+        $resource->_id_constraint($id_constraint);
 
         # custom format
         $resource->format($format) if $format_exists;
@@ -491,7 +491,44 @@ sub namespace_to_name {
         push @new_parts, join '_', @words;
     }
     return join '_', @new_parts;
-
 }
+
+
+sub _name {
+    my $self = shift;
+    my (@params) = @_;
+
+    return $self->{_name} unless @params;
+
+    $self->{_name} = $params[0];
+
+    return $self;
+}
+
+
+sub _ctrl {
+    my $self = shift;
+    my (@params) = @_;
+
+    return $self->{_ctrl} unless @params;
+
+    $self->{_ctrl} = $params[0];
+
+    return $self;
+}
+
+
+sub _id_constraint {
+    my $self = shift;
+    my (@params) = @_;
+
+    return $self->{_id_constraint} unless @params;
+
+    $self->{_id_constraint} = $params[0];
+
+    return $self;
+}
+
+
 
 1;
