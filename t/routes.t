@@ -588,7 +588,7 @@ $r = Forward::Routes->new;
 $articles = $r->add_route('articles/:id')
   ->defaults({first_name => 'foo', last_name => 'bar'})
   ->constraints({id => qr/\d+/})
-  ->method(['get','post']);
+  ->via(['get','post']);
 
 is ref $articles, 'Forward::Routes';
 

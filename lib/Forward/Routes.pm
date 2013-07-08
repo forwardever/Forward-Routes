@@ -45,8 +45,7 @@ sub initialize {
     my $params = ref $_[0] eq 'HASH' ? {%{$_[0]}} : {@_};
 
     # Save to route
-    $self->method(delete $params->{method});
-    $self->method(delete $params->{via});
+    $self->via(delete $params->{via});
     $self->namespace(delete $params->{namespace});
     $self->app_namespace(delete $params->{app_namespace});
     $self->defaults(delete $params->{defaults});
@@ -127,7 +126,7 @@ sub _add_child {
 
     # Format, method and namespace inheritance
     $child->format([@{$self->{format}}]) if $self->{format};
-    $child->method([@{$self->{method}}]) if $self->{method};
+    $child->via([@{$self->{via}}]) if $self->{via};
     $child->namespace($self->{namespace}) if $self->{namespace};
     $child->app_namespace($self->{app_namespace}) if $self->{app_namespace};
 
@@ -246,16 +245,16 @@ sub pattern {
 }
 
 
-sub method {
+sub via {
     my $self = shift;
 
-    return $self->{method} unless $_[0];
+    return $self->{via} unless $_[0];
 
     my $methods = ref $_[0] eq 'ARRAY' ? $_[0] : [@_];
 
     @$methods = map {lc $_} @$methods;
 
-    $self->{method} = $methods;
+    $self->{via} = $methods;
 
     return $self;
 }
@@ -273,12 +272,6 @@ sub to {
     $params->{controller} ||= undef;
 
     return $self->defaults($params);
-}
-
-
-sub via {
-    my $self = shift;
-    $self->method(@_);
 }
 
 
@@ -533,11 +526,11 @@ sub _match_method {
     my $self = shift;
     my ($value) = @_;
 
-    return 1 unless defined $self->method;
+    return 1 unless defined $self->via;
 
     return unless defined $value;
 
-    return !!grep { $_ eq $value } @{$self->method};
+    return !!grep { $_ eq $value } @{$self->via};
 }
 
 
@@ -589,7 +582,7 @@ sub build_path {
 
 
     # Method
-    $path->{method} = $route->{method}->[0] if $route->{method};
+    $path->{method} = $route->{via}->[0] if $route->{via};
 
     $path->{path} =~s/^\///;
 
