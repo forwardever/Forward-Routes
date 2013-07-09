@@ -8,11 +8,10 @@ sub _add {
     my $self = shift;
     my ($parent, $resource_name, $options) = @_;
 
-    my $resource = Forward::Routes::Resources::Plural->new($resource_name);
+    my $resource = Forward::Routes::Resources::Plural->new($resource_name,
+        _is_plural_resource => 1
+    );
 
-    # nested resource members
-    # e.g. /magazines/:magazine_id/ads/:id (:magazine_id represents the
-    # nested resource members)
     if ($parent->_is_plural_resource) {
         my $new_parent = $parent->_nested_resource_members;
         $new_parent->_add_child($resource);
@@ -41,10 +40,8 @@ sub _add {
     }
     my $ns_name_prefix = $resource->namespace ? Forward::Routes::Resources->namespace_to_name($resource->namespace) . '_' : '';
     my $route_name = $parent_resource_name . $ns_name_prefix . $resource_name;
+    $resource->name($route_name);
 
-
-    # create resource
-    $resource->_is_plural_resource(1)->name($route_name);
     $resource->{resource_name_part} = $ns_name_prefix . $resource_name;
 
 
