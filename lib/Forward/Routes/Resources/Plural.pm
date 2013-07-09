@@ -4,181 +4,164 @@ use warnings;
 use parent qw/Forward::Routes::Resources/;
 
 
-sub add {
-    my $class  = shift;
-    my $parent = shift;
+sub _add {
+    my $self = shift;
+    my ($parent, $name, $options) = @_;
 
-    my $names = $_[0] && ref $_[0] eq 'ARRAY' ? [@{$_[0]}] : [@_];
+    my $ns_name_prefix = '';
 
-    $names = Forward::Routes::Resources->_prepare_resource_options(@$names);
+    # path name
+    my $as = $name;
+    my $constraints;
+    my $namespace;
+    my $format;
+    my $format_exists;
+    my $namespace_exists;
+    my $only;
 
-    my $last_resource;
-
-    for (my $i=0; $i<@$names; $i++) {
-
-        my $ns_name_prefix = '';
-
-        my $name = $names->[$i];
-
-        # options
-        next if ref $name;
-
-        # path name
-        my $as = $name;
-        my $constraints;
-        my $namespace;
-        my $format;
-        my $format_exists;
-        my $namespace_exists;
-        my $only;
-
-        # custom resource params
-        if ($names->[$i+1] && ref $names->[$i+1] eq 'HASH') {
-            my $params = $names->[$i+1];
-
-            $as               = $params->{as}          if $params->{as};
-            $constraints      = $params->{constraints} if $params->{constraints};
-            $format_exists    = 1                      if exists $params->{format};
-            $namespace_exists = 1                      if exists $params->{namespace};
-            $format           = $params->{format}      if exists $params->{format};
-            $namespace        = $params->{namespace}   if exists $params->{namespace};
-            $only             = $params->{only}        if $params->{only};
-        }
-
-        # selected routes
-        my %selected = (
-            index       => 1,
-            create      => 1,
-            show        => 1,
-            update      => 1,
-            delete      => 1,
-            create_form => 1,
-            update_form => 1,
-            delete_form => 1
-        );
-
-        # only
-        if ($only) {
-            %selected = ();
-            foreach my $type (@$only) {
-                $selected{$type} = 1;
-            }
-        }
-
-        # custom constraint
-        my $id_constraint = $constraints->{id} || qr/[^.\/]+/;
-
-
-        # custom namespace
-        $namespace = $namespace_exists ? $namespace : $parent->namespace;
-
-
-        # camelize controller name (default)
-        my $ctrl = Forward::Routes::Resources->format_resource_controller->($name);
-
-
-        # final name
-        $ns_name_prefix = Forward::Routes::Resources->namespace_to_name($namespace).'_' if $namespace;
-        my $final_name = $ns_name_prefix.$name;
-
-
-        # nested resource name adjustment
-        my @parent_names;
-        if ($parent->_is_plural_resource) {
-            @parent_names = $parent->_parent_resource_names;
-
-            my $parent_name_prefix = join('_', @parent_names).'_';
-            $final_name = $parent_name_prefix.$final_name;
-        }
-        push @parent_names, $ns_name_prefix.$name;
-
-
-        # nested resource members
-        # e.g. /magazines/:magazine_id/ads/:id (:magazine_id represents the
-        # nested resource members)
-        $parent = $parent->_nested_resource_members
-          if $parent->_is_plural_resource;
-
-
-        # create resource
-        my $resource = Forward::Routes::Resources::Plural->new($as);
-        $resource->_is_plural_resource(1)->_parent_resource_names(@parent_names);
-        $parent->_add_child($resource);
-
-
-        # save resource attributes
-        $resource->_name($name);
-        $resource->_ctrl($ctrl);
-        $resource->_id_constraint($id_constraint);
-
-        # custom format
-        $resource->format($format) if $format_exists;
-        $resource->namespace($namespace) if $namespace_exists;
-
-
-        # collection
-        my $collection = $resource->_collection
-          if $selected{index} || $selected{create} || $selected{create_form};
-
-        $collection->add_route
-          ->via('get')
-          ->to($ctrl."#index")
-          ->name($final_name.'_index')
-          if $selected{index};
-
-        $collection->add_route
-          ->via('post')
-          ->to($ctrl."#create")
-          ->name($final_name.'_create')
-          if $selected{create};
-
-        # new resource item
-        $collection->add_route('/new')
-          ->via('get')
-          ->to($ctrl."#create_form")
-          ->name($final_name.'_create_form')
-          if $selected{create_form};
-
-
-        # members
-        my $members = $resource->init_members if $selected{show} || $selected{update}
-          || $selected{delete} || $selected{update_form}
-          || $selected{delete_form};
-
-        $members->add_route
-          ->via('get')
-          ->to($ctrl."#show")
-          ->name($final_name.'_show')
-          if $selected{show};
-
-        $members->add_route
-          ->via('put')
-          ->to($ctrl."#update")
-          ->name($final_name.'_update')
-          if $selected{update};
-
-        $members->add_route
-          ->via('delete')
-          ->to($ctrl."#delete")
-          ->name($final_name.'_delete')
-          if $selected{delete};
-
-        $members->add_route('edit')
-          ->via('get')
-          ->to($ctrl."#update_form")
-          ->name($final_name.'_update_form')
-          if $selected{update_form};
-
-        $members->add_route('delete')
-          ->via('get')
-          ->to($ctrl."#delete_form")
-          ->name($final_name.'_delete_form')
-          if $selected{delete_form};
-
-        $last_resource = $resource;
+    # custom resource params
+    if ($options) {
+        $as               = $options->{as}          if $options->{as};
+        $constraints      = $options->{constraints} if $options->{constraints};
+        $format_exists    = 1                       if exists $options->{format};
+        $namespace_exists = 1                       if exists $options->{namespace};
+        $format           = $options->{format}      if exists $options->{format};
+        $namespace        = $options->{namespace}   if exists $options->{namespace};
+        $only             = $options->{only}        if $options->{only};
     }
 
-    return $last_resource;
+    # selected routes
+    my %selected = (
+        index       => 1,
+        create      => 1,
+        show        => 1,
+        update      => 1,
+        delete      => 1,
+        create_form => 1,
+        update_form => 1,
+        delete_form => 1
+    );
+
+    # only
+    if ($only) {
+        %selected = ();
+        foreach my $type (@$only) {
+            $selected{$type} = 1;
+        }
+    }
+
+    # custom constraint
+    my $id_constraint = $constraints->{id} || qr/[^.\/]+/;
+
+
+    # custom namespace
+    $namespace = $namespace_exists ? $namespace : $parent->namespace;
+
+
+    # camelize controller name (default)
+    my $ctrl = Forward::Routes::Resources->format_resource_controller->($name);
+
+
+    # final name
+    $ns_name_prefix = Forward::Routes::Resources->namespace_to_name($namespace).'_' if $namespace;
+    my $final_name = $ns_name_prefix.$name;
+
+
+    # nested resource name adjustment
+    my @parent_names;
+    if ($parent->_is_plural_resource) {
+        @parent_names = $parent->_parent_resource_names;
+
+        my $parent_name_prefix = join('_', @parent_names).'_';
+        $final_name = $parent_name_prefix.$final_name;
+    }
+    push @parent_names, $ns_name_prefix.$name;
+
+
+    # nested resource members
+    # e.g. /magazines/:magazine_id/ads/:id (:magazine_id represents the
+    # nested resource members)
+    $parent = $parent->_nested_resource_members
+      if $parent->_is_plural_resource;
+
+
+    # create resource
+    my $resource = Forward::Routes::Resources::Plural->new($as);
+    $resource->_is_plural_resource(1)->_parent_resource_names(@parent_names);
+    $parent->_add_child($resource);
+
+
+    # save resource attributes
+    $resource->_name($name);
+    $resource->_ctrl($ctrl);
+    $resource->_id_constraint($id_constraint);
+
+    # custom format
+    $resource->format($format) if $format_exists;
+    $resource->namespace($namespace) if $namespace_exists;
+
+
+    # collection
+    my $collection = $resource->_collection
+      if $selected{index} || $selected{create} || $selected{create_form};
+
+    $collection->add_route
+      ->via('get')
+      ->to($ctrl."#index")
+      ->name($final_name.'_index')
+      if $selected{index};
+
+    $collection->add_route
+      ->via('post')
+      ->to($ctrl."#create")
+      ->name($final_name.'_create')
+      if $selected{create};
+
+    # new resource item
+    $collection->add_route('/new')
+      ->via('get')
+      ->to($ctrl."#create_form")
+      ->name($final_name.'_create_form')
+      if $selected{create_form};
+
+
+    # members
+    my $members = $resource->init_members if $selected{show} || $selected{update}
+      || $selected{delete} || $selected{update_form}
+      || $selected{delete_form};
+
+    $members->add_route
+      ->via('get')
+      ->to($ctrl."#show")
+      ->name($final_name.'_show')
+      if $selected{show};
+
+    $members->add_route
+      ->via('put')
+      ->to($ctrl."#update")
+      ->name($final_name.'_update')
+      if $selected{update};
+
+    $members->add_route
+      ->via('delete')
+      ->to($ctrl."#delete")
+      ->name($final_name.'_delete')
+      if $selected{delete};
+
+    $members->add_route('edit')
+      ->via('get')
+      ->to($ctrl."#update_form")
+      ->name($final_name.'_update_form')
+      if $selected{update_form};
+
+    $members->add_route('delete')
+      ->via('get')
+      ->to($ctrl."#delete_form")
+      ->name($final_name.'_delete_form')
+      if $selected{delete_form};
+
+    return $resource;
+
 }
 
 

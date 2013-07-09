@@ -68,21 +68,18 @@ sub add_route {
 
 sub add_resources {
     my $self = shift;
-
-    return Forward::Routes::Resources::Plural->add($self, @_);
+    return Forward::Routes::Resources::Plural->add($self, [@_]);
 }
 
 
 sub add_singular_resources {
     my $self = shift;
-
-    return Forward::Routes::Resources::Singular->add($self, @_);
+    return Forward::Routes::Resources::Singular->add($self, [@_]);
 }
 
 
 sub bridge {
     my $self = shift;
-
     return $self->add_route(@_)->_is_bridge(1);
 }
 
