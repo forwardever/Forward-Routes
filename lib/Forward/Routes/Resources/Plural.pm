@@ -8,8 +8,6 @@ sub _add {
     my $self = shift;
     my ($parent, $name, $options) = @_;
 
-    my $ns_name_prefix = '';
-
     # path name
     my $as = $name;
     my $constraints;
@@ -62,20 +60,15 @@ sub _add {
     my $ctrl = Forward::Routes::Resources->format_resource_controller->($name);
 
 
-    # final name
-    $ns_name_prefix = Forward::Routes::Resources->namespace_to_name($namespace).'_' if $namespace;
-    my $final_name = $ns_name_prefix.$name;
-
-
+    # resource name
     # nested resource name adjustment
-    my @parent_names;
+    my $parent_resource_name = '';
     if ($parent->_is_plural_resource) {
-        @parent_names = $parent->_parent_resource_names;
-
-        my $parent_name_prefix = join('_', @parent_names).'_';
-        $final_name = $parent_name_prefix.$final_name;
+        $parent_resource_name = defined $parent->resource_name ? $parent->resource_name . '_' : '';
     }
-    push @parent_names, $ns_name_prefix.$name;
+    my $ns_name_prefix = $namespace ? Forward::Routes::Resources->namespace_to_name($namespace) . '_' : '';
+    my $resource_name = $parent_resource_name . $ns_name_prefix . $name;
+
 
 
     # nested resource members
@@ -87,8 +80,10 @@ sub _add {
 
     # create resource
     my $resource = Forward::Routes::Resources::Plural->new($as);
-    $resource->_is_plural_resource(1)->_parent_resource_names(@parent_names);
+    $resource->_is_plural_resource(1)->resource_name($resource_name);
     $parent->_add_child($resource);
+
+    $resource->{resource_name_part} = $ns_name_prefix . $name;
 
 
     # save resource attributes
@@ -108,20 +103,20 @@ sub _add {
     $collection->add_route
       ->via('get')
       ->to($ctrl."#index")
-      ->name($final_name.'_index')
+      ->name($resource_name.'_index')
       if $selected{index};
 
     $collection->add_route
       ->via('post')
       ->to($ctrl."#create")
-      ->name($final_name.'_create')
+      ->name($resource_name.'_create')
       if $selected{create};
 
     # new resource item
     $collection->add_route('/new')
       ->via('get')
       ->to($ctrl."#create_form")
-      ->name($final_name.'_create_form')
+      ->name($resource_name.'_create_form')
       if $selected{create_form};
 
 
@@ -133,31 +128,31 @@ sub _add {
     $members->add_route
       ->via('get')
       ->to($ctrl."#show")
-      ->name($final_name.'_show')
+      ->name($resource_name.'_show')
       if $selected{show};
 
     $members->add_route
       ->via('put')
       ->to($ctrl."#update")
-      ->name($final_name.'_update')
+      ->name($resource_name.'_update')
       if $selected{update};
 
     $members->add_route
       ->via('delete')
       ->to($ctrl."#delete")
-      ->name($final_name.'_delete')
+      ->name($resource_name.'_delete')
       if $selected{delete};
 
     $members->add_route('edit')
       ->via('get')
       ->to($ctrl."#update_form")
-      ->name($final_name.'_update_form')
+      ->name($resource_name.'_update_form')
       if $selected{update_form};
 
     $members->add_route('delete')
       ->via('get')
       ->to($ctrl."#delete_form")
-      ->name($final_name.'_delete_form')
+      ->name($resource_name.'_delete_form')
       if $selected{delete_form};
 
     return $resource;
@@ -170,24 +165,21 @@ sub add_collection_route {
     my (@params) = @_;
 
     my $child = Forward::Routes->new(@params);
-
-    # makes sure that inheritance works
     $self->_collection->_add_child($child);
+
 
     # name
     my $name = $params[0];
     $name =~s|^/||;
     $name =~s|/|_|g;
 
+    my $namespace = $self->namespace;
+    my $ns_name_prefix = $namespace ? Forward::Routes::Resources->namespace_to_name($namespace) . '_' : '';
+
 
     $self->{_members}->pattern->{exclude}->{id} ||= [];
     push @{$self->{_members}->pattern->{exclude}->{id}}, $name;
 
-
-    # custom namespace
-    my $namespace = $self->namespace;
-
-    my $ns_name_prefix = $namespace ? Forward::Routes::Resources->namespace_to_name($namespace).'_' : '';
 
 
     # Auto set controller and action params and name
@@ -233,29 +225,12 @@ sub _members {
 sub _nested_resource_members {
     my $self = shift;
 
-    my $parent_name = ($self->_parent_resource_names)[-1];
+    my $parent_name = $self->{resource_name_part};
 
     my $parent_id_name = $self->singularize->($parent_name).'_id';
 
     return $self->add_route(':'.$parent_id_name)
       ->constraints($parent_id_name => $self->{_id_constraint});
-}
-
-
-sub _parent_resource_names {
-    my $self = shift;
-    my (@names) = @_;
-
-    # Initialize
-    $self->{_parent_resource_names} ||=[];
-
-
-    if (@names) {
-        $self->{_parent_resource_names} = \@names;
-        return $self;
-    }
-
-    return @{$self->{_parent_resource_names}};
 }
 
 

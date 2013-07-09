@@ -145,4 +145,15 @@ sub _ctrl {
 }
 
 
+sub resource_name {
+    my $self = shift;
+    my ($name) = @_;
+
+    return $self->{resource_name} unless defined $name;
+
+    $self->{resource_name} = $name;
+    return $self;
+}
+
+
 1;

@@ -8,8 +8,6 @@ sub _add {
     my $self = shift;
     my ($parent, $name, $options) = @_;
 
-    my $ns_name_prefix = '';
-
     # path name
     my $as = $name;
     my $namespace;
@@ -55,21 +53,16 @@ sub _add {
     my $ctrl = Forward::Routes::Resources->format_resource_controller->($name);
 
 
-    # final name
-    $ns_name_prefix = Forward::Routes::Resources->namespace_to_name($namespace).'_' if $namespace;
-    my $final_name = $ns_name_prefix.$name;
-
-
+    # resource name
     # nested resource name adjustment
-    my @parent_names;
+    my $parent_resource_name = '';
     if ($parent->_is_plural_resource) {
-
-        @parent_names = $parent->_parent_resource_names;
-
-        my $parent_name_prefix = join('_', @parent_names).'_';
-        $final_name = $parent_name_prefix.$final_name;
+        $parent_resource_name = defined $parent->resource_name ? $parent->resource_name . '_' : '';
     }
+    my $ns_name_prefix = $namespace ? Forward::Routes::Resources->namespace_to_name($namespace) . '_' : '';
+    my $resource_name = $parent_resource_name . $ns_name_prefix . $name;
 
+    
 
     # nested resource members
     # e.g. /magazines/:magazine_id/geocoder (:magazine_id represents the
@@ -80,7 +73,7 @@ sub _add {
 
     # create resource
     my $resource = Forward::Routes::Resources->new($as);
-    $resource->_is_singular_resource(1);
+    $resource->_is_singular_resource(1)->resource_name($resource_name);;
     $parent->_add_child($resource);
 
 
@@ -97,37 +90,37 @@ sub _add {
     $resource->add_route('/new')
       ->via('get')
       ->to("$ctrl#create_form")
-      ->name($final_name.'_create_form')
+      ->name($resource_name.'_create_form')
       if $selected{create_form};;
 
     $resource->add_route('/edit')
       ->via('get')
       ->to("$ctrl#update_form")
-      ->name($final_name.'_update_form')
+      ->name($resource_name.'_update_form')
       if $selected{update_form};
 
     $resource->add_route
       ->via('post')
       ->to("$ctrl#create")
-      ->name($final_name.'_create')
+      ->name($resource_name.'_create')
       if $selected{create};
 
     $resource->add_route
       ->via('get')
       ->to("$ctrl#show")
-      ->name($final_name.'_show')
+      ->name($resource_name.'_show')
       if $selected{show};
 
     $resource->add_route
       ->via('put')
       ->to("$ctrl#update")
-      ->name($final_name.'_update')
+      ->name($resource_name.'_update')
       if $selected{update};
 
     $resource->add_route
       ->via('delete')
       ->to("$ctrl#delete")
-      ->name($final_name.'_delete')
+      ->name($resource_name.'_delete')
       if $selected{delete};
 
     return $resource;
