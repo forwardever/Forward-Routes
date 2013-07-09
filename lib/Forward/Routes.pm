@@ -17,7 +17,7 @@ our $VERSION = '0.54';
 
 sub new {
     my $class = shift;
-    my $self = bless {}, "Forward::Routes";
+    my $self = bless {}, $class;
     return $self->initialize(@_);
 }
 
@@ -60,7 +60,7 @@ sub initialize {
 sub add_route {
     my $self = shift;
 
-    my $child = $self->new(@_);
+    my $child = Forward::Routes->new(@_);
 
     return $self->_add_child($child);
 }

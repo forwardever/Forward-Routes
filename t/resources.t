@@ -43,7 +43,7 @@ is_deeply $m->[0]->params => {controller => 'Photos', action => 'delete', id => 
 
 
 
-is ref $r->find_route('photos_index'), 'Forward::Routes::Resources';
+is ref $r->find_route('photos_index'), 'Forward::Routes';
 is $r->find_route('photos_foo'), undef;
 is $r->find_route('photos_index')->name, 'photos_index';
 is $r->find_route('photos_create_form')->name, 'photos_create_form';

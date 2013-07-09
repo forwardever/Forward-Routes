@@ -9,7 +9,7 @@ use Carp;
 
 sub new {
     my $class = shift;
-    my $self = bless {}, "Forward::Routes::Resources";
+    my $self = bless {}, $class;
     return $self->initialize(@_);
 }
 

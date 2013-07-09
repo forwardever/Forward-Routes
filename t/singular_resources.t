@@ -33,7 +33,7 @@ $m = $r->match(delete => 'geocoder');
 is_deeply $m->[0]->params => {controller => 'Geocoder', action => 'delete'};
 
 
-is ref $r->find_route('geocoder_create_form'), 'Forward::Routes::Resources';
+is ref $r->find_route('geocoder_create_form'), 'Forward::Routes';
 is $r->find_route('geocoder_foo'), undef;
 is $r->find_route('geocoder_create_form')->name, 'geocoder_create_form';
 is $r->find_route('geocoder_create')->name, 'geocoder_create';
