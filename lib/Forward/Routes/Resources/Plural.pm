@@ -8,46 +8,41 @@ sub _add {
     my $self = shift;
     my ($parent, $resource_name, $options) = @_;
 
-    my $resource = Forward::Routes::Resources::Plural->new($resource_name,
-        _is_plural_resource => 1
-    );
+    my $resource;
 
     if ($parent->_is_plural_resource) {
-        my $new_parent = $parent->_nested_resource_members;
-        $new_parent->_add_child($resource);
+        my $parent_id_name = $parent->_nested_resource_members;
+
+        $resource = Forward::Routes::Resources::Plural->new(':' . $parent_id_name . '/' . $resource_name,
+            _is_plural_resource => 1,
+            resource_name       => $resource_name
+        );
+
+        $resource->constraints($parent_id_name => $parent->{id_constraint});
     }
     else {
-        $parent->_add_child($resource);
+        $resource = Forward::Routes::Resources::Plural->new($resource_name,
+            _is_plural_resource => 1,
+            resource_name       => $resource_name
+        );
     }
+
+    $parent->_add_child($resource);
+
 
     # after _add_child because of inheritance
     $resource->init_options($options);
 
 
-    # enabled routes
     my $enabled_routes = $resource->enabled_routes;
 
 
     # camelize controller name (default)
     my $ctrl = Forward::Routes::Resources->format_resource_controller->($resource_name);
-
-
-    # resource name
-    # nested resource name adjustment
-    my $parent_resource_name = '';
-    if ($parent->_is_plural_resource) {
-        $parent_resource_name = defined $parent->name ? $parent->name . '_' : '';
-    }
-    my $ns_name_prefix = $resource->namespace ? Forward::Routes::Resources->namespace_to_name($resource->namespace) . '_' : '';
-    my $route_name = $parent_resource_name . $ns_name_prefix . $resource_name;
-    $resource->name($route_name);
-
-    $resource->{resource_name_part} = $ns_name_prefix . $resource_name;
-
-
-    # save resource attributes
-    $resource->resource_name($resource_name);
     $resource->_ctrl($ctrl);
+
+
+    my $route_name = $resource->name;
 
 
     # collection
@@ -174,10 +169,9 @@ sub _nested_resource_members {
 
     my $parent_name = $self->{resource_name_part};
 
-    my $parent_id_name = $self->singularize->($parent_name).'_id';
+    my $parent_id_name = $self->singularize->($parent_name) . '_id';
 
-    return $self->add_route(':'.$parent_id_name)
-      ->constraints($parent_id_name => $self->{id_constraint});
+    return $parent_id_name;
 }
 
 

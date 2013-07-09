@@ -49,6 +49,7 @@ sub initialize {
     $self->_is_plural_resource(delete $params->{_is_plural_resource});
     $self->_is_singular_resource(delete $params->{_is_singular_resource});
     $self->constraints(delete $params->{constraints});
+    $self->resource_name(delete $params->{resource_name});
 
     return $self;
 }
@@ -203,6 +204,17 @@ sub name {
 }
 
 
+sub resource_name {
+    my $self = shift;
+    my ($name) = @_;
+
+    return $self->{resource_name} unless defined $name;
+
+    $self->{resource_name} = $name;
+    return $self;
+}
+
+
 sub namespace {
     my $self = shift;
     my (@params) = @_;
@@ -272,22 +284,16 @@ sub _is_bridge {
 
 sub _is_plural_resource {
     my $self = shift;
-
     return $self->{_is_plural_resource} unless defined $_[0];
-
     $self->{_is_plural_resource} = $_[0];
-
     return $self;
 }
 
 
 sub _is_singular_resource {
     my $self = shift;
-
     return $self->{_is_singular_resource} unless defined $_[0];
-
     $self->{_is_singular_resource} = $_[0];
-
     return $self;
 }
 

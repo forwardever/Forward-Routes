@@ -127,23 +127,13 @@ sub _ctrl {
 }
 
 
-sub resource_name {
-    my $self = shift;
-    my ($name) = @_;
-
-    return $self->{resource_name} unless defined $name;
-
-    $self->{resource_name} = $name;
-    return $self;
-}
-
-
 sub init_options {
     my $self = shift;
     my ($options) = @_;
 
     # default
     $self->id_constraint(qr/[^.\/]+/);
+
 
     if ($options) {
         $self->format($options->{format}) if exists $options->{format};
@@ -152,6 +142,18 @@ sub init_options {
         $self->{only} = $options->{only};
         $self->pattern->pattern($options->{as}) if exists $options->{as};
     }
+
+    # nested resource name adjustment
+    my $parent_resource_name = '';
+    if ($self->parent && $self->parent->_is_plural_resource) {
+        $parent_resource_name = defined $self->parent->name ? $self->parent->name . '_' : '';
+    }
+    my $ns_name_prefix = $self->namespace ? Forward::Routes::Resources->namespace_to_name($self->namespace) . '_' : '';
+    my $route_name = $parent_resource_name . $ns_name_prefix . $self->{resource_name};
+    $self->name($route_name);
+
+    $self->{resource_name_part} = $ns_name_prefix . $self->{resource_name};
+
 }
 
 
