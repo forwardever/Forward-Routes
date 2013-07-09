@@ -8,6 +8,7 @@ sub _add {
     my $self = shift;
     my ($parent, $resource_name, $options) = @_;
 
+
     my $resource = Forward::Routes::Resources::Singular->new($resource_name);
 
     # nested resource members
