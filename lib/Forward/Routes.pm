@@ -69,14 +69,14 @@ sub add_route {
 sub add_resources {
     my $self = shift;
 
-    return Forward::Routes::Resources->add_plural($self, @_);
+    return Forward::Routes::Resources::Plural->add($self, @_);
 }
 
 
 sub add_singular_resources {
     my $self = shift;
 
-    return Forward::Routes::Resources->add_singular($self, @_);
+    return Forward::Routes::Resources::Singular->add($self, @_);
 }
 
 
@@ -103,15 +103,6 @@ sub parent {
     weaken $self->{parent};
 
     return $self;
-}
-
-
-sub _add_resource_route {
-    my $self = shift;
-
-    my $child = Forward::Routes::Resources->new(@_);
-
-    return $self->_add_child($child);
 }
 
 
