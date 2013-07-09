@@ -3,8 +3,6 @@ use strict;
 use warnings;
 use parent qw/Forward::Routes::Resources/;
 
-use Carp;
-
 
 sub add {
     my $class  = shift;
@@ -143,7 +141,7 @@ sub add {
 
 
         # members
-        my $members = $resource->_members if $selected{show} || $selected{update}
+        my $members = $resource->init_members if $selected{show} || $selected{update}
           || $selected{delete} || $selected{update_form}
           || $selected{delete_form};
 
@@ -188,8 +186,6 @@ sub add_collection_route {
     my $self = shift;
     my (@params) = @_;
 
-    $self->_is_plural_resource || Carp::croak('add_collection_route can only be called on plural resources');
-
     my $child = Forward::Routes->new(@params);
 
     # makes sure that inheritance works
@@ -228,7 +224,7 @@ sub _collection {
 }
 
 
-sub _members {
+sub init_members {
     my $self = shift;
 
     return $self->{_members} if $self->{_members};
@@ -241,6 +237,12 @@ sub _members {
     $self->{_members}->pattern->{exclude}->{id} ||= [];
     push @{$self->{_members}->pattern->{exclude}->{id}}, 'new';
 
+    return $self->{_members};
+}
+
+
+sub _members {
+    my $self = shift;
     return $self->{_members};
 }
 
