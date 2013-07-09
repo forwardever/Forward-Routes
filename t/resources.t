@@ -41,7 +41,7 @@ is_deeply $m->[0]->params => {controller => 'Photos', action => 'update', id => 
 $m = $r->match(delete => 'photos/1');
 is_deeply $m->[0]->params => {controller => 'Photos', action => 'delete', id => 1};
 
-is $resource->resource_name, 'tags';
+is $resource->name, 'tags';
 
 is ref $r->find_route('photos_index'), 'Forward::Routes';
 is $r->find_route('photos_foo'), undef;

@@ -13,7 +13,6 @@ my $r = Forward::Routes->new;
 
 my $ads = $r->add_resources('magazines')->add_resources('ads');
 
-
 # magazine routes work
 my $m = $r->match(get => 'magazines');
 is_deeply $m->[0]->params => {controller => 'Magazines', action => 'index'};
@@ -39,7 +38,7 @@ is_deeply $m->[0]->params => {controller => 'Magazines', action => 'update', id 
 $m = $r->match(delete => 'magazines/1');
 is_deeply $m->[0]->params => {controller => 'Magazines', action => 'delete', id => 1};
 
-is $ads->resource_name, 'magazines_ads';
+is $ads->name, 'magazines_ads';
 
 
 # nested ads routes work
@@ -130,7 +129,7 @@ is $m->[0]->name, 'magazines_ads_stats_show';
 is $r->build_path('magazines_ads_stats_show', magazine_id => 3, ad_id => 4, id => 5)->{path} => 'magazines/3/ads/4/stats/5';
 is $r->build_path('magazines_ads_stats_show', magazine_id => 3, ad_id => 4, id => 5)->{method} => 'get';
 
-is $stats->resource_name, 'magazines_ads_stats';
+is $stats->name, 'magazines_ads_stats';
 
 # magazines resource still works
 $m = $r->match(get => 'magazines');

@@ -23,7 +23,7 @@ $m = $r->match(get => 'magazines/4/ads/new');
 is $m->[0]->name, 'admin_magazines_ads_create_form';
 is $m->[0]->class, 'Ads';
 
-is $ads->resource_name, 'admin_magazines_ads';
+is $ads->name, 'admin_magazines_ads';
 
 
 # nested routes inherit namespace
@@ -35,7 +35,7 @@ $m = $r->match(get => 'magazines/4/ads/new');
 is $m->[0]->name, 'admin_magazines_admin_ads_create_form';
 is $m->[0]->class, 'Admin::Ads';
 
-is $ads->resource_name, 'admin_magazines_admin_ads';
+is $ads->name, 'admin_magazines_admin_ads';
 
 
 # nested routes also has namespace
@@ -57,4 +57,4 @@ $m = $r->match(get => 'magazines/4/ads/new');
 is $m->[0]->name, 'admin_magazines_admin_magazines_ads_create_form';
 is $m->[0]->class, 'Admin::Magazines::Ads';
 
-is $ads->resource_name, 'admin_magazines_admin_magazines_ads';
+is $ads->name, 'admin_magazines_admin_magazines_ads';

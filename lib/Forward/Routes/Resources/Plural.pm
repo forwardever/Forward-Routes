@@ -6,9 +6,9 @@ use parent qw/Forward::Routes::Resources/;
 
 sub _add {
     my $self = shift;
-    my ($parent, $name, $options) = @_;
+    my ($parent, $resource_name, $options) = @_;
 
-    my $resource = Forward::Routes::Resources::Plural->new($name);
+    my $resource = Forward::Routes::Resources::Plural->new($resource_name);
 
     # nested resource members
     # e.g. /magazines/:magazine_id/ads/:id (:magazine_id represents the
@@ -30,27 +30,26 @@ sub _add {
 
 
     # camelize controller name (default)
-    my $ctrl = Forward::Routes::Resources->format_resource_controller->($name);
+    my $ctrl = Forward::Routes::Resources->format_resource_controller->($resource_name);
 
 
     # resource name
     # nested resource name adjustment
     my $parent_resource_name = '';
     if ($parent->_is_plural_resource) {
-        $parent_resource_name = defined $parent->resource_name ? $parent->resource_name . '_' : '';
+        $parent_resource_name = defined $parent->name ? $parent->name . '_' : '';
     }
     my $ns_name_prefix = $resource->namespace ? Forward::Routes::Resources->namespace_to_name($resource->namespace) . '_' : '';
-    my $resource_name = $parent_resource_name . $ns_name_prefix . $name;
+    my $route_name = $parent_resource_name . $ns_name_prefix . $resource_name;
 
 
     # create resource
-    $resource->_is_plural_resource(1)->resource_name($resource_name);
-
-    $resource->{resource_name_part} = $ns_name_prefix . $name;
+    $resource->_is_plural_resource(1)->name($route_name);
+    $resource->{resource_name_part} = $ns_name_prefix . $resource_name;
 
 
     # save resource attributes
-    $resource->_name($name);
+    $resource->resource_name($resource_name);
     $resource->_ctrl($ctrl);
 
 
@@ -61,20 +60,20 @@ sub _add {
     $collection->add_route
       ->via('get')
       ->to($ctrl."#index")
-      ->name($resource_name.'_index')
+      ->name($route_name.'_index')
       if $enabled_routes->{index};
 
     $collection->add_route
       ->via('post')
       ->to($ctrl."#create")
-      ->name($resource_name.'_create')
+      ->name($route_name.'_create')
       if $enabled_routes->{create};
 
     # new resource item
     $collection->add_route('/new')
       ->via('get')
       ->to($ctrl."#create_form")
-      ->name($resource_name.'_create_form')
+      ->name($route_name.'_create_form')
       if $enabled_routes->{create_form};
 
 
@@ -86,31 +85,31 @@ sub _add {
     $members->add_route
       ->via('get')
       ->to($ctrl."#show")
-      ->name($resource_name.'_show')
+      ->name($route_name.'_show')
       if $enabled_routes->{show};
 
     $members->add_route
       ->via('put')
       ->to($ctrl."#update")
-      ->name($resource_name.'_update')
+      ->name($route_name.'_update')
       if $enabled_routes->{update};
 
     $members->add_route
       ->via('delete')
       ->to($ctrl."#delete")
-      ->name($resource_name.'_delete')
+      ->name($route_name.'_delete')
       if $enabled_routes->{delete};
 
     $members->add_route('edit')
       ->via('get')
       ->to($ctrl."#update_form")
-      ->name($resource_name.'_update_form')
+      ->name($route_name.'_update_form')
       if $enabled_routes->{update_form};
 
     $members->add_route('delete')
       ->via('get')
       ->to($ctrl."#delete_form")
-      ->name($resource_name.'_delete_form')
+      ->name($route_name.'_delete_form')
       if $enabled_routes->{delete_form};
 
     return $resource;
@@ -141,7 +140,7 @@ sub add_collection_route {
 
     # Auto set controller and action params and name
     $child->to($self->{_ctrl}.'#'.$name);
-    $child->name($ns_name_prefix.$self->{_name}.'_'.$name);
+    $child->name($ns_name_prefix.$self->{resource_name}.'_'.$name);
 
     return $child;
 }

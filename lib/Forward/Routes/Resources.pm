@@ -63,7 +63,7 @@ sub add_member_route {
 
     # Auto set controller and action params and name
     $child->to($self->{_ctrl}.'#'.$name);
-    $child->name($ns_name_prefix.$self->{_name}.'_'.$name);
+    $child->name($ns_name_prefix.$self->{resource_name}.'_'.$name);
 
     return $child;
 
@@ -118,18 +118,6 @@ sub namespace_to_name {
         push @new_parts, join '_', @words;
     }
     return join '_', @new_parts;
-}
-
-
-sub _name {
-    my $self = shift;
-    my (@params) = @_;
-
-    return $self->{_name} unless @params;
-
-    $self->{_name} = $params[0];
-
-    return $self;
 }
 
 
