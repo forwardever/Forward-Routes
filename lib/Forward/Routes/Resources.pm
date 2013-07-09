@@ -50,20 +50,14 @@ sub add_member_route {
     $members->_add_child($child);
 
     # name
-    my $name = $pattern;
-    $name =~s|^/||;
-    $name =~s|/|_|g;
-
-
-    # custom namespace
-    my $namespace = $self->namespace;
-
-    my $ns_name_prefix = $namespace ? Forward::Routes::Resources->namespace_to_name($namespace).'_' : '';
+    my $member_route_name = $pattern;
+    $member_route_name =~s|^/||;
+    $member_route_name =~s|/|_|g;
 
 
     # Auto set controller and action params and name
-    $child->to($self->{_ctrl}.'#'.$name);
-    $child->name($ns_name_prefix.$self->{resource_name}.'_'.$name);
+    $child->to($self->{_ctrl} . '#' . $member_route_name);
+    $child->name($self->{name} . '_' . $member_route_name);
 
     return $child;
 

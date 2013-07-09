@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 64;
+use Test::More tests => 66;
 use lib 'lib';
 use Forward::Routes;
 
@@ -12,6 +12,9 @@ use Forward::Routes;
 my $r = Forward::Routes->new;
 
 my $ads = $r->add_resources('magazines')->add_resources('ads');
+
+$ads->add_member_route('test_member');
+$ads->add_collection_route('test_collection');
 
 # magazine routes work
 my $m = $r->match(get => 'magazines');
@@ -40,6 +43,8 @@ is_deeply $m->[0]->params => {controller => 'Magazines', action => 'delete', id 
 
 is $ads->name, 'magazines_ads';
 
+ok $r->find_route('magazines_ads_test_member');
+ok $r->find_route('magazines_ads_test_collection');
 
 # nested ads routes work
 $m = $r->match(get => 'magazines/1/ads');
