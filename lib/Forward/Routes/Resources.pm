@@ -156,4 +156,24 @@ sub resource_name {
 }
 
 
+sub init_options {
+    my $self = shift;
+    my ($options) = @_;
+
+    # default
+    $self->id_constraint(qr/[^.\/]+/);
+
+    if ($options) {
+        $self->format($options->{format}) if exists $options->{format};
+        $self->namespace($options->{namespace}) if exists $options->{namespace};
+        $self->id_constraint($options->{constraints}->{id}) if $options->{constraints}->{id};
+        $self->{only} = $options->{only};
+        $self->pattern->pattern($options->{as}) if exists $options->{as};
+    }
+}
+
+
+sub id_constraint {
+}
+
 1;

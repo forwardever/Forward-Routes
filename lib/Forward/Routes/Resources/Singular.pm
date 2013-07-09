@@ -8,45 +8,25 @@ sub _add {
     my $self = shift;
     my ($parent, $name, $options) = @_;
 
-    # path name
-    my $as = $name;
-    my $namespace;
-    my $format;
-    my $format_exists;
-    my $namespace_exists;
-    my $only;
+    my $resource = Forward::Routes::Resources::Singular->new($name);
 
-
-    # custom resource params
-    if ($options) {
-        $as               = $options->{as}        if $options->{as};
-        $format_exists    = 1                     if exists $options->{format};
-        $namespace_exists = 1                     if exists $options->{namespace};
-        $format           = $options->{format}    if exists $options->{format};
-        $namespace        = $options->{namespace} if exists $options->{namespace};
-        $only             = $options->{only}      if $options->{only};
+    # nested resource members
+    # e.g. /magazines/:magazine_id/geocoder (:magazine_id represents the
+    # nested resource members)
+    if ($parent->_is_plural_resource) {
+        my $new_parent = $parent->_nested_resource_members;
+        $new_parent->_add_child($resource);
+    }
+    else {
+        $parent->_add_child($resource);
     }
 
-    # selected routes
-    my %selected = (
-        create      => 1,
-        show        => 1,
-        update      => 1,
-        delete      => 1,
-        create_form => 1,
-        update_form => 1
-    );
+    # after _add_child because of inheritance
+    $resource->init_options($options);
 
-    # only
-    if ($only) {
-        %selected = ();
-        foreach my $type (@$only) {
-            $selected{$type} = 1;
-        }
-    }
 
-    # custom namespace
-    $namespace = $namespace_exists ? $namespace : $parent->namespace;
+    # enabled routes
+    my $enabled_routes = $resource->enabled_routes;
 
 
     # camelize controller name (default)
@@ -59,31 +39,17 @@ sub _add {
     if ($parent->_is_plural_resource) {
         $parent_resource_name = defined $parent->resource_name ? $parent->resource_name . '_' : '';
     }
-    my $ns_name_prefix = $namespace ? Forward::Routes::Resources->namespace_to_name($namespace) . '_' : '';
+    my $ns_name_prefix = $resource->namespace ? Forward::Routes::Resources->namespace_to_name($resource->namespace) . '_' : '';
     my $resource_name = $parent_resource_name . $ns_name_prefix . $name;
-
-    
-
-    # nested resource members
-    # e.g. /magazines/:magazine_id/geocoder (:magazine_id represents the
-    # nested resource members)
-    $parent = $parent->_nested_resource_members
-      if $parent->_is_plural_resource;
 
 
     # create resource
-    my $resource = Forward::Routes::Resources->new($as);
     $resource->_is_singular_resource(1)->resource_name($resource_name);;
-    $parent->_add_child($resource);
 
 
     # save resource attributes
     $resource->_name($name);
     $resource->_ctrl($ctrl);
-
-    # custom format
-    $resource->format($format) if $format_exists;
-    $resource->namespace($namespace) if $namespace_exists;
 
 
     # members
@@ -91,39 +57,65 @@ sub _add {
       ->via('get')
       ->to("$ctrl#create_form")
       ->name($resource_name.'_create_form')
-      if $selected{create_form};;
+      if $enabled_routes->{create_form};;
 
     $resource->add_route('/edit')
       ->via('get')
       ->to("$ctrl#update_form")
       ->name($resource_name.'_update_form')
-      if $selected{update_form};
+      if $enabled_routes->{update_form};
 
     $resource->add_route
       ->via('post')
       ->to("$ctrl#create")
       ->name($resource_name.'_create')
-      if $selected{create};
+      if $enabled_routes->{create};
 
     $resource->add_route
       ->via('get')
       ->to("$ctrl#show")
       ->name($resource_name.'_show')
-      if $selected{show};
+      if $enabled_routes->{show};
 
     $resource->add_route
       ->via('put')
       ->to("$ctrl#update")
       ->name($resource_name.'_update')
-      if $selected{update};
+      if $enabled_routes->{update};
 
     $resource->add_route
       ->via('delete')
       ->to("$ctrl#delete")
       ->name($resource_name.'_delete')
-      if $selected{delete};
+      if $enabled_routes->{delete};
 
     return $resource;
 }
+
+
+sub enabled_routes {
+    my $self = shift;
+
+    my $only = $self->{only};
+
+    my %selected = (
+        create      => 1,
+        show        => 1,
+        update      => 1,
+        delete      => 1,
+        create_form => 1,
+        update_form => 1
+    );
+
+    if ($self->{only}) {
+        %selected = ();
+        foreach my $type (@$only) {
+            $selected{$type} = 1;
+        }
+    }
+
+    return \%selected;
+}
+
 
 1;
