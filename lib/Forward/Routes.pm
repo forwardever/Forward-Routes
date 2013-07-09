@@ -17,10 +17,13 @@ our $VERSION = '0.54';
 
 sub new {
     my $class = shift;
+    my $self = bless {}, "Forward::Routes";
+    return $self->initialize(@_);
+}
 
-    $class = ref $class if ref $class;
 
-    my $self = bless {}, $class;
+sub initialize {
+    my $self = shift;
 
     # block
     my $code_ref = pop @_ if @_ && ref $_[-1] eq 'CODE';
@@ -32,14 +35,6 @@ sub new {
 
     # Shortcut in case of chained API
     return $self unless @_;
-
-    # Process remaining params
-    return $self->initialize(@_);
-}
-
-
-sub initialize {
-    my $self = shift;
 
     # Remaining params
     my $params = ref $_[0] eq 'HASH' ? {%{$_[0]}} : {@_};

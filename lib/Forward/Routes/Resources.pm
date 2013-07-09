@@ -1,11 +1,17 @@
 package Forward::Routes::Resources;
-
 use strict;
 use warnings;
 
 use parent qw/Forward::Routes/;
 
 use Carp;
+
+
+sub new {
+    my $class = shift;
+    my $self = bless {}, "Forward::Routes::Resources";
+    return $self->initialize(@_);
+}
 
 
 sub add_singular {
