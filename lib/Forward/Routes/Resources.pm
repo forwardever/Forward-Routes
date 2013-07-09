@@ -39,9 +39,9 @@ sub add {
 
 sub add_member_route {
     my $self = shift;
-    my (@params) = @_;
+    my ($pattern, @params) = @_;
 
-    my $child = Forward::Routes->new(@params);
+    my $child = Forward::Routes->new($pattern, @params);
 
     $self->init_members;
     my $members = $self->_members;
@@ -50,7 +50,7 @@ sub add_member_route {
     $members->_add_child($child);
 
     # name
-    my $name = $params[0];
+    my $name = $pattern;
     $name =~s|^/||;
     $name =~s|/|_|g;
 

@@ -113,20 +113,18 @@ sub _add {
       if $enabled_routes->{delete_form};
 
     return $resource;
-
 }
 
 
 sub add_collection_route {
     my $self = shift;
-    my (@params) = @_;
+    my ($pattern, @params) = @_;
 
-    my $child = Forward::Routes->new(@params);
+    my $child = Forward::Routes->new($pattern, @params);
     $self->_collection->_add_child($child);
 
-
     # name
-    my $name = $params[0];
+    my $name = $pattern;
     $name =~s|^/||;
     $name =~s|/|_|g;
 
