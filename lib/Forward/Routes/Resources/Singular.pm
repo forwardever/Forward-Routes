@@ -8,23 +8,13 @@ sub _add {
     my $self = shift;
     my ($parent, $resource_name, $options) = @_;
 
-    my $resource;
+    my $resource = Forward::Routes::Resources::Singular->new($resource_name,
+        _is_singular_resource => 1,
+        resource_name         => $resource_name
+    );
 
     if ($parent->_is_plural_resource) {
-        my $parent_id_name = $parent->_nested_resource_members;
-
-        $resource = Forward::Routes::Resources::Singular->new(':' . $parent_id_name . '/' . $resource_name,
-            _is_singular_resource => 1,
-            resource_name         => $resource_name
-        );
-
-        $resource->constraints($parent_id_name => $parent->{id_constraint});
-    }
-    else {
-        $resource = Forward::Routes::Resources::Singular->new($resource_name,
-            _is_singular_resource => 1,
-            resource_name         => $resource_name
-        );
+        $resource->_nested_resource_members($parent);
     }
 
     $parent->_add_child($resource);

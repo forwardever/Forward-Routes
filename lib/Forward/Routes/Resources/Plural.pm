@@ -8,23 +8,13 @@ sub _add {
     my $self = shift;
     my ($parent, $resource_name, $options) = @_;
 
-    my $resource;
+    my $resource = Forward::Routes::Resources::Plural->new($resource_name,
+        _is_plural_resource => 1,
+        resource_name       => $resource_name
+    );
 
     if ($parent->_is_plural_resource) {
-        my $parent_id_name = $parent->_nested_resource_members;
-
-        $resource = Forward::Routes::Resources::Plural->new(':' . $parent_id_name . '/' . $resource_name,
-            _is_plural_resource => 1,
-            resource_name       => $resource_name
-        );
-
-        $resource->constraints($parent_id_name => $parent->{id_constraint});
-    }
-    else {
-        $resource = Forward::Routes::Resources::Plural->new($resource_name,
-            _is_plural_resource => 1,
-            resource_name       => $resource_name
-        );
+        $resource->_nested_resource_members($parent);
     }
 
     $parent->_add_child($resource);
@@ -161,17 +151,6 @@ sub init_members {
 sub _members {
     my $self = shift;
     return $self->{_members};
-}
-
-
-sub _nested_resource_members {
-    my $self = shift;
-
-    my $parent_name = $self->{resource_name_part};
-
-    my $parent_id_name = $self->singularize->($parent_name) . '_id';
-
-    return $parent_id_name;
 }
 
 
