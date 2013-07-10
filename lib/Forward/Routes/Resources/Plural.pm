@@ -105,39 +105,41 @@ sub inflate {
 
 
     # members
-    my $members = $self->members if $enabled_routes->{show} || $enabled_routes->{update}
-      || $enabled_routes->{delete} || $enabled_routes->{update_form}
-      || $enabled_routes->{delete_form};
+    if (    $enabled_routes->{show} || $enabled_routes->{update} || $enabled_routes->{delete}
+         || $enabled_routes->{update_form} || $enabled_routes->{delete_form}
+    ) {
+        my $members = $self->members;
 
-    $members->add_route
-      ->via('get')
-      ->to($ctrl."#show")
-      ->name($route_name.'_show')
-      if $enabled_routes->{show};
+        $members->add_route
+          ->via('get')
+          ->to($ctrl."#show")
+          ->name($route_name.'_show')
+          if $enabled_routes->{show};
 
-    $members->add_route
-      ->via('put')
-      ->to($ctrl."#update")
-      ->name($route_name.'_update')
-      if $enabled_routes->{update};
+        $members->add_route
+          ->via('put')
+          ->to($ctrl."#update")
+          ->name($route_name.'_update')
+          if $enabled_routes->{update};
 
-    $members->add_route
-      ->via('delete')
-      ->to($ctrl."#delete")
-      ->name($route_name.'_delete')
-      if $enabled_routes->{delete};
+        $members->add_route
+          ->via('delete')
+          ->to($ctrl."#delete")
+          ->name($route_name.'_delete')
+          if $enabled_routes->{delete};
 
-    $members->add_route('edit')
-      ->via('get')
-      ->to($ctrl."#update_form")
-      ->name($route_name.'_update_form')
-      if $enabled_routes->{update_form};
+        $members->add_route('edit')
+          ->via('get')
+          ->to($ctrl."#update_form")
+          ->name($route_name.'_update_form')
+          if $enabled_routes->{update_form};
 
-    $members->add_route('delete')
-      ->via('get')
-      ->to($ctrl."#delete_form")
-      ->name($route_name.'_delete_form')
-      if $enabled_routes->{delete_form};
+        $members->add_route('delete')
+          ->via('get')
+          ->to($ctrl."#delete_form")
+          ->name($route_name.'_delete_form')
+          if $enabled_routes->{delete_form};
+    }
 
     return $self;
 }
