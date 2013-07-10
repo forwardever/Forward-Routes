@@ -46,8 +46,6 @@ sub initialize {
     $self->defaults(delete $params->{defaults});
     $self->name(delete $params->{name});
     $self->to(delete $params->{to});
-    $self->_is_plural_resource(delete $params->{_is_plural_resource});
-    $self->_is_singular_resource(delete $params->{_is_singular_resource});
     $self->constraints(delete $params->{constraints});
     $self->resource_name(delete $params->{resource_name});
 
