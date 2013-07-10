@@ -118,14 +118,8 @@ sub init_options {
         $self->pattern->pattern($options->{as}) if exists $options->{as};
     }
 
-    # nested resource name adjustment
-    my $parent_resource_name = '';
-    my $parent = $self->parent;
-    if ($parent && $parent->_is_plural_resource && defined $parent->name) {
-        $parent_resource_name = $parent->name . '_';
-    }
     my $ns_name_prefix = $self->namespace ? Forward::Routes::Resources->namespace_to_name($self->namespace) . '_' : '';
-    my $route_name = $parent_resource_name . $ns_name_prefix . $self->{resource_name};
+    my $route_name = ($self->{nested_resources_parent_name} ? $self->{nested_resources_parent_name} . '_' : '') . $ns_name_prefix . $self->{resource_name};
     $self->name($route_name);
 
     $self->{resource_name_part} = $ns_name_prefix . $self->{resource_name};
@@ -145,12 +139,18 @@ sub _nested_resource_members {
     my $self = shift;
     my ($parent) = @_;
 
+    $parent->_is_plural_resource || return;
+
     my $parent_name = $parent->{resource_name_part};
 
     my $parent_id_name = $self->singularize->($parent_name) . '_id';
 
     $self->pattern->pattern(':' . $parent_id_name . '/' . $self->{resource_name});
     $self->constraints($parent_id_name => $parent->{id_constraint});
+    
+    if (defined $parent->name) {
+        $self->{nested_resources_parent_name} = $parent->name;
+    }
 }
 
 1;

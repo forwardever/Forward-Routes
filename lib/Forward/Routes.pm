@@ -106,9 +106,7 @@ sub _add_plural_resource {
         %$options
     );
 
-    if ($self->_is_plural_resource) {
-        $resource->_nested_resource_members($self);
-    }
+    $resource->_nested_resource_members($self);
 
     $self->_add_child($resource);
 
@@ -152,9 +150,7 @@ sub _add_singular_resource {
         %$options
     );
 
-    if ($self->_is_plural_resource) {
-        $resource->_nested_resource_members($self);
-    }
+    $resource->_nested_resource_members($self);
 
     $self->_add_child($resource);
 
