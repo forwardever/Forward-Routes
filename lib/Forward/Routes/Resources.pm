@@ -40,62 +40,7 @@ sub add_member_route {
 }
 
 
-sub members {
-    my $self = shift;
-    return $self;
-}
-
-
-sub _prepare_resource_options {
-    my $self = shift;
-    my (@names) = @_;
-
-    my @final;
-    while (@names) {
-        my $name = shift(@names);
-
-        if ($name =~m/^-/){
-            $name =~s/^-//;
-            push @final, {} unless ref $final[-1] eq 'HASH';
-            $final[-1]->{$name} = shift(@names);
-        }
-        else {
-            push @final, $name;
-        }
-    }
-    return \@final;
-}
-
-
-sub namespace_to_name {
-    my $self = shift;
-    my ($namespace) = @_;
-
-    my @new_parts;
-
-    my @parts = split /::/, $namespace;
-
-    for my $part (@parts) {
-        my @words;
-        while ($part =~ s/([A-Z]{1}[^A-Z]*)//){
-            my $word = lc $1;
-            push @words, $word;
-        }
-        push @new_parts, join '_', @words;
-    }
-    return join '_', @new_parts;
-}
-
-
-sub _ctrl {
-    my $self = shift;
-    my (@params) = @_;
-
-    return $self->{_ctrl} unless @params;
-
-    $self->{_ctrl} = $params[0];
-
-    return $self;
+sub id_constraint {
 }
 
 
@@ -125,7 +70,29 @@ sub init_options {
 }
 
 
-sub id_constraint {
+sub members {
+    my $self = shift;
+    return $self;
+}
+
+
+sub namespace_to_name {
+    my $self = shift;
+    my ($namespace) = @_;
+
+    my @new_parts;
+
+    my @parts = split /::/, $namespace;
+
+    for my $part (@parts) {
+        my @words;
+        while ($part =~ s/([A-Z]{1}[^A-Z]*)//){
+            my $word = lc $1;
+            push @words, $word;
+        }
+        push @new_parts, join '_', @words;
+    }
+    return join '_', @new_parts;
 }
 
 
@@ -146,5 +113,39 @@ sub _adjust_nested_resources {
         $self->{nested_resources_parent_name} = $parent->name;
     }
 }
+
+
+sub _ctrl {
+    my $self = shift;
+    my (@params) = @_;
+
+    return $self->{_ctrl} unless @params;
+
+    $self->{_ctrl} = $params[0];
+
+    return $self;
+}
+
+
+sub _prepare_resource_options {
+    my $self = shift;
+    my (@names) = @_;
+
+    my @final;
+    while (@names) {
+        my $name = shift(@names);
+
+        if ($name =~m/^-/){
+            $name =~s/^-//;
+            push @final, {} unless ref $final[-1] eq 'HASH';
+            $final[-1]->{$name} = shift(@names);
+        }
+        else {
+            push @final, $name;
+        }
+    }
+    return \@final;
+}
+
 
 1;
