@@ -155,6 +155,10 @@ sub init_options {
 
     $self->{resource_name_part} = $ns_name_prefix . $self->{resource_name};
 
+
+    my $ctrl = Forward::Routes::Resources->format_resource_controller->($self->{resource_name});
+    $self->_ctrl($ctrl);
+
 }
 
 

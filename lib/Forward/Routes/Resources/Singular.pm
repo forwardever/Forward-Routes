@@ -27,13 +27,8 @@ sub _add {
     my $enabled_routes = $resource->enabled_routes;
 
 
-    # camelize controller name (default)
-    my $ctrl = Forward::Routes::Resources->format_resource_controller->($resource_name);
-    $resource->_ctrl($ctrl);
-
-
     my $route_name = $resource->name;
-
+    my $ctrl       = $resource->_ctrl;
 
     # members
     $resource->add_route('/new')
