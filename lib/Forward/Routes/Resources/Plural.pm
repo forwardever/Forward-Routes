@@ -9,7 +9,8 @@ sub _add {
     my ($parent, $resource_name, $options) = @_;
 
     my $resource = Forward::Routes::Resources::Plural->new($resource_name,
-        resource_name => $resource_name
+        resource_name => $resource_name,
+        %$options
     );
 
     if ($parent->_is_plural_resource) {
@@ -18,8 +19,7 @@ sub _add {
 
     $parent->_add_child($resource);
 
-
-    # after _add_child because of inheritance
+    # after _add_child because parent name is needed for route name in case of nested resources
     $resource->init_options($options);
 
 
