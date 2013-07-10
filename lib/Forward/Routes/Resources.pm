@@ -25,7 +25,7 @@ sub add_member_route {
 
     # makes sure that inheritance works
     my $child = Forward::Routes->new($pattern, @params);
-    $members->_add_child($child);
+    $members->add_child($child);
 
     # name
     my $member_route_name = $pattern;

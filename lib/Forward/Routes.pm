@@ -71,7 +71,7 @@ sub add_route {
 
     my $child = Forward::Routes->new(@params);
 
-    return $self->_add_child($child);
+    return $self->add_child($child);
 }
 
 
@@ -108,10 +108,10 @@ sub _add_plural_resource {
 
     $resource->_adjust_nested_resources($self);
 
-    $self->_add_child($resource);
+    $self->add_child($resource);
 
     # after _adjust_nested_resources because parent name is needed for route name
-    # after _add_child because of namespace inheritance for route name
+    # after add_child because of namespace inheritance for route name
     $resource->init_options($options);
     
     $resource->inflate;
@@ -153,10 +153,10 @@ sub _add_singular_resource {
 
     $resource->_adjust_nested_resources($self);
 
-    $self->_add_child($resource);
+    $self->add_child($resource);
 
     # after _adjust_nested_resources because parent name is needed for route name
-    # after _add_child because of namespace inheritance for route name
+    # after add_child because of namespace inheritance for route name
     $resource->init_options($options);
     
     $resource->inflate;
@@ -179,31 +179,26 @@ sub children {
 
 sub parent {
     my $self = shift;
-    my ($parent) = @_;
-
-    return $self->{parent} unless $parent;
-
-    $self->{parent} = $parent;
-
-    weaken $self->{parent};
-
-    # inheritance
-    $self->format([@{$parent->{format}}]) if $parent->{format} && $self->{_inherit_format};
-    $self->via([@{$parent->{via}}]) if $parent->{via} && $self->{_inherit_via};
-    $self->namespace($parent->{namespace}) if $parent->{namespace} && $self->{_inherit_namespace};
-    $self->app_namespace($parent->{app_namespace}) if $parent->{app_namespace} && $self->{_inherit_app_namespace};
-
-    return $self;
+    $self->{parent};
 }
 
 
-sub _add_child {
+sub add_child {
     my $self = shift;
     my ($child) = @_;
 
+    # child
     push @{$self->children}, $child;
 
-    $child->parent($self);
+    # parent
+    $child->{parent} = $self;
+    weaken $child->{parent};
+
+    # inheritance
+    $child->format(        [@{$self->{format}}]   ) if $self->{format}        && $child->{_inherit_format};
+    $child->via(           [@{$self->{via}}]      ) if $self->{via}           && $child->{_inherit_via};
+    $child->namespace(     $self->{namespace}     ) if $self->{namespace}     && $child->{_inherit_namespace};
+    $child->app_namespace( $self->{app_namespace} ) if $self->{app_namespace} && $child->{_inherit_app_namespace};
 
     return $child;
 }

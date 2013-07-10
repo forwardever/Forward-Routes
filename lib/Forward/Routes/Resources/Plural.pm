@@ -79,7 +79,7 @@ sub add_collection_route {
     my ($pattern, @params) = @_;
 
     my $child = Forward::Routes->new($pattern, @params);
-    $self->_collection->_add_child($child);
+    $self->_collection->add_child($child);
 
     # name
     my $collection_route_name = $pattern;
