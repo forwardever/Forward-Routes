@@ -106,11 +106,12 @@ sub _add_plural_resource {
         %$options
     );
 
-    $resource->_nested_resource_members($self);
+    $resource->_adjust_nested_resources($self);
 
     $self->_add_child($resource);
 
-    # after _add_child because parent name is needed for route name in case of nested resources
+    # after _adjust_nested_resources because parent name is needed for route name
+    # after _add_child because of namespace inheritance for route name
     $resource->init_options($options);
     
     $resource->inflate;
@@ -150,12 +151,12 @@ sub _add_singular_resource {
         %$options
     );
 
-    $resource->_nested_resource_members($self);
+    $resource->_adjust_nested_resources($self);
 
     $self->_add_child($resource);
 
-
-    # after _add_child because parent name is needed for route name in case of nested resources
+    # after _adjust_nested_resources because parent name is needed for route name
+    # after _add_child because of namespace inheritance for route name
     $resource->init_options($options);
     
     $resource->inflate;

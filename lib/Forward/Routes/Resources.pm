@@ -135,7 +135,7 @@ sub id_constraint {
 }
 
 
-sub _nested_resource_members {
+sub _adjust_nested_resources {
     my $self = shift;
     my ($parent) = @_;
 
