@@ -19,9 +19,7 @@ sub add_member_route {
     my $self = shift;
     my ($pattern, @params) = @_;
 
-
-    $self->init_members;
-    my $members = $self->_members;
+    my $members = $self->members;
 
     # makes sure that inheritance works
     my $child = Forward::Routes->new($pattern, @params);
@@ -42,11 +40,7 @@ sub add_member_route {
 }
 
 
-sub init_members {
-}
-
-
-sub _members {
+sub members {
     my $self = shift;
     return $self;
 }

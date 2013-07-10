@@ -30,7 +30,7 @@ is $m->[0]->name, 'photos_search_form';
 $m = $r->match(get => 'photos/search');
 is $m, undef;
 my $re = '(?!new\Z)(?!search_form\Z)(?!search\Z)';
-like $photos->{_members}->pattern->pattern, qr/$re/;
+like $photos->{members}->pattern->pattern, qr/$re/;
 
 
 

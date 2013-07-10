@@ -4,6 +4,75 @@ use warnings;
 use parent qw/Forward::Routes::Resources/;
 
 
+sub add_collection_route {
+    my $self = shift;
+    my ($pattern, @params) = @_;
+
+    my $child = Forward::Routes->new($pattern, @params);
+    $self->collection->add_child($child);
+
+    # name
+    my $collection_route_name = $pattern;
+    $collection_route_name =~s|^/||;
+    $collection_route_name =~s|/|_|g;
+
+    $self->{members}->pattern->{exclude}->{id} ||= [];
+    push @{$self->{members}->pattern->{exclude}->{id}}, $collection_route_name;
+
+
+    # Auto set controller and action params and name
+    $child->to($self->{_ctrl}  . '#' . $collection_route_name);
+    $child->name($self->{name} . '_' . $collection_route_name);
+
+    return $child;
+}
+
+
+sub collection {
+    my $self = shift;
+    return $self->{collection} ||= $self->add_route;
+}
+
+
+sub enabled_routes {
+    my $self = shift;
+
+    my $only = $self->{only};
+
+    my %selected = (
+        index       => 1,
+        create      => 1,
+        show        => 1,
+        update      => 1,
+        delete      => 1,
+        create_form => 1,
+        update_form => 1,
+        delete_form => 1
+    );
+
+    if ($self->{only}) {
+        %selected = ();
+        foreach my $type (@$only) {
+            $selected{$type} = 1;
+        }
+    }
+
+    return \%selected;
+}
+
+
+sub id_constraint {
+    my $self = shift;
+    my (@params) = @_;
+
+    return $self->{id_constraint} unless @params;
+
+    $self->{id_constraint} = $params[0];
+
+    return $self;
+}
+
+
 sub inflate {
     my $self = shift;
 
@@ -12,7 +81,7 @@ sub inflate {
     my $ctrl           = $self->_ctrl;
 
     # collection
-    my $collection = $self->_collection
+    my $collection = $self->collection
       if $enabled_routes->{index} || $enabled_routes->{create} || $enabled_routes->{create_form};
 
     $collection->add_route
@@ -36,7 +105,7 @@ sub inflate {
 
 
     # members
-    my $members = $self->init_members if $enabled_routes->{show} || $enabled_routes->{update}
+    my $members = $self->members if $enabled_routes->{show} || $enabled_routes->{update}
       || $enabled_routes->{delete} || $enabled_routes->{update_form}
       || $enabled_routes->{delete_form};
 
@@ -74,98 +143,21 @@ sub inflate {
 }
 
 
-sub add_collection_route {
-    my $self = shift;
-    my ($pattern, @params) = @_;
-
-    my $child = Forward::Routes->new($pattern, @params);
-    $self->_collection->add_child($child);
-
-    # name
-    my $collection_route_name = $pattern;
-    $collection_route_name =~s|^/||;
-    $collection_route_name =~s|/|_|g;
-
-    $self->{_members}->pattern->{exclude}->{id} ||= [];
-    push @{$self->{_members}->pattern->{exclude}->{id}}, $collection_route_name;
-
-
-    # Auto set controller and action params and name
-    $child->to($self->{_ctrl}  . '#' . $collection_route_name);
-    $child->name($self->{name} . '_' . $collection_route_name);
-
-    return $child;
-}
-
-
-sub _collection {
+sub members {
     my $self = shift;
 
-    $self->{_collection} ||= $self->add_route;
-
-    return $self->{_collection};
-}
-
-
-sub init_members {
-    my $self = shift;
-
-    return $self->{_members} if $self->{_members};
+    return $self->{members} if $self->{members};
 
     my $id_constraint = $self->{id_constraint} || die 'missing id constraint';
 
-    $self->{_members} = $self->add_route(':id')
+    $self->{members} = $self->add_route(':id')
       ->constraints('id' => $id_constraint);
 
-    $self->{_members}->pattern->{exclude}->{id} ||= [];
-    push @{$self->{_members}->pattern->{exclude}->{id}}, 'new';
+    $self->{members}->pattern->{exclude}->{id} ||= [];
+    push @{$self->{members}->pattern->{exclude}->{id}}, 'new';
 
-    return $self->{_members};
+    return $self->{members};
 }
 
-
-sub _members {
-    my $self = shift;
-    return $self->{_members};
-}
-
-
-sub id_constraint {
-    my $self = shift;
-    my (@params) = @_;
-
-    return $self->{id_constraint} unless @params;
-
-    $self->{id_constraint} = $params[0];
-
-    return $self;
-}
-
-
-sub enabled_routes {
-    my $self = shift;
-
-    my $only = $self->{only};
-
-    my %selected = (
-        index       => 1,
-        create      => 1,
-        show        => 1,
-        update      => 1,
-        delete      => 1,
-        create_form => 1,
-        update_form => 1,
-        delete_form => 1
-    );
-
-    if ($self->{only}) {
-        %selected = ();
-        foreach my $type (@$only) {
-            $selected{$type} = 1;
-        }
-    }
-
-    return \%selected;
-}
 
 1;
