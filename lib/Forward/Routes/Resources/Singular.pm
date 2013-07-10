@@ -4,6 +4,31 @@ use warnings;
 use parent qw/Forward::Routes::Resources/;
 
 
+sub enabled_routes {
+    my $self = shift;
+
+    my $only = $self->{only};
+
+    my %selected = (
+        create      => 1,
+        show        => 1,
+        update      => 1,
+        delete      => 1,
+        create_form => 1,
+        update_form => 1
+    );
+
+    if ($self->{only}) {
+        %selected = ();
+        foreach my $type (@$only) {
+            $selected{$type} = 1;
+        }
+    }
+
+    return \%selected;
+}
+
+
 sub inflate {
     my $self = shift;
     
@@ -49,31 +74,6 @@ sub inflate {
       if $enabled_routes->{delete};
 
     return $self;
-}
-
-
-sub enabled_routes {
-    my $self = shift;
-
-    my $only = $self->{only};
-
-    my %selected = (
-        create      => 1,
-        show        => 1,
-        update      => 1,
-        delete      => 1,
-        create_form => 1,
-        update_form => 1
-    );
-
-    if ($self->{only}) {
-        %selected = ();
-        foreach my $type (@$only) {
-            $selected{$type} = 1;
-        }
-    }
-
-    return \%selected;
 }
 
 
