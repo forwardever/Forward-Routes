@@ -27,27 +27,32 @@ sub initialize {
 
     # block
     my $code_ref = pop @_ if @_ && ref $_[-1] eq 'CODE';
-    $code_ref->($self) if $code_ref;
 
     # Pattern
     my $pattern = @_ % 2 ? shift : undef;
     $self->pattern->pattern($pattern) if defined $pattern;
 
     # Shortcut in case of chained API
-    return $self unless @_;
+    return $self unless @_ || $code_ref;
 
     # Remaining params
     my $params = ref $_[0] eq 'HASH' ? {%{$_[0]}} : {@_};
 
-    # Save to route
-    $self->via(delete $params->{via});
-    $self->namespace(delete $params->{namespace});
-    $self->app_namespace(delete $params->{app_namespace});
+    # inherit
+    $self->parent(delete $params->{parent}) if exists $params->{parent};
+
+    $self->format(delete $params->{format}) if exists $params->{format};
+    $self->via(delete $params->{via}) if exists $params->{via};
+    $self->namespace(delete $params->{namespace}) if exists $params->{namespace};
+    $self->app_namespace(delete $params->{app_namespace}) if exists $params->{app_namespace};
     $self->defaults(delete $params->{defaults});
     $self->name(delete $params->{name});
     $self->to(delete $params->{to});
     $self->constraints(delete $params->{constraints});
     $self->resource_name(delete $params->{resource_name});
+
+    # after inheritance
+    $code_ref->($self) if $code_ref;
 
     return $self;
 }
@@ -59,8 +64,14 @@ sub initialize {
 
 sub add_route {
     my $self = shift;
+    my (@params) = @_;
 
-    my $child = Forward::Routes->new(@_);
+    my $code_ref = pop @params if @params && ref $params[-1] eq 'CODE';
+
+    push @params, parent => $self;
+    push @params, $code_ref if $code_ref;
+
+    my $child = Forward::Routes->new(@params);
 
     return $self->_add_child($child);
 }
@@ -92,12 +103,19 @@ sub children {
 
 sub parent {
     my $self = shift;
+    my ($parent) = @_;
 
-    return $self->{parent} unless $_[0];
+    return $self->{parent} unless $parent;
 
-    $self->{parent} = $_[0];
+    $self->{parent} = $parent;
 
     weaken $self->{parent};
+
+    # inheritance
+    $self->format([@{$parent->{format}}]) if $parent->{format};
+    $self->via([@{$parent->{via}}]) if $parent->{via};
+    $self->namespace($parent->{namespace}) if $parent->{namespace};
+    $self->app_namespace($parent->{app_namespace}) if $parent->{app_namespace};
 
     return $self;
 }
@@ -107,15 +125,7 @@ sub _add_child {
     my $self = shift;
     my ($child) = @_;
 
-    # Format, method and namespace inheritance
-    $child->format([@{$self->{format}}]) if $self->{format};
-    $child->via([@{$self->{via}}]) if $self->{via};
-    $child->namespace($self->{namespace}) if $self->{namespace};
-    $child->app_namespace($self->{app_namespace}) if $self->{app_namespace};
-
     push @{$self->children}, $child;
-
-    $child->parent($self);
 
     return $child;
 }
@@ -241,10 +251,16 @@ sub pattern {
 
 sub via {
     my $self = shift;
+    my (@params) = @_;
 
-    return $self->{via} unless $_[0];
+    return $self->{via} unless @params;
 
-    my $methods = ref $_[0] eq 'ARRAY' ? $_[0] : [@_];
+    if (!defined $params[0]) {
+        $self->{via} = undef;
+        return $self;
+    }
+
+    my $methods = ref $params[0] eq 'ARRAY' ? $params[0] : [@params];
 
     @$methods = map {lc $_} @$methods;
 

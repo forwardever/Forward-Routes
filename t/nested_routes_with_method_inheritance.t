@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 24;
+use Test::More tests => 29;
 use lib 'lib';
 use Forward::Routes;
 
@@ -105,3 +105,16 @@ is $path->{method}, 'post';
 
 $path = $root->build_path('three');
 is $path->{method}, 'delete';
+
+
+#############################################################################
+### back to undef
+
+my $r = Forward::Routes->new;
+my $hello = $r->add_route('hello')->via('post');
+ok $r->match(post => '/hello');
+ok !$r->match(get => '/hello');
+my $world = $hello->add_route('world')->via(undef);
+ok $r->match(post => '/hello/world');
+ok $r->match(get => '/hello/world');
+ok $r->match(put => '/hello/world');

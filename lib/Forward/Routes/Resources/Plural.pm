@@ -9,7 +9,8 @@ sub _add {
     my ($parent, $resource_name, $options) = @_;
 
     my $resource = Forward::Routes::Resources::Plural->new($resource_name,
-        resource_name => $resource_name
+        resource_name => $resource_name,
+        parent        => $parent
     );
 
     if ($parent->_is_plural_resource) {
@@ -95,7 +96,7 @@ sub add_collection_route {
     my $self = shift;
     my ($pattern, @params) = @_;
 
-    my $child = Forward::Routes->new($pattern, @params);
+    my $child = Forward::Routes->new($pattern, @params, parent => $self);
     $self->_collection->_add_child($child);
 
     # name
