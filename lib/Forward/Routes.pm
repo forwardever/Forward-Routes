@@ -284,17 +284,13 @@ sub _is_bridge {
 
 sub _is_plural_resource {
     my $self = shift;
-    return $self->{_is_plural_resource} unless defined $_[0];
-    $self->{_is_plural_resource} = $_[0];
-    return $self;
+    return ref $self eq 'Forward::Routes::Resources::Plural' ? 1 : 0;
 }
 
 
 sub _is_singular_resource {
     my $self = shift;
-    return $self->{_is_singular_resource} unless defined $_[0];
-    $self->{_is_singular_resource} = $_[0];
-    return $self;
+    return ref $self eq 'Forward::Routes::Resources::Singular' ? 1 : 0;
 }
 
 

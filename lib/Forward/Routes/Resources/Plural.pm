@@ -9,8 +9,7 @@ sub _add {
     my ($parent, $resource_name, $options) = @_;
 
     my $resource = Forward::Routes::Resources::Plural->new($resource_name,
-        _is_plural_resource => 1,
-        resource_name       => $resource_name
+        resource_name => $resource_name
     );
 
     if ($parent->_is_plural_resource) {
