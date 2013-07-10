@@ -15,28 +15,6 @@ sub new {
 }
 
 
-sub add {
-    my $class = shift;
-    my ($parent, $params) = @_;
-
-    $params = Forward::Routes::Resources->_prepare_resource_options(@$params);
-
-    my $last_resource;
-
-    while (my $name = shift @$params) {
-
-        my $options;
-        if (@$params && ref $params->[0] eq 'HASH') {
-            $options = shift @$params;
-        }
-
-        $last_resource = $class->_add($parent, $name, $options);
-    }
-
-    return $last_resource;
-}
-
-
 sub add_member_route {
     my $self = shift;
     my ($pattern, @params) = @_;

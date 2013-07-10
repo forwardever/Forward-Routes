@@ -4,70 +4,51 @@ use warnings;
 use parent qw/Forward::Routes::Resources/;
 
 
-sub _add {
+sub inflate {
     my $self = shift;
-    my ($parent, $resource_name, $options) = @_;
-
-    my $resource = Forward::Routes::Resources::Singular->new($resource_name,
-        resource_name => $resource_name,
-        %$options
-    );
-
-    if ($parent->_is_plural_resource) {
-        $resource->_nested_resource_members($parent);
-    }
-
-    $parent->_add_child($resource);
-
-
-    # after _add_child because of inheritance
-    $resource->init_options($options);
-
-
-    my $enabled_routes = $resource->enabled_routes;
-
-
-    my $route_name = $resource->name;
-    my $ctrl       = $resource->_ctrl;
+    
+    my $enabled_routes = $self->enabled_routes;
+    my $route_name     = $self->name;
+    my $ctrl           = $self->_ctrl;
 
     # members
-    $resource->add_route('/new')
+    $self->add_route('/new')
       ->via('get')
       ->to("$ctrl#create_form")
       ->name($route_name.'_create_form')
       if $enabled_routes->{create_form};;
 
-    $resource->add_route('/edit')
+    $self->add_route('/edit')
       ->via('get')
       ->to("$ctrl#update_form")
       ->name($route_name.'_update_form')
       if $enabled_routes->{update_form};
 
-    $resource->add_route
+    $self->add_route
       ->via('post')
       ->to("$ctrl#create")
       ->name($route_name.'_create')
       if $enabled_routes->{create};
 
-    $resource->add_route
+    $self->add_route
       ->via('get')
       ->to("$ctrl#show")
       ->name($route_name.'_show')
       if $enabled_routes->{show};
 
-    $resource->add_route
+    $self->add_route
       ->via('put')
       ->to("$ctrl#update")
       ->name($route_name.'_update')
       if $enabled_routes->{update};
 
-    $resource->add_route
+    $self->add_route
       ->via('delete')
       ->to("$ctrl#delete")
       ->name($route_name.'_delete')
       if $enabled_routes->{delete};
 
-    return $resource;
+    return $self;
 }
 
 

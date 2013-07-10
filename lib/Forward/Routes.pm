@@ -77,13 +77,94 @@ sub add_route {
 
 sub add_resources {
     my $self = shift;
-    return Forward::Routes::Resources::Plural->add($self, [@_]);
+    my $params = [@_];
+
+    $params = Forward::Routes::Resources->_prepare_resource_options(@$params);
+
+    my $last_resource;
+
+    while (my $name = shift @$params) {
+
+        my $options;
+        if (@$params && ref $params->[0] eq 'HASH') {
+            $options = shift @$params;
+        }
+
+        $last_resource = $self->_add_plural_resource($name, $options);
+    }
+
+    return $last_resource;
+}
+
+
+sub _add_plural_resource {
+    my $self = shift;
+    my ($resource_name, $options) = @_;
+
+    my $resource = Forward::Routes::Resources::Plural->new($resource_name,
+        resource_name => $resource_name,
+        %$options
+    );
+
+    if ($self->_is_plural_resource) {
+        $resource->_nested_resource_members($self);
+    }
+
+    $self->_add_child($resource);
+
+    # after _add_child because parent name is needed for route name in case of nested resources
+    $resource->init_options($options);
+    
+    $resource->inflate;
+    
+    return $resource;
 }
 
 
 sub add_singular_resources {
     my $self = shift;
-    return Forward::Routes::Resources::Singular->add($self, [@_]);
+    my $params = [@_];
+
+    $params = Forward::Routes::Resources->_prepare_resource_options(@$params);
+
+    my $last_resource;
+
+    while (my $name = shift @$params) {
+
+        my $options;
+        if (@$params && ref $params->[0] eq 'HASH') {
+            $options = shift @$params;
+        }
+
+        $last_resource = $self->_add_singular_resource($name, $options);
+    }
+
+    return $last_resource;
+}
+
+
+sub _add_singular_resource {
+    my $self = shift;
+    my ($resource_name, $options) = @_;
+
+    my $resource = Forward::Routes::Resources::Singular->new($resource_name,
+        resource_name => $resource_name,
+        %$options
+    );
+
+    if ($self->_is_plural_resource) {
+        $resource->_nested_resource_members($self);
+    }
+
+    $self->_add_child($resource);
+
+
+    # after _add_child because parent name is needed for route name in case of nested resources
+    $resource->init_options($options);
+    
+    $resource->inflate;
+    
+    return $resource;
 }
 
 

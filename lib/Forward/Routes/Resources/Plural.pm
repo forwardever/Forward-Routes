@@ -4,32 +4,15 @@ use warnings;
 use parent qw/Forward::Routes::Resources/;
 
 
-sub _add {
+sub inflate {
     my $self = shift;
-    my ($parent, $resource_name, $options) = @_;
 
-    my $resource = Forward::Routes::Resources::Plural->new($resource_name,
-        resource_name => $resource_name,
-        %$options
-    );
-
-    if ($parent->_is_plural_resource) {
-        $resource->_nested_resource_members($parent);
-    }
-
-    $parent->_add_child($resource);
-
-    # after _add_child because parent name is needed for route name in case of nested resources
-    $resource->init_options($options);
-
-
-    my $enabled_routes = $resource->enabled_routes;
-
-    my $route_name = $resource->name;
-    my $ctrl       = $resource->_ctrl;
+    my $enabled_routes = $self->enabled_routes;
+    my $route_name     = $self->name;
+    my $ctrl           = $self->_ctrl;
 
     # collection
-    my $collection = $resource->_collection
+    my $collection = $self->_collection
       if $enabled_routes->{index} || $enabled_routes->{create} || $enabled_routes->{create_form};
 
     $collection->add_route
@@ -53,7 +36,7 @@ sub _add {
 
 
     # members
-    my $members = $resource->init_members if $enabled_routes->{show} || $enabled_routes->{update}
+    my $members = $self->init_members if $enabled_routes->{show} || $enabled_routes->{update}
       || $enabled_routes->{delete} || $enabled_routes->{update_form}
       || $enabled_routes->{delete_form};
 
@@ -87,7 +70,7 @@ sub _add {
       ->name($route_name.'_delete_form')
       if $enabled_routes->{delete_form};
 
-    return $resource;
+    return $self;
 }
 
 
