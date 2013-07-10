@@ -10,7 +10,6 @@ sub _add {
 
     my $resource = Forward::Routes::Resources::Singular->new($resource_name,
         resource_name => $resource_name,
-        parent        => $parent
     );
 
     if ($parent->_is_plural_resource) {

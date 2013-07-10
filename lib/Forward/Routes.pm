@@ -28,6 +28,12 @@ sub initialize {
     # block
     my $code_ref = pop @_ if @_ && ref $_[-1] eq 'CODE';
 
+    # inherit
+    $self->{_inherit_format} = 1;
+    $self->{_inherit_via} = 1;
+    $self->{_inherit_namespace} = 1;
+    $self->{_inherit_app_namespace} = 1;
+
     # Pattern
     my $pattern = @_ % 2 ? shift : undef;
     $self->pattern->pattern($pattern) if defined $pattern;
@@ -37,9 +43,6 @@ sub initialize {
 
     # Remaining params
     my $params = ref $_[0] eq 'HASH' ? {%{$_[0]}} : {@_};
-
-    # inherit
-    $self->parent(delete $params->{parent}) if exists $params->{parent};
 
     $self->format(delete $params->{format}) if exists $params->{format};
     $self->via(delete $params->{via}) if exists $params->{via};
@@ -65,11 +68,6 @@ sub initialize {
 sub add_route {
     my $self = shift;
     my (@params) = @_;
-
-    my $code_ref = pop @params if @params && ref $params[-1] eq 'CODE';
-
-    push @params, parent => $self;
-    push @params, $code_ref if $code_ref;
 
     my $child = Forward::Routes->new(@params);
 
@@ -112,10 +110,10 @@ sub parent {
     weaken $self->{parent};
 
     # inheritance
-    $self->format([@{$parent->{format}}]) if $parent->{format};
-    $self->via([@{$parent->{via}}]) if $parent->{via};
-    $self->namespace($parent->{namespace}) if $parent->{namespace};
-    $self->app_namespace($parent->{app_namespace}) if $parent->{app_namespace};
+    $self->format([@{$parent->{format}}]) if $parent->{format} && $self->{_inherit_format};
+    $self->via([@{$parent->{via}}]) if $parent->{via} && $self->{_inherit_via};
+    $self->namespace($parent->{namespace}) if $parent->{namespace} && $self->{_inherit_namespace};
+    $self->app_namespace($parent->{app_namespace}) if $parent->{app_namespace} && $self->{_inherit_app_namespace};
 
     return $self;
 }
@@ -126,6 +124,8 @@ sub _add_child {
     my ($child) = @_;
 
     push @{$self->children}, $child;
+
+    $child->parent($self);
 
     return $child;
 }
@@ -140,6 +140,8 @@ sub app_namespace {
     my (@params) = @_;
 
     return $self->{app_namespace} unless @params;
+
+    $self->{_inherit_app_namespace} = 0;
 
     $self->{app_namespace} = $params[0];
 
@@ -183,6 +185,8 @@ sub format {
     my (@params) = @_;
 
     return $self->{format} unless @params;
+
+    $self->{_inherit_format} = 0;
 
     # no format constraint, no format matching performed
     if (!defined($params[0])) {
@@ -229,6 +233,8 @@ sub namespace {
 
     return $self->{namespace} unless @params;
 
+    $self->{_inherit_namespace} = 0;
+
     $self->{namespace} = $params[0];
 
     return $self;
@@ -254,6 +260,8 @@ sub via {
     my (@params) = @_;
 
     return $self->{via} unless @params;
+
+    $self->{_inherit_via} = 0;
 
     if (!defined $params[0]) {
         $self->{via} = undef;
