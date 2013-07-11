@@ -61,30 +61,6 @@ sub initialize {
 }
 
 
-sub _inherit_format {
-    my $self = shift;
-    $self->{_inherit_format};
-}
-
-
-sub _inherit_via {
-    my $self = shift;
-    $self->{_inherit_via};
-}
-
-
-sub _inherit_namespace {
-    my $self = shift;
-    $self->{_inherit_namespace};
-}
-
-
-sub _inherit_app_namespace {
-    my $self = shift;
-    $self->{_inherit_app_namespace};
-}
-
-
 ## ---------------------------------------------------------------------------
 ##  Routes tree
 ## ---------------------------------------------------------------------------
@@ -402,6 +378,30 @@ sub _is_bridge {
     $self->{_is_bridge} = $_[0];
 
     return $self;
+}
+
+
+sub _inherit_format {
+    my $self = shift;
+    $self->{_inherit_format};
+}
+
+
+sub _inherit_via {
+    my $self = shift;
+    $self->{_inherit_via};
+}
+
+
+sub _inherit_namespace {
+    my $self = shift;
+    $self->{_inherit_namespace};
+}
+
+
+sub _inherit_app_namespace {
+    my $self = shift;
+    $self->{_inherit_app_namespace};
 }
 
 
