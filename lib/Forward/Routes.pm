@@ -203,7 +203,12 @@ sub children {
 
 sub parent {
     my $self = shift;
-    $self->{parent};
+    my ($value) = @_;
+    return $self->{parent} unless $value;
+    
+    $self->{parent} = $value;
+    weaken $self->{parent};
+    return $self;
 }
 
 
@@ -215,8 +220,7 @@ sub add_child {
     push @{$self->children}, $child;
 
     # parent
-    $child->{parent} = $self;
-    weaken $child->{parent};
+    $child->parent($self);
 
     # inheritance
     $child->format(        [@{$self->{format}}]   ) if $self->{format}        && $child->_inherit_format;
