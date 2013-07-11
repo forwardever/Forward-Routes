@@ -73,6 +73,14 @@ sub params {
 }
 
 
+sub set_params {
+    my $self = shift;
+    my ($params) = @_;
+    $self->{params} = $params;
+    return $self;
+}
+
+
 sub captures {
     my $self = shift;
     my ($key) = @_;
@@ -85,6 +93,14 @@ sub captures {
 
     # Get hash value
     return $self->{captures}->{$key};
+}
+
+
+sub set_captures {
+    my $self = shift;
+    my ($captures) = @_;
+    $self->{captures} = $captures;
+    return $self;
 }
 
 

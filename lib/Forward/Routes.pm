@@ -458,8 +458,8 @@ sub match {
 
     my $m = $matches->[-1];
     for (my $i=0; $i<(@$matches-1); $i++) {
-        $matches->[$i]->{params} = {%{$m->params}, %{$matches->[$i]->params} }; # all params except controller and action
-        $matches->[$i]->{captures} = $m->captures;
+        $matches->[$i]->set_params({%{$m->params}, %{$matches->[$i]->params}}); # all params except controller and action
+        $matches->[$i]->set_captures($m->captures);
         $matches->[$i]->_add_name($m->name);
     }
 
