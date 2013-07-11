@@ -1,5 +1,4 @@
 package Forward::Routes::Match;
-
 use strict;
 use warnings;
 
@@ -11,9 +10,7 @@ sub new {
 sub _add_params {
     my $self = shift;
     my ($params) = @_;
-
     %{$self->params} = (%$params, %{$self->params});
-
     return $self;
 }
 
@@ -21,9 +18,7 @@ sub _add_params {
 sub _add_captures {
     my $self = shift;
     my ($params) = @_;
-
     %{$self->captures} = (%$params, %{$self->captures});
-
     return $self;
 }
 
@@ -31,9 +26,7 @@ sub _add_captures {
 sub _add_name {
     my $self = shift;
     my (@params) = @_;
-
     $self->{name} = $params[0] if @params;
-
     return $self;
 }
 
@@ -41,9 +34,7 @@ sub _add_name {
 sub _add_namespace {
     my $self = shift;
     my (@params) = @_;
-
     $self->{namespace} = $params[0] if @params;
-
     return $self;
 }
 
@@ -51,9 +42,7 @@ sub _add_namespace {
 sub _add_app_namespace {
     my $self = shift;
     my (@params) = @_;
-
     $self->{app_namespace} = $params[0] if @params;
-
     return $self;
 }
 
@@ -61,14 +50,8 @@ sub _add_app_namespace {
 sub params {
     my $self = shift;
     my ($key) = @_;
-
-    # Initialize
     $self->{params} ||= {};
-
-    # Get hash
     return $self->{params} unless defined $key && length $key;
-
-    # Get hash value
     return $self->{params}->{$key};
 }
 
@@ -84,14 +67,8 @@ sub _set_params {
 sub captures {
     my $self = shift;
     my ($key) = @_;
-
-    # Initialize
     $self->{captures} ||= {};
-
-    # Get hash
     return $self->{captures} unless defined $key && length $key;
-
-    # Get hash value
     return $self->{captures}->{$key};
 }
 
@@ -107,11 +84,8 @@ sub _set_captures {
 sub is_bridge {
     my $self = shift;
     my (@is_bridge) = @_;
-
     return $self->{is_bridge} unless @is_bridge;
-
     $self->{is_bridge} = $is_bridge[0];
-
     return $self;
 }
 
