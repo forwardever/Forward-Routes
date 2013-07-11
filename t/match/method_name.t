@@ -1,13 +1,8 @@
-#!/usr/bin/env perl
-
 use strict;
 use warnings;
-
-use Test::More;
+use Test::More tests => 6;
 
 use Forward::Routes;
-
-use Test::More tests => 6;
 
 
 #############################################################################
@@ -17,10 +12,10 @@ my $m = Forward::Routes::Match->new;
 
 is $m->name, undef;
 
-is $m->_add_name('hello'), $m;
+is $m->_set_name('hello'), $m;
 is $m->name, 'hello';
 
-is $m->_add_name('you'), $m;
+is $m->_set_name('you'), $m;
 is $m->name, 'you';
 
 

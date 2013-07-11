@@ -460,7 +460,7 @@ sub match {
     for (my $i=0; $i<(@$matches-1); $i++) {
         $matches->[$i]->_set_params({%{$m->params}, %{$matches->[$i]->params}}); # all params except controller and action
         $matches->[$i]->_set_captures($m->captures);
-        $matches->[$i]->_add_name($m->name);
+        $matches->[$i]->_set_name($m->name);
     }
 
     return $matches;
@@ -546,9 +546,9 @@ sub _match {
     # Match object
     if (!@$matches){
         my $m = Forward::Routes::Match->new;
-        $m->_add_name($self->name);
-        $m->_add_app_namespace($self->app_namespace);
-        $m->_add_namespace($self->namespace);
+        $m->_set_name($self->name);
+        $m->_set_app_namespace($self->app_namespace);
+        $m->_set_namespace($self->namespace);
 
         if ($self->{format}) {
             $m->_add_params({format => $format_extracted_from_path});
@@ -559,8 +559,8 @@ sub _match {
 
     if ($self->_is_bridge) {
         my $m = Forward::Routes::Match->new;
-        $m->_add_app_namespace($self->app_namespace);
-        $m->_add_namespace($self->namespace);
+        $m->_set_app_namespace($self->app_namespace);
+        $m->_set_namespace($self->namespace);
 
         $m->is_bridge(1);
 

@@ -81,14 +81,6 @@ sub params {
 }
 
 
-sub _add_app_namespace {
-    my $self = shift;
-    my (@params) = @_;
-    $self->{app_namespace} = $params[0] if @params;
-    return $self;
-}
-
-
 sub _add_captures {
     my $self = shift;
     my ($params) = @_;
@@ -96,21 +88,6 @@ sub _add_captures {
     return $self;
 }
 
-
-sub _add_name {
-    my $self = shift;
-    my (@params) = @_;
-    $self->{name} = $params[0] if @params;
-    return $self;
-}
-
-
-sub _add_namespace {
-    my $self = shift;
-    my (@params) = @_;
-    $self->{namespace} = $params[0] if @params;
-    return $self;
-}
 
 
 sub _add_params {
@@ -121,10 +98,34 @@ sub _add_params {
 }
 
 
+sub _set_app_namespace {
+    my $self = shift;
+    my ($value) = @_;
+    $self->{app_namespace} = $value;
+    return $self;
+}
+
+
 sub _set_captures {
     my $self = shift;
     my ($captures) = @_;
     $self->{captures} = $captures;
+    return $self;
+}
+
+
+sub _set_name {
+    my $self = shift;
+    my ($value) = @_;
+    $self->{name} = $value;
+    return $self;
+}
+
+
+sub _set_namespace {
+    my $self = shift;
+    my ($value) = @_;
+    $self->{namespace} = $value;
     return $self;
 }
 
