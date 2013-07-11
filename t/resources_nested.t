@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 66;
+use Test::More tests => 73;
 use lib 'lib';
 use Forward::Routes;
 
@@ -210,3 +210,29 @@ is $m, undef;
 
 $m = $r->match(get => 'magazines/22/ads/4');
 is_deeply $m->[0]->params => {controller => 'Ads', action => 'show', magazine_id => 22, id => 4};
+
+
+#############################################################################
+### with -as option
+
+$r = Forward::Routes->new;
+$r->add_resources('magazines')->add_resources('ads', -as => 'advertising');
+
+
+$m = $r->match(get => 'magazines/1/advertising/new');
+is_deeply $m->[0]->params => {controller => 'Ads', action => 'create_form', magazine_id => 1};
+
+$m = $r->match(post => 'magazines/1/advertising');
+is_deeply $m->[0]->params => {controller => 'Ads', action => 'create', magazine_id => 1};
+
+
+is $r->build_path('magazines_ads_create_form', magazine_id => 4)->{path} => 'magazines/4/advertising/new';
+is $r->build_path('magazines_ads_create_form', magazine_id => 4)->{method} => 'get';
+
+is $r->build_path('magazines_ads_create', magazine_id => 5)->{path} => 'magazines/5/advertising';
+is $r->build_path('magazines_ads_create', magazine_id => 5)->{method} => 'post';
+
+
+$e = eval {$r->build_path('magazines_ads_index')->{path}; };
+like $@ => qr/Required param 'magazine_id' was not passed when building a path/;
+

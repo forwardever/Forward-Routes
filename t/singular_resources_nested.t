@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 32;
+use Test::More tests => 39;
 use lib 'lib';
 use Forward::Routes;
 
@@ -107,3 +107,32 @@ is $m, undef;
 
 $m = $r->match(get => 'magazines/22/manager');
 is_deeply $m->[0]->params => {controller => 'Manager', action => 'show', magazine_id => 22};
+
+
+
+#############################################################################
+### test with -as option
+$r = Forward::Routes->new;
+$r->add_resources('magazines')->add_singular_resources('manager', -as => 'management');
+
+
+# nested manager routes work
+$m = $r->match(get => 'magazines/1/management');
+is_deeply $m->[0]->params => {controller => 'Manager', action => 'show', magazine_id => 1};
+
+$m = $r->match(get => 'magazines/1/management/new');
+is_deeply $m->[0]->params => {controller => 'Manager', action => 'create_form', magazine_id => 1};
+
+
+
+# build path
+is $r->build_path('magazines_manager_show', magazine_id => 3)->{path} => 'magazines/3/management';
+is $r->build_path('magazines_manager_show', magazine_id => 3)->{method} => 'get';
+
+is $r->build_path('magazines_manager_create_form', magazine_id => 4)->{path} => 'magazines/4/management/new';
+is $r->build_path('magazines_manager_create_form', magazine_id => 4)->{method} => 'get';
+
+
+$e = eval {$r->build_path('magazines_manager_show')->{path}; };
+like $@ => qr/Required param 'magazine_id' was not passed when building a path/;
+undef $e;

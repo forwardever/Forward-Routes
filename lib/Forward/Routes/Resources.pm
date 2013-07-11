@@ -50,19 +50,24 @@ sub init_options {
     # default
     $self->id_constraint(qr/[^.\/]+/);
 
+    # only resource specific options
     if ($options) {
         $self->id_constraint($options->{constraints}->{id}) if $options->{constraints}->{id};
         $self->{only} = $options->{only};
-        $self->pattern->pattern($options->{as}) if exists $options->{as};
+        $self->{as} = $options->{as};
     }
+}
 
+
+sub preprocess {
+    my $self = shift;
+    
     my $ns_name_prefix = $self->namespace ? Forward::Routes::Resources->namespace_to_name($self->namespace) . '_' : '';
     my $route_name = ($self->{nested_resources_parent_name} ? $self->{nested_resources_parent_name} . '_' : '') . $ns_name_prefix . $self->{resource_name};
     $self->name($route_name);
 
     $self->{resource_name_part} = $ns_name_prefix . $self->{resource_name};
-
-
+    
     my $ctrl = Forward::Routes::Resources->format_resource_controller->($self->{resource_name});
     $self->_ctrl($ctrl);
 }
@@ -104,7 +109,7 @@ sub _adjust_nested_resources {
 
     my $parent_id_name = $self->singularize->($parent_name) . '_id';
 
-    $self->pattern->pattern(':' . $parent_id_name . '/' . $self->{resource_name});
+    $self->pattern->pattern(':' . $parent_id_name . '/' . ($self->{as} // $self->{resource_name}));
     $self->constraints($parent_id_name => $parent->{id_constraint});
     
     if (defined $parent->name) {

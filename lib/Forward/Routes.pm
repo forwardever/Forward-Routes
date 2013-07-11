@@ -101,10 +101,11 @@ sub _add_plural_resource {
     my $self = shift;
     my ($resource_name, $options) = @_;
 
-    my $resource = Forward::Routes::Resources::Plural->new($resource_name,
+    my $resource = Forward::Routes::Resources::Plural->new($options->{as} // $resource_name,
         resource_name => $resource_name,
         %$options
     );
+    $resource->init_options($options);
 
     $resource->_adjust_nested_resources($self);
 
@@ -112,8 +113,8 @@ sub _add_plural_resource {
 
     # after _adjust_nested_resources because parent name is needed for route name
     # after add_child because of namespace inheritance for route name
-    $resource->init_options($options);
-    
+    $resource->preprocess;
+   
     $resource->inflate;
     
     return $resource;
@@ -146,10 +147,11 @@ sub _add_singular_resource {
     my $self = shift;
     my ($resource_name, $options) = @_;
 
-    my $resource = Forward::Routes::Resources::Singular->new($resource_name,
+    my $resource = Forward::Routes::Resources::Singular->new($options->{as} // $resource_name,
         resource_name => $resource_name,
         %$options
     );
+    $resource->init_options($options);
 
     $resource->_adjust_nested_resources($self);
 
@@ -157,8 +159,8 @@ sub _add_singular_resource {
 
     # after _adjust_nested_resources because parent name is needed for route name
     # after add_child because of namespace inheritance for route name
-    $resource->init_options($options);
-    
+    $resource->preprocess;
+   
     $resource->inflate;
     
     return $resource;
