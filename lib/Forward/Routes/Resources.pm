@@ -36,7 +36,6 @@ sub add_member_route {
     $child->name($self->{name} . '_' . $member_route_name);
 
     return $child;
-
 }
 
 
@@ -66,7 +65,6 @@ sub init_options {
 
     my $ctrl = Forward::Routes::Resources->format_resource_controller->($self->{resource_name});
     $self->_ctrl($ctrl);
-
 }
 
 

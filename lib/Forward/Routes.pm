@@ -61,6 +61,30 @@ sub initialize {
 }
 
 
+sub _inherit_format {
+    my $self = shift;
+    $self->{_inherit_format};
+}
+
+
+sub _inherit_via {
+    my $self = shift;
+    $self->{_inherit_via};
+}
+
+
+sub _inherit_namespace {
+    my $self = shift;
+    $self->{_inherit_namespace};
+}
+
+
+sub _inherit_app_namespace {
+    my $self = shift;
+    $self->{_inherit_app_namespace};
+}
+
+
 ## ---------------------------------------------------------------------------
 ##  Routes tree
 ## ---------------------------------------------------------------------------
@@ -195,10 +219,10 @@ sub add_child {
     weaken $child->{parent};
 
     # inheritance
-    $child->format(        [@{$self->{format}}]   ) if $self->{format}        && $child->{_inherit_format};
-    $child->via(           [@{$self->{via}}]      ) if $self->{via}           && $child->{_inherit_via};
-    $child->namespace(     $self->{namespace}     ) if $self->{namespace}     && $child->{_inherit_namespace};
-    $child->app_namespace( $self->{app_namespace} ) if $self->{app_namespace} && $child->{_inherit_app_namespace};
+    $child->format(        [@{$self->{format}}]   ) if $self->{format}        && $child->_inherit_format;
+    $child->via(           [@{$self->{via}}]      ) if $self->{via}           && $child->_inherit_via;
+    $child->namespace(     $self->{namespace}     ) if $self->{namespace}     && $child->_inherit_namespace;
+    $child->app_namespace( $self->{app_namespace} ) if $self->{app_namespace} && $child->_inherit_app_namespace;
 
     return $child;
 }
