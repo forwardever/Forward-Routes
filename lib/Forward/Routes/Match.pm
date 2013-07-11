@@ -73,7 +73,7 @@ sub params {
 }
 
 
-sub set_params {
+sub _set_params {
     my $self = shift;
     my ($params) = @_;
     $self->{params} = $params;
@@ -96,7 +96,7 @@ sub captures {
 }
 
 
-sub set_captures {
+sub _set_captures {
     my $self = shift;
     my ($captures) = @_;
     $self->{captures} = $captures;
