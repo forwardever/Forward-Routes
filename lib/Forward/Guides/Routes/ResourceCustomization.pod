@@ -46,14 +46,12 @@ This offers a lot more flexibility:
 Changes of a resources namespace also effects nested resources (inheritance)!
 
 =head1 as
-
-The first part of the URL pattern can be changed with the help of the C<-as>
-option.
+The C<-as> option changes automatic route and controller naming.
 
     my $r = Forward::Routes->new;
     $r->add_resources(
         'photos',
-        'users' => -as => 'customers',
+        'customers' => -as => 'users',
         'prices'
     );
 

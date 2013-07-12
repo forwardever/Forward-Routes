@@ -61,13 +61,13 @@ sub init_options {
 
 sub preprocess {
     my $self = shift;
-    
+
     my $ns_name_prefix = $self->namespace ? Forward::Routes::Resources->namespace_to_name($self->namespace) . '_' : '';
     my $route_name = ($self->{nested_resources_parent_name} ? $self->{nested_resources_parent_name} . '_' : '') . $ns_name_prefix . $self->{resource_name};
     $self->name($route_name);
 
     $self->{resource_name_part} = $ns_name_prefix . $self->{resource_name};
-    
+
     my $ctrl = Forward::Routes::Resources->format_resource_controller->($self->{resource_name});
     $self->_ctrl($ctrl);
 }
@@ -109,9 +109,11 @@ sub _adjust_nested_resources {
 
     my $parent_id_name = $self->singularize->($parent_name) . '_id';
 
-    $self->pattern->pattern(':' . $parent_id_name . '/' . ($self->{as} // $self->{resource_name}));
+    my $old_pattern = $self->pattern->pattern;
+
+    $self->pattern->pattern(':' . $parent_id_name . '/' . $old_pattern);
     $self->constraints($parent_id_name => $parent->{id_constraint});
-    
+
     if (defined $parent->name) {
         $self->{nested_resources_parent_name} = $parent->name;
     }

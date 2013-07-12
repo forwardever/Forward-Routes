@@ -113,7 +113,7 @@ is_deeply $m->[0]->params => {controller => 'Manager', action => 'show', magazin
 #############################################################################
 ### test with -as option
 $r = Forward::Routes->new;
-$r->add_resources('magazines')->add_singular_resources('manager', -as => 'management');
+$r->add_resources('magazines')->add_singular_resources('management', -as => 'manager');
 
 
 # nested manager routes work

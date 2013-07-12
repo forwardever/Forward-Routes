@@ -12,7 +12,7 @@ use Forward::Routes;
 my $r = Forward::Routes->new;
 $r->add_resources(
     'photos',
-    'users' => -as => 'customers',
+    'customers' => -as => 'users',
     'prices'
 );
 

@@ -101,8 +101,8 @@ sub _add_plural_resource {
     my $self = shift;
     my ($resource_name, $options) = @_;
 
-    my $resource = Forward::Routes::Resources::Plural->new($options->{as} // $resource_name,
-        resource_name => $resource_name,
+    my $resource = Forward::Routes::Resources::Plural->new($resource_name,
+        resource_name => $options->{as} // $resource_name,
         %$options
     );
     $resource->init_options($options);
@@ -147,8 +147,8 @@ sub _add_singular_resource {
     my $self = shift;
     my ($resource_name, $options) = @_;
 
-    my $resource = Forward::Routes::Resources::Singular->new($options->{as} // $resource_name,
-        resource_name => $resource_name,
+    my $resource = Forward::Routes::Resources::Singular->new($resource_name,
+        resource_name => $options->{as} // $resource_name,
         %$options
     );
     $resource->init_options($options);

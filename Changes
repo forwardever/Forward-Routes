@@ -1,5 +1,10 @@
 Changes for Forward::Routes
 
+0.56    2013-07-12 00:00:00
+        - API Change: the "as" option for resources now changes the
+          automatic naming of routes and controllers, it no longer
+          changes the path pattern of the URL (inverse behaviour, rails like)
+
 0.55    2013-07-12 00:00:00
         - cleanup and refactoring
         - fixed automatic route name generation for adding collection and member routes

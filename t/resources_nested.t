@@ -216,7 +216,7 @@ is_deeply $m->[0]->params => {controller => 'Ads', action => 'show', magazine_id
 ### with -as option
 
 $r = Forward::Routes->new;
-$r->add_resources('magazines')->add_resources('ads', -as => 'advertising');
+$r->add_resources('magazines')->add_resources('advertising', -as => 'ads');
 
 
 $m = $r->match(get => 'magazines/1/advertising/new');

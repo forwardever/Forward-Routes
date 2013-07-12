@@ -13,7 +13,7 @@ my $r = Forward::Routes->new;
 
 $r->add_singular_resources(
     'geocoder',
-    'contact' => -as => 'contact_details',
+    'contact_details' => -as => 'contact',
     'test'
 );
 
