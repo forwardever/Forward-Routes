@@ -19,7 +19,7 @@ is $m->[0]->name, 'admin_magazines_index';
 is $m->[0]->class, 'Admin::Magazines';
 
 $m = $r->match(get => 'magazines/4/manager/new');
-is $m->[0]->name, 'admin_magazines_manager_create_form';
+is $m->[0]->name, 'admin_magazines__manager_create_form';
 is $m->[0]->class, 'Manager';
 
 
@@ -29,7 +29,7 @@ $ads = $r->add_resources('magazines' => -namespace => 'Admin')
   ->add_singular_resources('manager');
 
 $m = $r->match(get => 'magazines/4/manager/new');
-is $m->[0]->name, 'admin_magazines_admin_manager_create_form';
+is $m->[0]->name, 'admin_magazines_manager_create_form';
 is $m->[0]->class, 'Admin::Manager';
 
 
@@ -39,7 +39,7 @@ $ads = $r->add_resources('magazines' => -namespace => 'Admin')
   ->add_singular_resources('manager' => -namespace => 'Admin');
 
 $m = $r->match(get => 'magazines/4/manager/new');
-is $m->[0]->name, 'admin_magazines_admin_manager_create_form';
+is $m->[0]->name, 'admin_magazines_manager_create_form';
 is $m->[0]->class, 'Admin::Manager';
 
 
@@ -51,4 +51,3 @@ $ads = $r->add_resources('magazines' => -namespace => 'Admin')
 $m = $r->match(get => 'magazines/4/manager/new');
 is $m->[0]->name, 'admin_magazines_admin_magazines_manager_create_form';
 is $m->[0]->class, 'Admin::Magazines::Manager';
-

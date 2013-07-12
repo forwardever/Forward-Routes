@@ -4,6 +4,8 @@ Changes for Forward::Routes
         - API Change: the "as" option for resources now changes the
           automatic naming of routes and controllers, it no longer
           changes the path pattern of the URL (inverse behaviour, rails like)
+        - API Change: use shorter names for frequent use cases and longer
+          names for edge cases for nested resources (rails like)
 
 0.55    2013-07-12 00:00:00
         - cleanup and refactoring

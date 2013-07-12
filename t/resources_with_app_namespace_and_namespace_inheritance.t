@@ -64,7 +64,7 @@ is $m->[0]->namespace, 'Admin';
 is $m->[0]->class, 'My::Admin::Magazines';
 
 $m = $r->match(get => 'magazines/4/ads/new');
-is $m->[0]->name, 'admin_magazines_admin_ads_create_form';
+is $m->[0]->name, 'admin_magazines_ads_create_form';
 is $m->[0]->app_namespace, 'My';
 is $m->[0]->namespace, 'Admin';
 is $m->[0]->class, 'My::Admin::Ads';
@@ -85,7 +85,7 @@ is $m->[0]->namespace, 'Admin';
 is $m->[0]->class, 'My::Admin::Magazines';
 
 $m = $r->match(get => 'magazines/4/ads/new');
-is $m->[0]->name, 'admin_magazines_admin_ads_create_form';
+is $m->[0]->name, 'admin_magazines_ads_create_form';
 is $m->[0]->app_namespace, 'My';
 is $m->[0]->namespace, 'Admin';
 is $m->[0]->class, 'My::Admin::Ads';

@@ -62,7 +62,18 @@ sub init_options {
 sub preprocess {
     my $self = shift;
 
-    my $ns_name_prefix = $self->namespace ? Forward::Routes::Resources->namespace_to_name($self->namespace) . '_' : '';
+    my $current_namespace = $self->namespace || '';
+    my $parent_namespace = '';
+    my $parent_is_plural_resource;
+    if ($self->parent) {
+        $parent_namespace  = $self->parent->namespace || '';
+        $parent_is_plural_resource = 1 if $self->parent->_is_plural_resource;
+    }
+
+    my $ns_name_prefix = 
+      $current_namespace ne $parent_namespace || !$parent_is_plural_resource && $current_namespace
+        ? Forward::Routes::Resources->namespace_to_name($current_namespace) . '_'
+        : '';
     my $route_name = ($self->{nested_resources_parent_name} ? $self->{nested_resources_parent_name} . '_' : '') . $ns_name_prefix . $self->{resource_name};
     $self->name($route_name);
 

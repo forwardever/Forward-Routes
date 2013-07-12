@@ -9,6 +9,7 @@ use Forward::Routes;
 #############################################################################
 ### nested resources and namespaces
 
+
 # magazine routes
 my $r = Forward::Routes->new;
 my $ads = $r->add_resources('magazines' => -namespace => 'Admin')
@@ -20,10 +21,10 @@ is $m->[0]->class, 'Admin::Magazines';
 
 
 $m = $r->match(get => 'magazines/4/ads/new');
-is $m->[0]->name, 'admin_magazines_ads_create_form';
+is $m->[0]->name, 'admin_magazines__ads_create_form';
 is $m->[0]->class, 'Ads';
 
-is $ads->name, 'admin_magazines_ads';
+is $ads->name, 'admin_magazines__ads';
 
 
 # nested routes inherit namespace
@@ -32,10 +33,10 @@ $ads = $r->add_resources('magazines' => -namespace => 'Admin')
   ->add_resources('ads');
 
 $m = $r->match(get => 'magazines/4/ads/new');
-is $m->[0]->name, 'admin_magazines_admin_ads_create_form';
+is $m->[0]->name, 'admin_magazines_ads_create_form';
 is $m->[0]->class, 'Admin::Ads';
 
-is $ads->name, 'admin_magazines_admin_ads';
+is $ads->name, 'admin_magazines_ads';
 
 
 # nested routes also has namespace
@@ -44,7 +45,7 @@ $ads = $r->add_resources('magazines' => -namespace => 'Admin')
   ->add_resources('ads' => -namespace => 'Admin');
 
 $m = $r->match(get => 'magazines/4/ads/new');
-is $m->[0]->name, 'admin_magazines_admin_ads_create_form';
+is $m->[0]->name, 'admin_magazines_ads_create_form';
 is $m->[0]->class, 'Admin::Ads';
 
 
