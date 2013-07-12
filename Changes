@@ -6,6 +6,8 @@ Changes for Forward::Routes
           changes the path pattern of the URL (inverse behaviour, rails like)
         - API Change: use shorter names for frequent use cases and longer
           names for edge cases for nested resources (rails like)
+        - API Change: nested resources: do not include namespace in
+          capture names (untested/not specified behaviour in the past)
 
 0.55    2013-07-12 00:00:00
         - cleanup and refactoring

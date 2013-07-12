@@ -77,8 +77,6 @@ sub preprocess {
     my $route_name = ($self->{nested_resources_parent_name} ? $self->{nested_resources_parent_name} . '_' : '') . $ns_name_prefix . $self->{resource_name};
     $self->name($route_name);
 
-    $self->{resource_name_part} = $ns_name_prefix . $self->{resource_name};
-
     my $ctrl = Forward::Routes::Resources->format_resource_controller->($self->{resource_name});
     $self->_ctrl($ctrl);
 }
@@ -116,9 +114,7 @@ sub _adjust_nested_resources {
 
     $parent->_is_plural_resource || return;
 
-    my $parent_name = $parent->{resource_name_part};
-
-    my $parent_id_name = $self->singularize->($parent_name) . '_id';
+    my $parent_id_name = $self->singularize->($parent->resource_name) . '_id';
 
     my $old_pattern = $self->pattern->pattern;
 
