@@ -1,5 +1,12 @@
 Changes for Forward::Routes
 
+0.55    2013-07-12 00:00:00
+        - cleanup and refactoring
+        - fixed automatic route name generation for adding collection and member routes
+          on nested resources
+        - make sure that inheritance works if options are passed within add_route
+          command (embedded option, no chaining)
+
 0.54    2013-07-08 00:00:00
         - removed method 'method', not documented, use 'via' instead
 
