@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 52;
+use Test::More tests => 55;
 use lib 'lib';
 use Forward::Routes;
 
@@ -28,7 +28,7 @@ is $m->[0]->name, 'photos_search_form';
 
 # has to provide undef (could match show without regex adjustment)
 $m = $r->match(get => 'photos/search');
-is $m, undef;
+is_deeply $m->[0]->params => {controller => 'Photos', action => 'show', id => 'search'};
 my $re = '(?!new\Z)(?!search_form\Z)(?!search\Z)';
 like $photos->{members}->pattern->pattern, qr/$re/;
 
@@ -148,6 +148,19 @@ isa_ok $photos->add_collection_route('search_form'), 'Forward::Routes';
 
 $r = Forward::Routes->new;
 $photos = $r->add_resources('photos' => -only => [qw/show/]);
+$photos->add_collection_route('search_form');
+$photos->add_collection_route('search');
+
+$m = $r->match(get => 'photos/search_form');
+ok $m;
+$m = $r->match(get => 'photos/search');
+is_deeply $m->[0]->params => {controller => 'Photos', action => 'show', id => 'search'};
+$m = $r->match(get => 'photos/new');
+is_deeply $m->[0]->params => {controller => 'Photos', action => 'show', id => 'new'};
+
+
+$r = Forward::Routes->new;
+$photos = $r->add_resources('photos' => -only => [qw/show/], -constraints => {id => qr/\d+/});
 $photos->add_collection_route('search_form');
 $photos->add_collection_route('search')->via('post');
 

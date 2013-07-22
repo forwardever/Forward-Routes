@@ -16,9 +16,6 @@ sub add_collection_route {
     $collection_route_name =~s|^/||;
     $collection_route_name =~s|/|_|g;
 
-    $self->{members}->pattern->{exclude}->{id} ||= [];
-    push @{$self->{members}->pattern->{exclude}->{id}}, $collection_route_name;
-
 
     # Auto set controller and action params and name
     $child->to($self->{_ctrl}  . '#' . $collection_route_name);
@@ -154,9 +151,6 @@ sub members {
 
     $self->{members} = $self->add_route(':id')
       ->constraints('id' => $id_constraint);
-
-    $self->{members}->pattern->{exclude}->{id} ||= [];
-    push @{$self->{members}->pattern->{exclude}->{id}}, 'new';
 
     return $self->{members};
 }

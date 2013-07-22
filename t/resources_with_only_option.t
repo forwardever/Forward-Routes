@@ -88,7 +88,7 @@ $m = $r->match(get => 'users');
 is $m, undef;
 
 $m = $r->match(get => 'users/new');
-is $m, undef;
+is_deeply $m->[0]->params, {id => 'new', controller => 'Users', action => 'show'};
 
 $m = $r->match(post => 'users');
 is $m, undef;
@@ -298,7 +298,7 @@ $m = $r->match(get => 'users');
 is $m, undef;
 
 $m = $r->match(get => 'users/new');
-is $m, undef;
+is_deeply $m->[0]->params, {id => 'new', controller => 'Users', action => 'show'};
 
 $m = $r->match(post => 'users');
 is_deeply $m->[0]->params => {controller => 'Users', action => 'create'};
