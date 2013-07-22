@@ -52,7 +52,10 @@ sub init_options {
 
     # only resource specific options
     if ($options) {
-        $self->id_constraint($options->{constraints}->{id}) if $options->{constraints}->{id};
+        $self->id_name($options->{id_name}) if $options->{id_name};
+        my $id_name = $options->{id_name} || 'id';
+
+        $self->id_constraint($options->{constraints}->{$id_name}) if $options->{constraints}->{$id_name};
         $self->{only} = $options->{only};
         $self->{as} = $options->{as};
     }
@@ -70,7 +73,7 @@ sub preprocess {
         $parent_is_plural_resource = 1 if $self->parent->_is_plural_resource;
     }
 
-    my $ns_name_prefix = 
+    my $ns_name_prefix =
       $current_namespace ne $parent_namespace || !$parent_is_plural_resource && $current_namespace
         ? Forward::Routes::Resources->namespace_to_name($current_namespace) . '_'
         : '';
@@ -114,12 +117,14 @@ sub _adjust_nested_resources {
 
     $parent->_is_plural_resource || return;
 
-    my $parent_id_name = $self->singularize->($parent->resource_name) . '_id';
+    # no adjustment of id name if custom id name set
+    my $parent_id_name = $parent->id_name ? $parent->id_name : $self->singularize->($parent->resource_name) . '_id';
 
     my $old_pattern = $self->pattern->pattern;
 
     $self->pattern->pattern(':' . $parent_id_name . '/' . $old_pattern);
     $self->constraints($parent_id_name => $parent->{id_constraint});
+
 
     if (defined $parent->name) {
         $self->{nested_resources_parent_name} = $parent->name;

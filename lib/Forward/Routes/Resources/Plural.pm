@@ -70,6 +70,18 @@ sub id_constraint {
 }
 
 
+sub id_name {
+    my $self = shift;
+    my (@params) = @_;
+
+    return $self->{id_name} unless @params;
+
+    $self->{id_name} = $params[0];
+
+    return $self;
+}
+
+
 sub inflate {
     my $self = shift;
 
@@ -149,8 +161,10 @@ sub members {
 
     my $id_constraint = $self->{id_constraint} || die 'missing id constraint';
 
-    $self->{members} = $self->add_route(':id')
-      ->constraints('id' => $id_constraint);
+    my $id_name = $self->id_name || 'id';
+
+    $self->{members} = $self->add_route(':' . $id_name)
+      ->constraints($id_name => $id_constraint);
 
     return $self->{members};
 }
