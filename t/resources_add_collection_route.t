@@ -26,7 +26,6 @@ is_deeply $m->[0]->params => {controller => 'Photos', action => 'search_form'};
 is $m->[0]->name, 'photos_search_form';
 
 
-# has to provide undef (could match show without regex adjustment)
 $m = $r->match(get => 'photos/search');
 is_deeply $m->[0]->params => {controller => 'Photos', action => 'show', id => 'search'};
 my $re = '(?!new\Z)(?!search_form\Z)(?!search\Z)';
@@ -144,7 +143,6 @@ isa_ok $photos->add_collection_route('search_form'), 'Forward::Routes';
 
 #############################################################################
 # with only option
-# has to provide undef (could match show without regex adjustment)
 
 $r = Forward::Routes->new;
 $photos = $r->add_resources('photos' => -only => [qw/show/]);
