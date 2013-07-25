@@ -1,8 +1,8 @@
 #!/usr/bin/env perl
 
-# Copyright (C) 2011, ForwardEver
+# Copyright (C) 2013, ForwardEver
 
-use 5.008007;
+use 5.010001;
 
 use strict;
 use warnings;
@@ -21,10 +21,11 @@ WriteMakefile(
     (   $mm < 6.46
         ? ()
         : ( META_MERGE => {
-                requires  => {perl => '5.008007'},
+                requires  => {perl => '5.010001'},
                 resources => {
                     license    => 'http://dev.perl.org/licenses/',
-                    repository => 'http://github.com/forwardever/Forward-Routes'
+                    repository => 'https://github.com/forwardever/Forward-Routes',
+                    bugtracker => 'https://github.com/forwardever/Forward-Routes/issues'
                 },
                 no_index => {directory => [qw/t/]}
             },

@@ -1,6 +1,10 @@
 Changes for Forward::Routes
 
 0.56    2013-07-12 00:00:00
+        - custom id names for resources (e.g. my_id instead of id)
+        - API change: resource names such as 'new' and 'edit' can become
+          id placeholder values if request method does not match or if
+          there is no match because of 'only' option
         - API Change: the "as" option for resources now changes the
           automatic naming of routes and controllers, it no longer
           changes the path pattern of the URL (inverse behaviour, rails like)

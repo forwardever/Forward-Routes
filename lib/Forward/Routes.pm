@@ -2,13 +2,15 @@ package Forward::Routes;
 use strict;
 use warnings;
 
+use 5.010001;
+
 use Forward::Routes::Match;
 use Forward::Routes::Pattern;
 use Forward::Routes::Resources;
 use Scalar::Util qw/weaken/;
 use Carp 'croak';
 
-our $VERSION = '0.55';
+our $VERSION = '0.56';
 
 
 ## ---------------------------------------------------------------------------
