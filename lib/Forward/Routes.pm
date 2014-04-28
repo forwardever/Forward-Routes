@@ -28,7 +28,7 @@ sub initialize {
     my $self = shift;
 
     # block
-    my $code_ref = pop @_ if @_ && ref $_[-1] eq 'CODE';
+    $self->{code_ref} = pop @_ if @_ && ref $_[-1] eq 'CODE';
 
     # inherit
     $self->{_inherit_format} = 1;
@@ -41,7 +41,7 @@ sub initialize {
     $self->pattern->pattern($pattern) if defined $pattern;
 
     # Shortcut in case of chained API
-    return $self unless @_ || $code_ref;
+    return $self unless @_ || $self->{code_ref};
 
     # Remaining params
     my $params = ref $_[0] eq 'HASH' ? {%{$_[0]}} : {@_};
@@ -55,9 +55,6 @@ sub initialize {
     $self->to(delete $params->{to});
     $self->constraints(delete $params->{constraints});
     $self->resource_name(delete $params->{resource_name});
-
-    # after inheritance
-    $code_ref->($self) if $code_ref;
 
     return $self;
 }
@@ -207,6 +204,9 @@ sub add_child {
     $child->via(           [@{$self->{via}}]      ) if $self->{via}           && $child->_inherit_via;
     $child->namespace(     $self->{namespace}     ) if $self->{namespace}     && $child->_inherit_namespace;
     $child->app_namespace( $self->{app_namespace} ) if $self->{app_namespace} && $child->_inherit_app_namespace;
+
+    my $code_ref = delete $child->{code_ref};
+    $code_ref->($child) if $code_ref;
 
     return $child;
 }

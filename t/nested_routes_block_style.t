@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 12;
+use Test::More tests => 13;
 use lib 'lib';
 use Forward::Routes;
 
@@ -51,7 +51,7 @@ is_deeply $m->[0]->params, {controller => 'Comment', action => 'show', author_na
 #############################################################################
 ### block style
 
-my $b = Forward::Routes->new;
+my $b = Forward::Routes->new->app_namespace('Root');
 
 $b->add_route('/authors', sub {
     my $authors = shift;
@@ -88,6 +88,7 @@ $b->add_route('/authors', sub {
 # tests
 $m = $b->match(get => '/authors');
 is_deeply $m->[0]->params, {controller => 'Author', action => 'index'};
+is $m->[0]->class, 'Root::Author';
 
 $m = $b->match(get => '/authors/steven');
 is_deeply $m->[0]->params, {controller => 'Author', action => 'show', author_name => 'steven'};
