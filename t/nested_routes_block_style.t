@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 13;
+use Test::More tests => 23;
 use lib 'lib';
 use Forward::Routes;
 
@@ -51,7 +51,7 @@ is_deeply $m->[0]->params, {controller => 'Comment', action => 'show', author_na
 #############################################################################
 ### block style
 
-my $b = Forward::Routes->new->app_namespace('Root');
+my $b = Forward::Routes->new;
 
 $b->add_route('/authors', sub {
     my $authors = shift;
@@ -88,7 +88,7 @@ $b->add_route('/authors', sub {
 # tests
 $m = $b->match(get => '/authors');
 is_deeply $m->[0]->params, {controller => 'Author', action => 'index'};
-is $m->[0]->class, 'Root::Author';
+is $m->[0]->class, 'Author';
 
 $m = $b->match(get => '/authors/steven');
 is_deeply $m->[0]->params, {controller => 'Author', action => 'show', author_name => 'steven'};
@@ -104,6 +104,73 @@ is_deeply $m->[0]->params, {controller => 'Comment', action => 'index', author_n
 
 $m = $b->match(get => '/authors/steven/articles/4/comments/3');
 is_deeply $m->[0]->params, {controller => 'Comment', action => 'show', author_name => 'steven', article_id => 4, comment_id => 3};
+
+
+
+#############################################################################
+### block style with inheritance
+
+my $root = Forward::Routes->new->app_namespace('Root');
+$root->add_route('/authors', sub {
+    my $authors = shift;
+
+    $authors->namespace('My::Authors');
+    $authors->format('json');
+    $authors->via(['post']);
+
+    $authors->add_route('/:author_name', sub {
+        my $author = shift;
+
+        $author->add_route('articles', sub {
+            my $articles = shift;
+
+            $articles->add_route('/:article_id', sub {
+                my $article = shift;
+                $article->add_route('comments')->name("comments_index")->to("Comment#index");
+            });
+
+        });
+
+    });
+});
+my $comments_index_route = $root->find_route('comments_index');
+is $comments_index_route->{app_namespace}, 'Root';
+is $comments_index_route->{namespace}, 'My::Authors';
+is_deeply $comments_index_route->{format}, ['json'];
+is_deeply $comments_index_route->{via}, ['post'];
+$m = $root->match(post => '/authors/steven/articles/4/comments.json');
+is_deeply $m->[0]->params, {controller => 'Comment', action => 'index', author_name => 'steven', article_id => 4, format => 'json'};
+
+
+
+# similar test
+$root = Forward::Routes->new->app_namespace('Admin');
+$root->add_route('/authors', namespace => 'Your::Authors', format => ['xml'], via => ['put'], sub {
+    my $authors = shift;
+
+    $authors->add_route('/:author_name', sub {
+        my $author = shift;
+
+        $author->add_route('articles', sub {
+            my $articles = shift;
+
+            $articles->add_route('/:article_id', sub {
+                my $article = shift;
+                $article->add_route('comments')->name("comments_index")->to("Comment#index");
+            });
+
+        });
+
+    });
+});
+$comments_index_route = $root->find_route('comments_index');
+is $comments_index_route->{app_namespace}, 'Admin';
+is $comments_index_route->{namespace}, 'Your::Authors';
+is_deeply $comments_index_route->{format}, ['xml'];
+is_deeply $comments_index_route->{via}, ['put'];
+$m = $root->match(put => '/authors/steven/articles/4/comments.xml');
+is_deeply $m->[0]->params, {controller => 'Comment', action => 'index', author_name => 'steven', article_id => 4, format => 'xml'};
+
 
 
 #############################################################################
