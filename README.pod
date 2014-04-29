@@ -504,4 +504,6 @@ L<https://github.com/kraih/mojo/tree/master/lib/Mojolicious/Routes>
 
 Concept of restful resources inspired by Ruby on Rails
 
+mla (fix inheritance with block-style nested routes)
+
 =cut
