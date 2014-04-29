@@ -134,10 +134,10 @@ $root->add_route('/authors', sub {
     });
 });
 my $comments_index_route = $root->find_route('comments_index');
-is $comments_index_route->{app_namespace}, 'Root';
-is $comments_index_route->{namespace}, 'My::Authors';
-is_deeply $comments_index_route->{format}, ['json'];
-is_deeply $comments_index_route->{via}, ['post'];
+is $comments_index_route->app_namespace, 'Root';
+is $comments_index_route->namespace, 'My::Authors';
+is_deeply $comments_index_route->format, ['json'];
+is_deeply $comments_index_route->via, ['post'];
 $m = $root->match(post => '/authors/steven/articles/4/comments.json');
 is_deeply $m->[0]->params, {controller => 'Comment', action => 'index', author_name => 'steven', article_id => 4, format => 'json'};
 
@@ -164,10 +164,10 @@ $root->add_route('/authors', namespace => 'Your::Authors', format => ['xml'], vi
     });
 });
 $comments_index_route = $root->find_route('comments_index');
-is $comments_index_route->{app_namespace}, 'Admin';
-is $comments_index_route->{namespace}, 'Your::Authors';
-is_deeply $comments_index_route->{format}, ['xml'];
-is_deeply $comments_index_route->{via}, ['put'];
+is $comments_index_route->app_namespace, 'Admin';
+is $comments_index_route->namespace, 'Your::Authors';
+is_deeply $comments_index_route->format, ['xml'];
+is_deeply $comments_index_route->via, ['put'];
 $m = $root->match(put => '/authors/steven/articles/4/comments.xml');
 is_deeply $m->[0]->params, {controller => 'Comment', action => 'index', author_name => 'steven', article_id => 4, format => 'xml'};
 
